@@ -1,18 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from projecthandler.models import Project
-from sf_user.models import CustomUser
+from authosm.models import OsmUser
 
 
 @login_required
 def home(request):
-    user = CustomUser.objects.get(id=request.user.id)
+    user = OsmUser.objects.get(id=request.user.id)
+
     projects = Project.objects.filter(owner=user).select_subclasses()
     result = {
         'projects': len(projects) if projects else 0,
     }
-    return render(request, 'home.html', result)
+    return redirect('projects:open_project', project_id='admin')
+    #return render(request, 'home.html', result)
 
 
 def forbidden(request):

@@ -15,19 +15,17 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
 from sf_user import views as user_views
+from authosm import views as user_views
 from sf_t3d import views
 
 app_name = 'base'
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^auth/$', user_views.login_view, name='auth_user'),
-    url(r'^auth_guest/$', user_views.guest_login, name='auth_user_guest'),
-    url(r'^register', user_views.register_view, name='register_user'),
+    #url(r'^admin/', admin.site.urls),
+    url(r'^auth/$', user_views.user_login, name='auth_user'),
+    #url(r'^auth_guest/$', user_views.guest_login, name='auth_user_guest'),
+    #url(r'^register', user_views.register_view, name='register_user'),
     url(r'^projects/', include('projecthandler.urls.project', namespace='projects'), name='projects_base'),
-    #url(r'^vims/', include('vimhandler.urls', namespace='vim'), name='vims_base'),
-    #url(r'^sdn/', include('sdnctrlhandler.urls', namespace='sdn'), name='sdns_base'),
 
     url(r'^$', views.home, name='home'),
     url(r'^home', views.home, name='home'),

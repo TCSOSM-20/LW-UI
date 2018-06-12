@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = "sf_user.CustomUser"
+AUTH_USER_MODEL = "authosm.OsmUser"
 
 SITE_NAME = "Open Source MANO"
 SHORT_SITE_NAME = "OSM"
@@ -46,10 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sf_user',
+    'authosm',
     'projecthandler',
     'vimhandler',
     'instancehandler',
-    'sdnctrlhandler'
+    'sdnctrlhandler',
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -112,6 +114,8 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+AUTHENTICATION_BACKENDS = ['authosm.backend.OsmBackend']
 
 
 # Password validation

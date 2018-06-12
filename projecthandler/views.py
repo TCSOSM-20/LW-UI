@@ -20,21 +20,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import render, redirect
-from django.template.loader import render_to_string
 from lib.util import Util
-from sf_user.models import CustomUser
-import tarfile
-
-
 from projecthandler.osm_model import OsmProject
-from projecthandler.models import Project
-
-
-Project.add_project_type('osm', OsmProject)
+from lib.osm.osmclient.client import Client
 
 
 
-from projecthandler.models import Repository
 
 @login_required
 def home(request):
@@ -43,81 +34,14 @@ def home(request):
 
 @login_required
 def create_new_project(request):
-    if request.method == 'POST':
-        error_msgs = []
-        user = CustomUser.objects.get(id=request.user.id)
-        name = request.POST.get('name', 'WithoutName')
-        info = request.POST.get('info', ' ')
-        type = request.POST.get('type', '')
-        start_from = request.POST.get('startfrom', 'scratch')
-
-        project_types = Project.get_project_types()
-        if type in project_types:
-            project_class = project_types[type]
-
-        else:
-            # FIXME this error is not handled
-            error_msgs.append('Project type undefined.')
-            return render(request, 'error.html',
-                          {'error_msg': 'Error creating new project, project type undefined. Please retry.'})
-
-        try:
-
-            if start_from == 'scratch':
-                print 'from scratch'
-                data_project = {}
-
-            elif start_from == 'files':
-                print 'from files'
-                data_project = project_class.data_project_from_files(request)
-
-            elif start_from == 'example':
-                print 'from example'
-                data_project = project_class.data_project_from_example(request)
-
-            project = project_class.create_project(name, user, False, info, data_project)
-            # print project.get_dataproject()
-
-
-        except Exception as e:
-            print 'Error creating ' + type + ' project! Please retry.'
-            print e
-            return render(request, 'error.html', {'error_msg': 'Error creating ' + type + ' project! Please retry.'})
-        return redirect('projects:open_project', project_id=project.id)
-
-    elif request.method == 'GET':
-        csrf_token_value = get_token(request)
-        result = {}
-        data_type_selector = [{
-            'id': '-1',
-            'text': 'Select an option'
-        }]
-        type_example_files = {}
-        type_container_template = ''
-        project_types = Project.get_project_types()
-        print "project_types", project_types.keys()
-        for type in project_types:
-            project_class = project_types[type]
-            type_example_files.update(project_class.get_example_list())
-            data_type_selector.append({
-                'id': type,
-                'text': type,
-                'value': type
-            })
-            type_container_template += render_to_string(type + '/' + type + '_new_project.html')
-
-        result.update({'type_example_files': json.dumps(type_example_files)})
-        result.update({'data_type_selector': json.dumps(data_type_selector)})
-        result.update({'type_container_template': type_container_template})
-        result.update({'csrf_token': csrf_token_value})
-        return render(request, 'new_project.html', result)
+    return render(request, 'home.html', {})
 
 
 @login_required
 def user_projects(request):
     csrf_token_value = get_token(request)
-    user = CustomUser.objects.get(id=request.user.id)
-    projects = Project.objects.filter(owner=user).select_subclasses()
+    user = request.user
+    projects = user.get_projects()
 
     return render(request, 'projectlist.html', {
         'projects': list(projects),
@@ -128,11 +52,25 @@ def user_projects(request):
 @login_required
 def open_project(request, project_id=None):
     try:
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        project_overview = projects[0].get_overview_data()
-        prj_token = project_overview['type']
-        print request.COOKIES.keys()
-        return render(request, prj_token + '/' + prj_token + '_project_details.html',
+        user = request.user
+        client = Client()
+        nsd = client.nsd_list()
+        vnfd = client.vnfd_list()
+        ns = client.ns_list()
+        vnf = client.vnf_list()
+        project_overview = {
+            'owner': user.username,
+            'name': project_id,
+            'updated_date': '-',
+            'created_date': '-',
+            'info': '-',
+            'type': 'osm',
+            'nsd': len(nsd) if nsd else 0,
+            'vnfd': len(vnfd) if vnfd else 0,
+            'ns': len(ns) if ns else 0,
+            'vnf': len(vnf) if vnf else 0,
+        }
+        return render(request, 'osm/osm_project_details.html',
                       {'project_overview': project_overview, 'project_id': project_id})
 
     except Exception as e:
@@ -145,7 +83,7 @@ def delete_project(request, project_id=None):
     if request.method == 'POST':
 
         try:
-            Project.objects.filter(id=project_id).delete()
+            ##TODO delete project
             return redirect('projects:projects_list')
         except Exception as e:
             print e
@@ -153,13 +91,8 @@ def delete_project(request, project_id=None):
 
     elif request.method == 'GET':
         try:
-            projects = Project.objects.filter(id=project_id).select_subclasses()
-            project_overview = projects[0].get_overview_data()
-            prj_token = project_overview['type']
-            #                 example: 'etsi/etsi_project_delete.html'
-            print  prj_token + '/' + prj_token + '_project_delete.html', project_overview['name']
-            return render(request, prj_token + '/' + prj_token + '_project_delete.html',
-                          {'project_id': project_id, 'project_name': project_overview['name']})
+            return render(request, 'osm/osm_project_delete.html',
+                          {'project_id': project_id, 'project_name': project_id})
 
         except Exception as e:
             print e
@@ -169,62 +102,49 @@ def delete_project(request, project_id=None):
 @login_required
 def show_descriptors(request, project_id=None, descriptor_type=None):
     csrf_token_value = get_token(request)
-    projects = Project.objects.filter(id=project_id).select_subclasses()
-    project_overview = projects[0].get_overview_data()
-    prj_token = project_overview['type']
 
-    url = prj_token + '/' + prj_token + '_project_descriptors.html'
+    client = Client()
+    try:
+        if descriptor_type == 'nsd':
+            descriptors = client.nsd_list()
+
+        elif descriptor_type == 'vnfd':
+            descriptors = client.vnfd_list()
+    except Exception as e:
+        descriptors = []
+
+    url = 'osm/osm_project_descriptors.html'
     return __response_handler(request, {
-        'descriptors': projects[0].get_descriptors(descriptor_type),
+        'descriptors': descriptors,
         'project_id': project_id,
-        'project_type': prj_token,
-        'project_overview_data': project_overview,
+        'project_type': 'osm',
         "csrf_token_value": csrf_token_value,
         'descriptor_type': descriptor_type
     },url)
 
 
 @login_required
-def graph(request, project_id=None):
-    if request.method == 'GET':
-        csrf_token_value = get_token(request)
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        project_overview = projects[0].get_overview_data()
-        prj_token = project_overview['type']
-        # example : 'etsi/project_graph.html'
-        return render(request, prj_token + '/project_graph.html', {
-            'project_id': project_id,
-            'project_overview_data': projects[0].get_overview_data(),
-            'collapsed_sidebar': False
-        })
-
-
-@login_required
-def graph_data(request, project_id=None, descriptor_id=None):
-    print 'graph_data', project_id, descriptor_id
-    projects = Project.objects.filter(id=project_id).select_subclasses()
-    project_overview = projects[0].get_overview_data()
-    # data = projects[0].get_overview_data()
-    prj_token = project_overview['type']
-
-    topology = projects[0].get_graph_data_json_topology(descriptor_id)
-    response = HttpResponse(topology, content_type="application/json")
-    response["Access-Control-Allow-Origin"] = "*"
-
-    return response
-
-
-@login_required
 def delete_descriptor(request, project_id=None, descriptor_type=None, descriptor_id=None):
     csrf_token_value = get_token(request)
-    projects = Project.objects.filter(id=project_id).select_subclasses()
-    result = projects[0].delete_descriptor(descriptor_type, descriptor_id)
-    project_overview = projects[0].get_overview_data()
+
+    try:
+        client = Client()
+        if descriptor_type == 'nsd':
+            result = client.nsd_delete(descriptor_id)
+        elif descriptor_type == 'vnfd':
+            result = client.vnfd_delete(descriptor_id)
+
+        else:
+            return False
+
+    except Exception as e:
+        result = False
+    project_overview = OsmProject.get_overview_data()
     prj_token = project_overview['type']
     page = prj_token + '/' + prj_token + '_project_descriptors.html'
 
     return render(request, page, {
-        'descriptors': projects[0].get_descriptors(descriptor_type),
+        'descriptors': OsmProject.get_descriptors(descriptor_type),
         'project_id': project_id,
         'project_overview_data': project_overview,
         "csrf_token_value": csrf_token_value,
@@ -236,31 +156,9 @@ def delete_descriptor(request, project_id=None, descriptor_type=None, descriptor
 
 
 @login_required
-def clone_descriptor(request, project_id=None, descriptor_type=None, descriptor_id=None):
-    csrf_token_value = get_token(request)
-    projects = Project.objects.filter(id=project_id).select_subclasses()
-    new_id = request.GET.get('newid', '')
-    result = projects[0].clone_descriptor(descriptor_type, descriptor_id, new_id)
-    project_overview = projects[0].get_overview_data()
-    prj_token = project_overview['type']
-    page = prj_token + '/' + prj_token + '_project_descriptors.html'
-
-    return render(request, page, {
-        'descriptors': projects[0].get_descriptors(descriptor_type),
-        'project_id': project_id,
-        'project_overview_data': project_overview,
-        "csrf_token_value": csrf_token_value,
-        'descriptor_type': descriptor_type,
-        'alert_message': {
-            'success': result,
-            'message': "Cloned!" if result else 'Error in cloning'}
-    })
-
-
-@login_required
 def new_descriptor(request, project_id=None, descriptor_type=None):
-    projects = Project.objects.filter(id=project_id).select_subclasses()
-    project_overview = projects[0].get_overview_data()
+
+    project_overview = OsmProject.get_overview_data()
     prj_token = project_overview['type']
     page = prj_token + '/descriptor/descriptor_new.html'
     if request.method == 'GET':
@@ -280,17 +178,17 @@ def new_descriptor(request, project_id=None, descriptor_type=None):
             text = file_uploaded.read()
             data_type = file_uploaded.name.split(".")[-1]
             desc_name = file_uploaded.name.split(".")[0]
-            result = projects[0].create_descriptor(desc_name, descriptor_type, text, data_type, file_uploaded)
+            result = OsmProject.create_descriptor(desc_name, descriptor_type, text, data_type, file_uploaded)
         else:
             text = request.POST.get('text')
             desc_name = request.POST.get('id')
-            result = projects[0].create_descriptor(desc_name, descriptor_type, text, data_type)
+            result = OsmProject.create_descriptor(desc_name, descriptor_type, text, data_type)
 
 
         response_data = {
             'project_id': project_id,
             'descriptor_type': descriptor_type,
-            'project_overview_data': projects[0].get_overview_data(),
+            'project_overview_data':OsmProject.get_overview_data(),
             'descriptor_id': result,
             'alert_message': {
                 'success': True if result != False else False,
@@ -306,8 +204,7 @@ def new_descriptor(request, project_id=None, descriptor_type=None):
 def edit_descriptor(request, project_id=None, descriptor_id=None, descriptor_type=None):
     if request.method == 'POST':
         print "edit_descriptor"
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].edit_descriptor(descriptor_type, descriptor_id, request.POST.get('text'),
+        result = OsmProject.edit_descriptor(descriptor_type, descriptor_id, request.POST.get('text'),
                                              request.POST.get('type'))
         response_data = {
             'project_id': project_id,
@@ -324,13 +221,12 @@ def edit_descriptor(request, project_id=None, descriptor_id=None, descriptor_typ
 
     elif request.method == 'GET':
         csrf_token_value = get_token(request)
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        project_overview = projects[0].get_overview_data()
+        project_overview = OsmProject.get_overview_data()
         print project_overview
         prj_token = project_overview['type']
         page = prj_token + '/descriptor/descriptor_view.html'
 
-        descriptor = projects[0].get_descriptor(descriptor_id, descriptor_type)
+        descriptor = OsmProject.get_descriptor(descriptor_id, descriptor_type)
 
         descriptor_string_json = json.dumps(descriptor)
         descriptor_string_yaml = Util.json2yaml(descriptor)
@@ -338,128 +234,10 @@ def edit_descriptor(request, project_id=None, descriptor_id=None, descriptor_typ
         return render(request, page, {
             'project_id': project_id,
             'descriptor_id': descriptor_id,
-            'project_overview_data': projects[0].get_overview_data(),
+            'project_overview_data': OsmProject.get_overview_data(),
             'descriptor_type': descriptor_type,
             'descriptor_strings': {'descriptor_string_yaml': descriptor_string_yaml,
                                    'descriptor_string_json': descriptor_string_json}})
-
-
-@login_required
-def graph_positions(request, project_id=None):
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].edit_graph_positions(json.loads(request.POST.get('positions')))
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-
-@login_required
-def add_element(request, project_id=None):
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].get_add_element(request)
-
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-
-@login_required
-def remove_element(request, project_id=None):
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].get_remove_element(request)
-
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-
-@login_required
-def add_link(request, project_id=None):
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].get_add_link(request)
-
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-
-@login_required
-def remove_link(request, project_id=None):
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].get_remove_link(request)
-
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-@login_required
-def get_available_nodes(request, project_id=None):
-    if request.method == 'GET':
-        csrf_token_value = get_token(request)
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        print "get_available_nodes", request.GET.dict()
-        result = projects[0].get_available_nodes(request.GET.dict())
-        status_code = 500 if result == None else 200
-        print json.dumps(result)
-        response = HttpResponse(json.dumps(result), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-@login_required
-def overviewelement(request, project_id=None):
-    if request.method == 'GET':
-        result = {}
-        error_msg = None
-        try:
-            projects = Project.objects.filter(id=project_id).select_subclasses()
-            project = projects[0]
-            parameters = request.GET.dict()
-            print "parameters", parameters
-            result = project.get_node_overview(**parameters)
-        except Exception as e:
-            error_msg = str(e)
-
-        if error_msg is not None:
-            return JsonResponse({'error': {'error_msg': str(error_msg)}})
-
-        return JsonResponse({'node_overview': result})
-
-# ETSI specific method #
-@login_required
-def add_node_to_vnffg(request, project_id=None):
-    print "add_node_to_vnffg"  # TODO log
-    if request.method == 'POST':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].add_node_to_vnffg(request)
-
-        status_code = 200 if result else 500
-        response = HttpResponse(json.dumps({}), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-
-@login_required
-def unused_vnf(request, project_id=None, nsd_id=None):
-    if request.method == 'GET':
-        print 'in method unused_vnf : ', project_id, nsd_id  # TODO log
-        projects = Project.objects.filter(id=project_id).select_subclasses()
-        result = projects[0].get_unused_vnf(nsd_id)
-        status_code = 500 if result == None else 200
-        response = HttpResponse(json.dumps(result), content_type="application/json", status=status_code)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-# end ETSI specific method #
 
 
 # OSM specific method #
@@ -475,8 +253,8 @@ def get_package_files_list(request, project_id, project, descriptor_id, descript
     return __response_handler(request, result)
 
 
-def download_pkg(request, project_id, project, descriptor_id, descriptor_type):
-    tar_pkg = project.download_pkg(project, descriptor_id, descriptor_type)
+def download_pkg(request, project_id, descriptor_id, descriptor_type):
+    tar_pkg = OsmProject.download_pkg(descriptor_id, descriptor_type)
 
     response = HttpResponse(content_type="application/tgz")
     response["Content-Disposition"] = "attachment; filename=osm_export.tar.gz"
@@ -511,9 +289,8 @@ def create_ns(request, project_id, project, descriptor_id, descriptor_type):
 @login_required
 def custom_action(request, project_id=None, descriptor_id=None, descriptor_type=None, action_name=None):
     if request.method == 'GET':
-        projects = Project.objects.filter(id=project_id).select_subclasses()
         print "Custom action: " + action_name
-        return globals()[action_name](request, project_id, projects[0], descriptor_id, descriptor_type)
+        return globals()[action_name](request, project_id, descriptor_id, descriptor_type)
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
