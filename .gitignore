@@ -45,3 +45,5 @@ static/bower_components
 projecthandler/migrations/
 sf_user/migrations/
 instancehandler/migrations
+sdnctrlhandler/migrations
+authosm/migrations

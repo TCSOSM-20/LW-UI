@@ -42,7 +42,7 @@ class Project(models.Model):
 
 
     """
-    owner = models.ForeignKey('sf_user.CustomUser', db_column='owner')
+    owner = models.ForeignKey('authosm.OsmUser', db_column='owner')
     name = models.CharField(max_length=20, default='')
     created_date = models.DateTimeField(default=timezone.now)
     updated_date = models.DateTimeField(default=timezone.now, blank=True, null=True)
@@ -287,47 +287,3 @@ class ProjectStateless(Project):
 
     def get_overview_data(self):
         raise NotImplementedError
-
-class Repository(models.Model):
-    """ Repository
-    """
-    name = models.CharField(max_length=20, default='')
-    base_url = models.TextField(default='')
-    last_update = models.DateTimeField(default=timezone.now)
-    DIR_NAME = "/tmp/git_repo/"
-
-    def fetch_repository(self):
-        """
-        :return: git.remote.FetchInfo object
-        """
-        if os.path.isdir(self.DIR_NAME):
-            shutil.rmtree(self.DIR_NAME)
-
-        os.mkdir(self.DIR_NAME)
-        repo = git.Repo.init(self.DIR_NAME)
-        origin = repo.create_remote('origin', self.base_url)
-        origin.fetch()
-        fetch_info = origin.pull('master')[0]
-        return fetch_info
-
-    def push_repository(self, msg=None):
-        """
-        :param msg: Commit message
-        :return: git.remote.PushInfo object
-        """
-        repo = git.Repo.init(self.DIR_NAME)
-        origin = repo.remote('origin')
-        repo.git.add('--all')
-        repo.git.commit('-m \'[RDCL3D commit] ' + msg + '\'')
-        push_info = origin.push('master')[0]
-        return push_info
-
-    def to_json(self):
-        """
-        :return: JSON data of object
-        """
-        return {
-            'name': self.name,
-            'base_url': self.base_url.rstrip('\/'),
-            'last_update': self.last_update
-        }

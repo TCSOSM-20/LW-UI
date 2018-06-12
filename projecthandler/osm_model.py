@@ -1,5 +1,5 @@
 #
-#   Copyright 2017 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+#   Copyright 2018 EveryUP Srl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,37 +16,24 @@
 
 from __future__ import unicode_literals
 
-import copy
 import json
 import os.path
 import yaml
 from lib.util import Util
 import logging
-from projecthandler.models import ProjectStateless
 
-from lib.osm.osm_parser import OsmParser
-from lib.osm.osm_rdcl_graph import OsmRdclGraph
 from lib.osm.osmclient.client import Client
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('OsmModel.py')
 
 
-PATH_TO_SCHEMAS = 'lib/osm/schemas/'
-PATH_TO_DESCRIPTORS_TEMPLATES = 'lib/osm/descriptor_template'
-DESCRIPTOR_TEMPLATE_SUFFIX = '.json'
-GRAPH_MODEL_FULL_NAME = 'lib/TopologyModels/osm/osm.yaml'
-EXAMPLES_FOLDER = 'usecases/OSM/'
-
-
-class OsmProject(ProjectStateless):
+class OsmProject(object):
     """Osm Project class
-    The data model has the following descriptors:
-        # descrtiptor list in comment #
-
     """
 
-    def get_descriptors(self, type_descriptor):
+    @staticmethod
+    def get_descriptors( type_descriptor):
         """Returns all descriptors of a given type"""
         log.debug("Get %s descriptors", type_descriptor)
         try:
@@ -62,7 +49,8 @@ class OsmProject(ProjectStateless):
             result = {}
         return result
 
-    def get_descriptor(self, descriptor_id, type_descriptor):
+    @staticmethod
+    def get_descriptor( descriptor_id, type_descriptor):
         """Returns a specific descriptor"""
         try:
             client = Client()
@@ -79,93 +67,36 @@ class OsmProject(ProjectStateless):
 
         return result
 
-    @classmethod
-    def data_project_from_files(cls, request):
-
-        file_dict = {}
-        for my_key in request.FILES.keys():
-            file_dict[my_key] = request.FILES.getlist(my_key)
-
-        log.debug(file_dict)
-
-        data_project = OsmParser.importprojectfiles(file_dict)
-
-        return data_project
-
-    @classmethod
-    def data_project_from_example(cls, request):
-        osm_id = request.POST.get('example-osm-id', '')
-        data_project = OsmParser.importprojectdir(EXAMPLES_FOLDER + osm_id + '/JSON', 'yaml')
-        return data_project
-
-    @classmethod
-    def get_example_list(cls):
-        """Returns a list of directories, in each directory there is a project osm"""
-
-        path = EXAMPLES_FOLDER
-        dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
-        return {'osm': dirs}
-
-    @classmethod
-    def get_new_descriptor(cls, descriptor_type, request_id):
-
-        json_template = cls.get_descriptor_template(descriptor_type)
-
-        return json_template
-
-    @classmethod
-    def get_descriptor_template(cls, type_descriptor):
-        """Returns a descriptor template for a given descriptor type"""
-
-        try:
-            schema = Util.loadjsonfile(os.path.join(PATH_TO_DESCRIPTORS_TEMPLATES, type_descriptor + DESCRIPTOR_TEMPLATE_SUFFIX))
-            return schema
-        except Exception as e:
-            log.exception(e)
-            return False
-
-    @classmethod
-    def get_clone_descriptor(cls, descriptor, type_descriptor, new_descriptor_id):
-        new_descriptor = copy.deepcopy(descriptor)
-
-        return new_descriptor
-
-    def get_type(self):
+    @staticmethod
+    def get_type():
         return "osm"
 
     def __str__(self):
         return self.name
 
-    def get_overview_data(self):
-        current_data = json.loads(self.data_project)
+    @staticmethod
+    def get_overview_data():
         client = Client()
         nsd = client.nsd_list()
         vnfd = client.vnfd_list()
         ns = client.ns_list()
         vnf = client.vnf_list()
         result = {
-            'owner': self.owner.__str__(),
-            'name': self.name,
-            'updated_date': self.updated_date.strftime('%Y-%m-%d %H:%M'),
-            'info': self.info,
+            'owner': '-',
+            'name': '-',
+            'updated_date': '-',
+            'info': '-',
             'type': 'osm',
             'nsd': len(nsd) if nsd else 0,
             'vnfd': len(vnfd) if vnfd else 0,
             'ns': len(ns) if ns else 0,
             'vnf': len(vnf) if vnf else 0,
-            #'validated': self.validated
         }
 
         return result
 
-    def get_graph_data_json_topology(self, descriptor_id):
-        rdcl_graph = OsmRdclGraph()
-        project = self.get_dataproject()
-        topology = rdcl_graph.build_graph_from_project(project,
-                                                     model=self.get_graph_model(GRAPH_MODEL_FULL_NAME))
-        return json.dumps(topology)
-
-    def create_descriptor(self, descriptor_name, type_descriptor, new_data, data_type, file_uploaded):
+    @staticmethod
+    def create_descriptor(descriptor_name, type_descriptor, new_data, data_type, file_uploaded):
         """Creates a descriptor of a given type from a json or yaml representation
 
         Returns the descriptor id or False
@@ -188,7 +119,8 @@ class OsmProject(ProjectStateless):
             result = False
         return result
 
-    def delete_descriptor(self, type_descriptor, descriptor_id):
+    @staticmethod
+    def delete_descriptor(type_descriptor, descriptor_id):
         log.debug('Delete descriptor')
         try:
             client = Client()
@@ -206,7 +138,8 @@ class OsmProject(ProjectStateless):
             result = False
         return result
 
-    def edit_descriptor(self, type_descriptor, descriptor_id, new_data, data_type):
+    @staticmethod
+    def edit_descriptor(type_descriptor, descriptor_id, new_data, data_type):
         log.debug("Edit descriptor")
         try:
             client = Client()
@@ -231,7 +164,8 @@ class OsmProject(ProjectStateless):
             result = False
         return result
 
-    def get_package_files_list(self, type_descriptor, descriptor_id):
+    @staticmethod
+    def get_package_files_list(type_descriptor, descriptor_id):
         try:
             client = Client()
             if type_descriptor == 'nsd':
@@ -247,9 +181,6 @@ class OsmProject(ProjectStateless):
             result = False
         print result
         return result
-
-    def set_validated(self, value):
-        self.validated = True if value is not None and value == True else False
 
     def get_add_element(self, request):
         result = False
@@ -272,7 +203,8 @@ class OsmProject(ProjectStateless):
 
         return result
 
-    def create_ns(self, descriptor_type, descriptor_id, data_ns):
+    @staticmethod
+    def create_ns(descriptor_type, descriptor_id, data_ns):
         try:
             client = Client()
             if descriptor_type == 'nsd':
@@ -286,7 +218,8 @@ class OsmProject(ProjectStateless):
         print result
         return result
 
-    def download_pkg(self, project, descriptor_id, descriptor_type):
+    @staticmethod
+    def download_pkg(descriptor_id, descriptor_type):
         try:
             client = Client()
             if descriptor_type == 'nsd':
@@ -300,31 +233,4 @@ class OsmProject(ProjectStateless):
             log.exception(e)
             result = False
         print result
-        return result
-
-    def get_available_nodes(self, args):
-        """Returns all available node """
-        log.debug('get_available_nodes')
-        try:
-            result = []
-            #current_data = json.loads(self.data_project)
-            model_graph = self.get_graph_model(GRAPH_MODEL_FULL_NAME)
-            for node in model_graph['layer'][args['layer']]['nodes']:
-
-                current_data = {
-                    "id": node,
-                    "category_name": model_graph['nodes'][node]['label'],
-                    "types": [
-                        {
-                            "name": "generic",
-                            "id": node
-                        }
-                    ]
-                }
-                result.append(current_data)
-
-            #result = current_data[type_descriptor][descriptor_id]
-        except Exception as e:
-            log.debug(e)
-            result = []
         return result
