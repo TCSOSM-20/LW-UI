@@ -14,7 +14,7 @@ log = logging.getLogger('helper.py')
 
 
 class Client(object):
-    def __init__(self, host=os.getenv('OSM_SERVER', "localhost"), so_port=9999, so_project='admin', **kwargs):
+    def __init__(self, host=os.getenv('OSM_SERVER', "localhost"), so_port=9999, so_project='admin', ro_host=None, ro_port=9090, **kwargs):
 
         self._user = 'admin'
         self._password = 'admin'
@@ -76,7 +76,6 @@ class Client(object):
             return self._send_post(_url, headers=headers,
                                   json=vim_data)
         return None
-
 
     def sdn_list(self):
         token = self.get_token()
@@ -302,6 +301,33 @@ class Client(object):
             return self._send_get(_url, headers=headers)
         return None
 
+    def ns_alarm_create(self, id, alarm_payload):
+        token = self.get_token()
+        headers = {}
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+            headers['Content-Type'] = 'application/json'
+#            headers['accept'] = 'application/json'
+
+            _url = "{0}/test/message/alarm_request".format(self._base_path)
+            return self._send_post(_url, headers=headers, json=alarm_payload)
+        return None
+
+    def ns_metric_export(self, id, metric_payload):
+
+        token = self.get_token()
+        headers = {}
+        if token:
+            headers['Authorization'] = 'Bearer {}'.format(token)
+            headers['Content-Type'] = 'application/json'
+            #headers['accept'] = 'application/json'
+            print "DIO"
+            _url = "{0}/test/message/metric_request".format(self._base_path)
+            print _url
+            return self._send_post(_url, headers=headers, json=metric_payload)
+        return None
+
+
     def vnfd_list(self):
         token = self.get_token()
         if token:
@@ -416,7 +442,12 @@ class Client(object):
             log.exception(e)
             #print "Exception during send POST"
             return {'error': 'error during connection to agent'}
-        return Util.json_loads_byteified(r.text)
+        if 'accept' in kwargs['headers']:
+            accept = kwargs['headers']['accept']
+            if accept == 'application/json':
+                #print "json"
+                return Util.json_loads_byteified(r.text)
+        return r
 
     def _send_put(self, url, data=None, json=None, **kwargs):
         try:
