@@ -19,6 +19,17 @@ function performAction(url) {
     $('#modal_instance_new_action').modal('show');
 }
 
+function exportMetricNs(url) {
+    console.log(url)
+    $("#formExportMetricNS").attr("action", url);
+    $('#modal_instance_export_metric').modal('show');
+}
+
+function newAlarmNs(url) {
+    $("#formAlarmNS").attr("action", url);
+    $('#modal_instance_new_alarm').modal('show');
+}
+
 function deleteNs(url, force) {
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
@@ -129,6 +140,70 @@ $(document).ready(function () {
             bootbox.alert({
                     title: "Action",
                     message: "Action received."
+                });
+        }).fail(function(result){
+            var data  = result.responseJSON;
+            var title = "Error " + (data.code ? data.code: 'unknown');
+                var message = data.detail ? data.detail: 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+        });
+    });
+
+    $("#formAlarmNS").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        console.log(post_url);
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response,textStatus, jqXHR) {
+            $('#modal_instance_new_action').modal('hide');
+            bootbox.alert({
+                    title: "Metric",
+                    message: "Alarm created."
+                });
+        }).fail(function(result){
+            var data  = result.responseJSON;
+            var title = "Error " + (data.code ? data.code: 'unknown');
+                var message = data.detail ? data.detail: 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+        });
+    });
+
+    $("#formExportMetricNS").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        console.log(post_url);
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response,textStatus, jqXHR) {
+            $('#modal_instance_new_action').modal('hide');
+            bootbox.alert({
+                    title: "Metric",
+                    message: "Metric exported."
                 });
         }).fail(function(result){
             var data  = result.responseJSON;

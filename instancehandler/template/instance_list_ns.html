@@ -75,14 +75,21 @@
                             <ul class="dropdown-menu">
                                 <li><a href="#"
                                        onclick="javascript:performAction('{% url 'projects:instances:action' instance_id=i|get:'_id' project_id=project_id type=type %}')">
-                                    <i class="fa fa-magic"></i>Exec NS Primitive</a></li>
+                                    <i class="fa fa-magic"></i> Exec NS Primitive</a></li>
                                 <li>
                                     <a href="{% url 'projects:instances:ns_operations' project_id=project_id type=type instance_id=i|get:'_id' %}">
-                                        <i class="fa fa-list"></i>Active operations</a></li>
+                                        <i class="fa fa-list"></i> Active operations</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#"
+                                       onclick="javascript:newAlarmNs('{% url 'projects:instances:ns_create_alarm' instance_id=i|get:'_id' project_id=project_id type=type %}')">
+                                    <i class="far fa-bell"></i> New Alarm</a></li>
+                                <li><a href="#"
+                                       onclick="javascript:exportMetricNs('{% url 'projects:instances:ns_export_metric' instance_id=i|get:'_id' project_id=project_id type=type %}')">
+                                    <i class="far fa-chart-bar"></i> Export metric</a></li>
                                 <li class="divider"></li>
                                 <li>
                                     <a href="javascript:deleteNs('{% url 'projects:instances:delete' instance_id=i|get:'_id' project_id=project_id type=type %}', true)">
-                                        <i class="far fa-trash-alt" style="color:red" ></i>Force delete</a></li>
+                                        <i class="far fa-trash-alt" style="color:red" ></i> Force delete</a></li>
                             </ul>
 
 

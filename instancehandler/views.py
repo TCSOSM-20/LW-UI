@@ -123,6 +123,47 @@ def show(request, project_id=None, instance_id=None, type=None):
     print result
     return __response_handler(request, result)
 
+@login_required
+def export_metric(request, project_id=None, instance_id=None, type=None):
+
+    metric_data = request.POST.dict()
+
+    client = Client()
+    keys = ["collection_period",
+            "vnf_member_index",
+            "metric_name",
+            "correlation_id",
+            "vdu_name",
+            "collection_unit"]
+    metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
+
+    response = client.ns_metric_export(instance_id, metric_data)
+
+    return __response_handler(request, {}, None, to_redirect=False,
+                              status=response.status_code)
+
+@login_required
+def create_alarm(request, project_id=None, instance_id=None, type=None):
+    metric_data = request.POST.dict()
+    print metric_data
+    client = Client()
+
+
+    keys = ["threshold_value",
+            "vnf_member_index",
+            "metric_name",
+            "vdu_name",
+            "alarm_name",
+            "correlation_id",
+            "statistic",
+            "operation",
+            "severity"]
+    metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
+
+    result = client.ns_alarm_create(instance_id, metric_data)
+    return __response_handler(request, {}, None, to_redirect=False,
+                              status=result['status'] if 'status' in result else None)
+
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
@@ -132,3 +173,5 @@ def __response_handler(request, data_res, url=None, to_redirect=None, *args, **k
         return redirect(url, *args, **kwargs)
     else:
         return render(request, url, data_res)
+
+
