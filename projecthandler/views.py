@@ -22,7 +22,7 @@ from django.middleware.csrf import get_token
 from django.shortcuts import render, redirect
 from lib.util import Util
 from projecthandler.osm_model import OsmProject
-from lib.osm.osmclient.client import Client
+from lib.osm.osmclient.clientv2 import Client
 
 
 

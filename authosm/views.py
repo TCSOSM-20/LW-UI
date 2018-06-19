@@ -33,7 +33,6 @@ def user_login(request):
         user = authenticate(username=request.POST.get('username'),
                             password=request.POST.get('password'),
                             project_id=request.POST.get('project_id'))
-
         if user and user.is_active:
             if user.is_authenticated():
                 login(request, user)
@@ -44,4 +43,4 @@ def user_login(request):
                     return HttpResponseRedirect(next_page)
         else:
             error_message = 'Login failed!'
-    return render(request, 'login.html', {'error_message':error_message, 'collapsed_sidebar': False})
+    return render(request, 'login.html', {'error_message': error_message, 'collapsed_sidebar': False})

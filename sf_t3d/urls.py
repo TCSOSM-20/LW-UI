@@ -15,7 +15,7 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import url, include
-from sf_user import views as user_views
+#from sf_user import views as user_views
 from authosm import views as user_views
 from sf_t3d import views
 
