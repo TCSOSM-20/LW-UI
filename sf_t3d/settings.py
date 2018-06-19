@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'sf_user',
+    'django.contrib.sessions',
     'authosm',
     'projecthandler',
     'vimhandler',
@@ -66,7 +66,7 @@ MIDDLEWARE_CLASSES = [
 
 ]
 
-SESSION_ENGINE='sf_user.sessions'
+SESSION_ENGINE ='django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 3500 #25 min
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True

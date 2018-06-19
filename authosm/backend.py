@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 from .models import OsmUser
-
+from lib.osm.osmclient.clientv2 import Client
 
 class OsmBackend(object):
 
@@ -28,18 +28,25 @@ class OsmBackend(object):
             password = kwargs['password']
             project_id = kwargs['project_id']
 
-            print username
-            print password
-            print project_id
+            client = Client()
+            result = client.auth(kwargs)
+            print "######"
+            print result
 
-            try:
+            if 'error' in result and result['error'] == True:
+                return None
+            else:
 
-                return OsmUser.objects.get(username=username)
-            except OsmUser.DoesNotExist:
-                # Create a new user. There's no need to set a password
-                # we will keep just some preferences
-                user = OsmUser(username=username)
-                user.save()
+                try:
+                    user = OsmUser.objects.get(username=username)
+
+                except OsmUser.DoesNotExist:
+                    # Create a new user. There's no need to set a password
+                    # we will keep just some preferences
+                    user = OsmUser(username=username)
+
+                    user.save()
+                user.session = result['data']
                 return user
 
         return None
