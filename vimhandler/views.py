@@ -24,7 +24,7 @@ import yaml
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('view.py')
+log = logging.getLogger('vimhandler.py')
 
 
 @login_required
