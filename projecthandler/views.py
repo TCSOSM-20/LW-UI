@@ -38,18 +38,26 @@ def home(request):
 
 @login_required
 def create_new_project(request):
-    return render(request, 'home.html', {})
+    if request.method == 'POST':
+        client = Client()
+        new_project_dict = request.POST.dict()
+        keys = ["name"]
+        project_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_project_dict.items()))
+        result = client.project_create(request.session['token'], project_data)
+        if isinstance(result, dict) and 'error' in result and result['error']:
+            print result
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
 def user_projects(request):
-    csrf_token_value = get_token(request)
-    user = request.user
-    projects = user.get_projects()
-
+    client = Client()
+    result = client.project_list(request.session['token'])
     return render(request, 'projectlist.html', {
-        'projects': list(projects),
-        'csrf_token': csrf_token_value
+        'projects': result['data'] if result and result['error'] is False else [],
     })
 
 
@@ -85,23 +93,14 @@ def open_project(request, project_id=None):
 
 @login_required
 def delete_project(request, project_id=None):
-    if request.method == 'POST':
-
-        try:
-            ##TODO delete project
-            return redirect('projects:projects_list')
-        except Exception as e:
-            print e
-            return render(request, 'error.html', {'error_msg': 'Error deleting Project.'})
-
-    elif request.method == 'GET':
-        try:
-            return render(request, 'osm/osm_project_delete.html',
-                          {'project_id': project_id, 'project_name': project_id})
-
-        except Exception as e:
-            print e
-            return render(request, 'error.html', {'error_msg': 'Project not found.'})
+    client = Client()
+    result = client.project_delete(request.session['token'], project_id)
+    if isinstance(result, dict) and 'error' in result and result['error']:
+        print result
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
@@ -198,7 +197,6 @@ def new_descriptor(request, project_id=None, descriptor_type=None):
         if result['error']:
             print result
             return __response_handler(request, result['data'], url=None, status=result['data']['status'] if 'status' in result['data'] else 500)
-
         else:
             return __response_handler(request, {}, url=None, status=200)
 
