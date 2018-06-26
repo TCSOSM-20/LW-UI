@@ -381,7 +381,6 @@ class Client(object):
         return result
 
     def ns_create(self, token, ns_data):
-        token = self.get_token()
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
@@ -542,6 +541,82 @@ class Client(object):
         #result['data'] = Util.json_loads_byteified(r.text)
         result['data'] = r.text
         return result
+
+    def vim_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/vims".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
+    def vim_delete(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = { "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/vims/{1}".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        print r.status_code
+        if r.status_code == requests.codes.accepted:
+            result['error'] = False
+        else:
+            result['data'] = r.text
+        return result
+
+
+
+    def vim_get(self, token, id):
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/vims/{1}".format(self._base_path, id)
+
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def vim_create(self, token, vim_data):
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/vims".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=vim_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        print r.status_code
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
 
     @staticmethod
     def md5(f):
