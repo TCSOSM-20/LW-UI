@@ -16,22 +16,24 @@
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from lib.osm.osmclient.client import Client
+from django.http import HttpResponse
+import json
 import logging
+#from lib.osm.osmclient.client import Client
+from lib.osm.osmclient.clientv2 import Client
 
 logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('view.py')
+log = logging.getLogger('sdnctrlhandler/view.py')
 
 
 @login_required
 def list(request, project_id):
     client = Client()
-    result = client.sdn_list()
+    result = client.sdn_list(request.session['token'])
 
     result = {
         'project_id': project_id,
-        'sdns': result
+        'sdns': result['data'] if result and result['error'] is False else []
     }
     return __response_handler(request, result, 'sdn_list.html')
 
@@ -55,7 +57,7 @@ def create(request, project_id):
         sdn_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_sdn_dict.items()))
         sdn_data['port'] = int(sdn_data['port'])
 
-        result = client.sdn_create(sdn_data)
+        result = client.sdn_create(request.session['token'], sdn_data)
 
         return __response_handler(request, result, 'projects:sdns:list', to_redirect=True, project_id=project_id)
 
@@ -64,7 +66,7 @@ def create(request, project_id):
 def delete(request, project_id, sdn_id=None):
     try:
         client = Client()
-        del_res = client.sdn_delete(sdn_id)
+        del_res = client.sdn_delete(request.session['token'], sdn_id)
     except Exception as e:
         log.exception(e)
     return __response_handler(request, {}, 'projects:sdns:list', to_redirect=True, project_id=project_id)
@@ -73,16 +75,18 @@ def delete(request, project_id, sdn_id=None):
 @login_required
 def show(request, project_id, sdn_id=None):
     client = Client()
-    datacenter = client.sdn_get(sdn_id)
+    result = client.sdn_get(request.session['token'], sdn_id)
+    if isinstance(result, dict) and 'error' in result and result['error']:
+        return render(request, 'error.html')
     return __response_handler(request, {
-        "sdn": datacenter
-    }, project_id=project_id)
+        "sdn": result['data'],
+        "project_id": project_id})
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
-    if 'application/json' in raw_content_types:
-        return JsonResponse(data_res)
+    if 'application/json' in raw_content_types or url is None:
+        return HttpResponse(json.dumps(data_res), content_type="application/json", *args, **kwargs)
     elif to_redirect:
         return redirect(url, *args, **kwargs)
     else:
