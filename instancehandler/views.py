@@ -18,19 +18,24 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 import yaml
+import json
 import logging
-from lib.osm.osmclient.client import Client
+from lib.osm.osmclient.clientv2 import Client
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('instancehandler/view.py')
 
 
 @login_required
 def list(request, project_id=None, type=None):
     client = Client()
     if type == 'ns':
-        result = client.ns_list()
+        instance_list = client.ns_list(request.session['token'])
     elif type == 'vnf':
-        result = client.vnf_list()
+        instance_list = client.vnf_list(request.session['token'])
 
-    result = {'instances': result, 'type': type, 'project_id': project_id}
+    result = {'instances': instance_list['data'] if instance_list and instance_list['error'] is False else [],
+              'type': type, 'project_id': project_id}
 
     return __response_handler(request, result, 'instance_list.html')
 
@@ -69,24 +74,29 @@ def create(request, project_id=None):
                 ns_data["vnf"] = ns_config["vnf"]
     print ns_data
     client = Client()
-    result = client.ns_create(ns_data)
-    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns', project_id=project_id)
+    result = client.ns_create(request.session['token'], ns_data)
+    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
+                              project_id=project_id)
+
 
 @login_required
 def ns_operations(request, project_id=None, instance_id=None, type=None):
     client = Client()
-    result = client.ns_op_list(instance_id)
-    return __response_handler(request, {'operations': result, 'type': 'ns', 'project_id': project_id}, 'instance_operations_list.html')
+    op_list = client.ns_op_list(request.session['token'], instance_id)
+    return __response_handler(request,
+                              {'operations': op_list['data'] if op_list and op_list['error'] is False else [],
+                               'type': 'ns', 'project_id': project_id}, 'instance_operations_list.html')
+
 
 @login_required
 def ns_operation(request, op_id, project_id=None, instance_id=None, type=None):
     client = Client()
-    result = client.ns_op(op_id)
-    return __response_handler(request, result)
+    result = client.ns_op(request.session['token'], op_id)
+    return __response_handler(request, result['data'])
+
 
 @login_required
 def action(request, project_id=None, instance_id=None, type=None):
-
     client = Client()
 
     # result = client.ns_action(instance_id, action_payload)
@@ -98,8 +108,14 @@ def action(request, project_id=None, instance_id=None, type=None):
         "primitive_params": {k: v for k, v in zip(primitive_param_keys, primitive_param_value) if len(k) > 0}
     }
 
-    result = client.ns_action(instance_id, action_payload)
-    return __response_handler(request, result, None, to_redirect=False, status=result['status'] if 'status' in result else None )
+    result = client.ns_action(request.session['token'], instance_id, action_payload)
+    print result
+    if result['error']:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
@@ -107,9 +123,10 @@ def delete(request, project_id=None, instance_id=None, type=None):
     force = bool(request.GET.get('force', False))
     result = {}
     client = Client()
-    result = client.ns_delete(instance_id, force)
+    result = client.ns_delete(request.session['token'], instance_id, force)
     print result
-    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns', project_id=project_id)
+    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
+                              project_id=project_id)
 
 
 @login_required
@@ -117,15 +134,15 @@ def show(request, project_id=None, instance_id=None, type=None):
     # result = {}
     client = Client()
     if type == 'ns':
-        result = client.ns_get(instance_id)
+        result = client.ns_get(request.session['token'], instance_id)
     elif type == 'vnf':
-        result = client.vnf_get(instance_id)
+        result = client.vnf_get(request.session['token'], instance_id)
     print result
     return __response_handler(request, result)
 
+
 @login_required
 def export_metric(request, project_id=None, instance_id=None, type=None):
-
     metric_data = request.POST.dict()
 
     client = Client()
@@ -137,17 +154,21 @@ def export_metric(request, project_id=None, instance_id=None, type=None):
             "collection_unit"]
     metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
 
-    response = client.ns_metric_export(instance_id, metric_data)
+    result = client.ns_metric_export(request.session['token'], instance_id, metric_data)
 
-    return __response_handler(request, {}, None, to_redirect=False,
-                              status=response.status_code)
+    if result['error']:
+        print result
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
+
 
 @login_required
 def create_alarm(request, project_id=None, instance_id=None, type=None):
     metric_data = request.POST.dict()
     print metric_data
     client = Client()
-
 
     keys = ["threshold_value",
             "vnf_member_index",
@@ -160,18 +181,20 @@ def create_alarm(request, project_id=None, instance_id=None, type=None):
             "severity"]
     metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
 
-    result = client.ns_alarm_create(instance_id, metric_data)
-    return __response_handler(request, {}, None, to_redirect=False,
-                              status=result['status'] if 'status' in result else None)
+    result = client.ns_alarm_create(request.session['token'], instance_id, metric_data)
+    if result['error']:
+        print result
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
     if 'application/json' in raw_content_types or url is None:
-        return JsonResponse(data_res, *args, **kwargs)
+        return HttpResponse(json.dumps(data_res), content_type="application/json", *args, **kwargs)
     elif to_redirect:
         return redirect(url, *args, **kwargs)
     else:
         return render(request, url, data_res)
-
-

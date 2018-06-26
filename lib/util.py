@@ -78,7 +78,7 @@ class Util(object):
     def json2yaml(cls, object_json):
         """Converts a json object into a yaml representation"""
         log.debug('json2yaml')
-        return yaml.safe_dump(object_json, default_flow_style=False) if not object_json is None else None
+        return yaml.safe_dump(object_json, default_flow_style=False, indent=2) if not object_json is None else None
 
     @classmethod
     def openfile(cls, filepath, mode='r', buffering=1):

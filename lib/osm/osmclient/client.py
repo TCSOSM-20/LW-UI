@@ -14,7 +14,7 @@ log = logging.getLogger('helper.py')
 
 
 class Client(object):
-    def __init__(self, host=os.getenv('OSM_SERVER', "192.168.100.199"), so_port=9999, so_project='admin', ro_host=None, ro_port=9090, **kwargs):
+    def __init__(self, host=os.getenv('OSM_SERVER', "192.168.1.73"), so_port=9999, so_project='admin', ro_host=None, ro_port=9090, **kwargs):
 
         self._user = 'admin'
         self._password = 'admin'
@@ -321,7 +321,6 @@ class Client(object):
             headers['Authorization'] = 'Bearer {}'.format(token)
             headers['Content-Type'] = 'application/json'
             #headers['accept'] = 'application/json'
-            print "DIO"
             _url = "{0}/test/message/metric_request".format(self._base_path)
             print _url
             return self._send_post(_url, headers=headers, json=metric_payload)

@@ -36,11 +36,12 @@ def user_login(request):
         if user and user.is_active:
             if user.is_authenticated():
                 login(request, user)
-                print next_page
+                request.session['token'] = user.session
+                print request.session['token']
                 if next_page == "" or next_page is None:
                     return HttpResponseRedirect('/home')
                 else:
                     return HttpResponseRedirect(next_page)
         else:
             error_message = 'Login failed!'
-    return render(request, 'login.html', {'error_message': error_message, 'collapsed_sidebar': False})
+    return render(request, 'login.html', {'error_message':error_message, 'collapsed_sidebar': False})
