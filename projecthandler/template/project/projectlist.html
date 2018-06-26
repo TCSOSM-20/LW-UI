@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-
+{% load get %}
+{% load date_tag %}
 {% load staticfiles %}
 
 {% block head_block %}
@@ -31,7 +32,10 @@
         <div class="box-header with-border">
                   <h3 class="box-title">Projects</h3>
             <div class="box-tools">
-                <a href="" class="btn btn-block btn-primary btn-sm" disabled><i class="fa fa-plus"></i><span> New Project</span></a>
+                <button type="button" class="btn btn-default" data-container="body"
+                                        data-toggle="tooltip" data-placement="top" title="New Project"
+                                        onclick="javascript:showModalNewProject()">
+                                    <i class="fa fa-plus"></i> New Project</button>
             </div>
         </div>
         <div class="box-body">
@@ -40,12 +44,10 @@
 					<tr>
 
 						<th>Name</th>
-						<th>Info</th>
-						<th>Type</th>
+
 						<th>Modification Date</th>
 						<th>Creation Date</th>
 
-						<th>Owner</th>
 
 						<th><i class="far fa-trash-alt"></i></th>
 					</tr>
@@ -55,15 +57,13 @@
 					<tr>
 
 						<td>
-							<a href="javascript:openProject('{{ p.id }}')" >{{ p.name }}</a>
+							<a href="javascript:openProject('{{ p.name }}')" >{{ p.name }}</a>
 						</td>
-						<td>{{ p.info }}</td>
-						<td>{{ p.get_type }}</td>
-						<td>{{ p.updated_date }}</td>
-						<td>{{ p.created_date }}</td>
-						<td>{{ p.owner.username }}</td>
 
-						<td><a href="#"> Delete</a></td>
+						<td>{{ p|get_sub:"_admin,modified"|get_date}}</td>
+                        <td>{{ p|get_sub:"_admin,created"|get_date}}</td>
+
+						<td><a href="javascript:deleteProject('{% url 'projects:delete_project'  project_id=p|get:'_id' %}')"> Delete</a></td>
 
 					</tr>
 				{% endfor %}
@@ -74,11 +74,89 @@
 </div>
 
 </div>
+{% include "modal/new_project.html" %}
 {% endblock %}
 
 {% block resource_block %}
   	{{ block.super }}
+    <script>
+    function showModalNewProject(){
+        $('#modal_new_project').modal('show');
+    }
 
+    function deleteProject(url) {
+    bootbox.confirm("Are you sure want to delete?", function (result) {
+        if (result) {
+            $.ajax({
+            url: url,
+            type: 'GET',
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response,textStatus, jqXHR) {
+
+            bootbox.alert({
+                title: "Result",
+                message: "Project deleted.",
+                callback: function () {
+                    location.reload();
+                }
+            });
+        }).fail(function(result){
+            var data  = result.responseJSON;
+            var title = "Error " + (data.code ? data.code: 'unknown');
+                var message = data.detail ? data.detail: 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+        });
+        }
+    })
+    }
+
+    $(document).ready(function () {
+    $("#formNewProject").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        console.log(post_url);
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response,textStatus, jqXHR) {
+            bootbox.alert({
+                    title: "Result",
+                    message: "Project created.",
+                callback: function () {
+                    location.reload();
+                }
+                });
+        }).fail(function(result){
+            var data  = result.responseJSON;
+            var title = "Error " + (data.code ? data.code: 'unknown');
+                var message = data.detail ? data.detail: 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+        });
+    });
+    });
+
+
+
+
+    </script>
 
 
 {% endblock %}
