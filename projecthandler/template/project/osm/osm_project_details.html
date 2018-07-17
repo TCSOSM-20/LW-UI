@@ -44,7 +44,7 @@
                     <div class="inner"><h3>{{ project_overview.nsd }}</h3>
                         <p>NS packages</p></div>
                     <div class="icon"><i class="fa fa-archive"></i></div>
-                    <a href='{% url "projects:list_descriptors"  project_id=project_id descriptor_type="nsd" %}' class="small-box-footer">Open list <i
+                    <a href='{% url "projects:list_descriptors"   descriptor_type="nsd" %}' class="small-box-footer">Open list <i
                             class="fa fa-arrow-circle-right"></i></a></div>
             </div>
             <div class="col-md-6 ">
@@ -52,7 +52,7 @@
                     <div class="inner"><h3>{{ project_overview.vnfd }}</h3>
                         <p>VNF packages</p></div>
                     <div class="icon"><i class="fa fa-archive"></i></div>
-                    <a href='{% url "projects:list_descriptors"  project_id=project_id descriptor_type="vnfd" %}' class="small-box-footer">Open list <i
+                    <a href='{% url "projects:list_descriptors"   descriptor_type="vnfd" %}' class="small-box-footer">Open list <i
                             class="fa fa-arrow-circle-right"></i></a></div>
             </div>
         </div>
@@ -62,7 +62,7 @@
                     <div class="inner"><h3>{{ project_overview.ns }}</h3>
                         <p>NS Instances</p></div>
                     <div class="icon"><i class="fa fa-sitemap fa-fw"></i></div>
-                    <a href='{% url "projects:instances:list" project_id=project_id type="ns"  %}' class="small-box-footer">Open list <i
+                    <a href='{% url "projects:instances:list"  type="ns"  %}' class="small-box-footer">Open list <i
                             class="fa fa-arrow-circle-right"></i></a></div>
             </div>
 
@@ -71,7 +71,7 @@
                     <div class="inner"><h3>{{ project_overview.vnf }}</h3>
                         <p>VNF Instances</p></div>
                     <div class="icon"><i class="far fa-hdd fa-fw"></i></div>
-                    <a href='{% url "projects:instances:list" project_id=project_id type="vnf"  %}' class="small-box-footer">Open list <i
+                    <a href='{% url "projects:instances:list"  type="vnf"  %}' class="small-box-footer">Open list <i
                             class="fa fa-arrow-circle-right"></i></a></div>
             </div>
 

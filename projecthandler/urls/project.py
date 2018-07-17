@@ -18,24 +18,26 @@ from django.conf.urls import url, include
 from projecthandler import views
 
 urlpatterns = [
+    url(r'^$', views.open_project, name='open_project'),
     url(r'^list/', views.user_projects, name='projects_list'),
     url(r'^new/', views.create_new_project, name='new_project'),
-    url(r'^(?P<project_id>\w+)/$', views.open_project, name='open_project'),
-    url(r'^(?P<project_id>\w+)/sdn/', include('sdnctrlhandler.urls', namespace='sdns'), name='sdns_base'),
-    url(r'^(?P<project_id>\w+)/vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
-    url(r'^(?P<project_id>\w+)/instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),
-    url(r'^(?P<project_id>\w+)/delete$', views.delete_project, name='delete_project'),
-    url(r'^(?P<project_id>\w+)/descriptors/(?P<descriptor_type>\w+)/list$', views.show_descriptors, name='list_descriptors'),
-    url(r'^(?P<project_id>\w+)/descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)(/$)',
+    url(r'^delete$', views.delete_project, name='delete_project'),
+    url(r'^switch/(?P<project_id>\w+)', views.switch_project, name='switch_project'),
+    url(r'^descriptors/(?P<descriptor_type>\w+)/list$', views.show_descriptors, name='list_descriptors'),
+    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)(/$)',
         views.edit_descriptor, name='edit_descriptor'),
-    url(r'^(?P<project_id>\w+)/descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/delete$',
+    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/delete$',
         views.delete_descriptor,
         name='delete_descriptor'),
-    url(r'^(?P<project_id>\w+)/descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/action/(?P<action_name>[-\w]+)',
+    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/action/(?P<action_name>[-\w]+)',
         views.custom_action,
         name='custom_action'),
-    url(r'^(?P<project_id>\w+)/descriptors/(?P<descriptor_type>\w+)/new$', views.new_descriptor,
+    url(r'^descriptors/(?P<descriptor_type>\w+)/new$', views.new_descriptor,
         name='new_descriptor'),
-
+    url(r'^composer$', views.open_composer, name='open_composer'),
+    url(r'^availablenodes', views.get_available_nodes, name='get_available_nodes'),
+    url(r'^sdn/', include('sdnctrlhandler.urls', namespace='sdns'), name='sdns_base'),
+    url(r'^vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
+    url(r'^instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),
 
 ]

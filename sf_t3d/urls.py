@@ -23,7 +23,6 @@ app_name = 'base'
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
     url(r'^auth/$', user_views.user_login, name='auth_user'),
-    #url(r'^auth_guest/$', user_views.guest_login, name='auth_user_guest'),
     #url(r'^register', user_views.register_view, name='register_user'),
     url(r'^projects/', include('projecthandler.urls.project', namespace='projects'), name='projects_base'),
 

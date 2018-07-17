@@ -24,20 +24,19 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="#"><i class="fa fa-sitemap"></i> Composer</a></li>
+    <li><a href="{% url 'projects:instances:list'  type=type %}">{{ type|upper }} Instances</a></li>
+    <li><a href="#"><i class="fa fa-sitemap"></i> {{ type|upper }} Topology</a></li>
 {% endblock %}
 
 {% block content_body %}
     {{ block.super }}
     {% csrf_token %}
-    {% include 'osm/descriptor/modal/create_link_chooser.html' %}
-{% include 'osm/descriptor/modal/choose_node_id.html' %}
-{% include 'osm/modal/modal_keyboard_info.html' %}
+
     <div class="row" >
         <div class="col-md-12">
             {% block topology_toolbar %}
                 {{ block.super }}
-                 {% include 'topology_toolbar.html' %}
+                 {% include 'topology_toolbar_instance.html' %}
             {% endblock %}
             <div id="graph_ed_container" style="width: 100%; height:100%; background-color: white; border: 2px #3c8dbc solid;">
 
@@ -71,8 +70,7 @@
 
 
     <script src="/static/src/osm_gui_properties.js"></script>
-    <script src="/static/src/projecthandler/composer.js"></script>
-    <script src="/static/src/projecthandler/osm/controller.js"></script>
+    <script src="/static/src/instancehandler/instance_topology_view.js"></script>
 
 {% endblock %}
 

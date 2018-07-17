@@ -18,8 +18,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import json
-#from lib.osm.osmclient.client import Client
 from lib.osm.osmclient.clientv2 import Client
+import authosm.utils as osmutils
 import yaml
 import logging
 
@@ -28,9 +28,11 @@ log = logging.getLogger('vimhandler.py')
 
 
 @login_required
-def list(request, project_id):
+def list(request):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
-    result = client.vim_list(request.session['token'])
+    result = client.vim_list(user.get_token())
     print result
     result = {
         "project_id": project_id,
@@ -40,7 +42,9 @@ def list(request, project_id):
 
 
 @login_required
-def create(request, project_id):
+def create(request):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     result = {'project_id': project_id}
     if request.method == 'GET':
         return __response_handler(request, result, 'vim_create.html')
@@ -70,23 +74,26 @@ def create(request, project_id):
             except Exception as e:
                 # TODO return error on json.loads exception
                 print e
-        result = client.vim_create(request.session['token'], vim_data)
+        result = client.vim_create(user.get_token(), vim_data)
         # TODO  'vim:show', to_redirect=True, vim_id=vim_id
-        return __response_handler(request, result, 'projects:vims:list', to_redirect=True, project_id=project_id)
+        return __response_handler(request, result, 'projects:vims:list', to_redirect=True, )
 
 @login_required
-def delete(request, project_id, vim_id=None):
+def delete(request, vim_id=None):
+    user = osmutils.get_user(request)
     try:
         client = Client()
-        del_res = client.vim_delete(request.session['token'], vim_id)
+        del_res = client.vim_delete(user.get_token(), vim_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'projects:vims:list', to_redirect=True, project_id=project_id)
+    return __response_handler(request, {}, 'projects:vims:list', to_redirect=True, )
 
 @login_required
-def show(request, project_id, vim_id=None):
+def show(request, vim_id=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
-    result = client.vim_get(request.session['token'], vim_id)
+    result = client.vim_get(user.get_token(), vim_id)
     print result
     if isinstance(result, dict) and 'error' in result and result['error']:
         return render(request, 'error.html')

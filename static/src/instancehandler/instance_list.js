@@ -25,6 +25,10 @@ function exportMetricNs(url) {
     $('#modal_instance_export_metric').modal('show');
 }
 
+function showInstanceTopology(url) {
+    window.location.href = url;
+}
+
 function newAlarmNs(url) {
     $("#formAlarmNS").attr("action", url);
     $('#modal_instance_new_alarm').modal('show');
@@ -72,10 +76,17 @@ function showInstanceDetails(url_info) {
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         success: function (result) {
-            editorJSON.setValue(JSON.stringify(result, null, "\t"));
-            editorJSON.setOption("autoRefresh", true);
-            dialog.modal('hide');
-            $('#modal_show_instance').modal('show');
+
+            if(result['data'] !== undefined) {
+                editorJSON.setValue(JSON.stringify(result['data'], null, "\t"));
+                editorJSON.setOption("autoRefresh", true);
+                dialog.modal('hide');
+                $('#modal_show_instance').modal('show');
+            }
+            else{
+                dialog.modal('hide');
+                bootbox.alert("An error occurred while retrieving the information.");
+            }
         },
         error: function (result) {
             dialog.modal('hide');

@@ -1,5 +1,5 @@
 #
-#   Copyright 2018 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+#   Copyright 2018 EveryUP Srl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,6 +14,6 @@
 #   limitations under the License.
 #
 
-from django.contrib import admin
 
-# Register your models here.
+class OSMAuthException(Exception):
+    pass

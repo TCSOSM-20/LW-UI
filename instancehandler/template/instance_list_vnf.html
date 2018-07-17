@@ -29,7 +29,7 @@
                 <tr>
 
                     <td>{{ i|get:"_id" }}</td>
-                    <td><a href="javascript:openDescriptorView('{{project_id}}', 'vnfd', '{{ i|get:"vnfd-id" }}')"> {{ i|get:"vnfd-ref" }}</a></td>
+                    <td><a href="javascript:openDescriptorView('vnfd', '{{ i|get:"vnfd-id" }}')"> {{ i|get:"vnfd-ref" }}</a></td>
                     <td>{{ i|get:"member-vnf-index-ref" }}</td>
                     <td class="ellipsis" data-text="{{ i|get:"nsr-id-ref" }}">{{ i|get:"nsr-id-ref" }}</td>
                     <td >{{ i|get:"created-time"|get_date }}</td>
@@ -37,7 +37,7 @@
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default"
-                                    onclick="javascript:showInstanceDetails('{% url 'projects:instances:show' instance_id=i|get:'_id' project_id=project_id type=type %}')"
+                                    onclick="javascript:showInstanceDetails('{% url 'projects:instances:show' instance_id=i|get:'_id'  type=type %}')"
                                     data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">
                                 <i class="fa fa-info"></i>
                             </button>

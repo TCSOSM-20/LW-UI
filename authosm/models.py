@@ -18,8 +18,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-from lib.osm.osmclient.client import Client
-import uuid
+
+from authosm.exceptions import OSMAuthException
+from lib.osm.osmclient.clientv2 import Client
+import utils
 
 
 class OsmUserManager(BaseUserManager):
@@ -58,22 +60,52 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
         * is_superuser
 
     """
-    username = models.CharField(_('username'), max_length=255, unique=True, db_index=True)
-    current_project = models.CharField(_('project_id'), max_length=255)
-    token_project = models.CharField(_('token'), max_length=36)
+    username = models.CharField(_('username'), primary_key=True, max_length=255, unique=True, db_index=True)
+
     is_admin = models.BooleanField(_('admin status'), default=False)
     is_basic_user = models.BooleanField(_('basic_user status'), default=False)
+    current_project = models.CharField(_('project_id'), max_length=255)
+
+    psw = models.CharField(_('psw'), max_length=36)
+    token = models.CharField(_('token'), max_length=36)
+    project_id = models.CharField(_('project_id'), max_length=36)
+    token_expires = models.FloatField(_('token_expires'), max_length=36)
 
     objects = OsmUserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
+    @property
+    def is_authenticated(self):
+        """Checks for a valid authentication."""
+        if self.token is not None and utils.is_token_valid({'expires': self.token_expires}):
+            return True
+        else:
+            return False
+
+    def get_token(self):
+        if self.is_authenticated:
+            return {'id': self.token, 'expires': self.token_expires, 'project_id': self.project_id}
+        return None
+
+    def switch_project(self, project_id):
+        client = Client()
+        result = client.switch_project({'project_id': project_id, 'username': self.username, 'password': self.psw})
+        if 'error' in result and result['error'] is True:
+            raise OSMAuthException(result['data'])
+        else:
+            self.token = result['data']['id']
+            self.project_id = result['data']['project_id']
+            self.token_expires = result['data']['expires']
+            self.save()
+            return True
+        return False
+
     class Meta:
         verbose_name = _('custom user')
         verbose_name_plural = _('custom users')
         abstract = True
-
 
 
 class OsmUser(AbstractOsmUser):
@@ -87,6 +119,3 @@ class OsmUser(AbstractOsmUser):
     class Meta(AbstractOsmUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
-    def get_projects(self):
-        client = Client()
-        return []

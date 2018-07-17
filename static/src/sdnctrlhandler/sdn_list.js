@@ -1,19 +1,19 @@
-function deleteSDN(project_id, sdn_uuid) {
+function deleteSDN(sdn_uuid) {
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-            location.href = '/projects/' + project_id + '/sdn/' + sdn_uuid + '/delete'
+            location.href = '/projects/sdn/' + sdn_uuid + '/delete'
         }
     })
 }
 
-function showSDN(project_id, sdn_uuid) {
+function showSDN(sdn_uuid) {
     var dialog = bootbox.dialog({
         message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
         closeButton: true
     });
 
     $.ajax({
-        url: '/projects/' + project_id + '/sdn/' + sdn_uuid ,
+        url: '/projects/sdn/' + sdn_uuid ,
         //url: '/sdn/' + sdn_uuid,
         type: 'GET',
         dataType: "json",

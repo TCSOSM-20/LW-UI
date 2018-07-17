@@ -56,6 +56,7 @@ dreamer.ModelGraphEditor = (function (global) {
         this._edit_mode = (args.edit_mode != undefined) ? args.edit_mode : this._edit_mode;
 
         Object.keys(args.gui_properties["nodes"]).forEach(function (key, index) {
+            console.log(key + " ####")
             this.type_property[key] = args.gui_properties["nodes"][key];
             if ( this.type_property[key]['property'] != undefined){
                 for(var c_prop in this.type_property[key]){
@@ -69,6 +70,7 @@ dreamer.ModelGraphEditor = (function (global) {
                 }
             }
             else{
+
                 this.type_property[key]["shape"] = this.parent.get_d3_symbol(this.type_property[key]["shape"]);
                 if (this.type_property[key]["image"] != undefined) {
                     this.type_property[key]["image"] = IMAGE_PATH + this.type_property[key]["image"];
@@ -331,7 +333,7 @@ dreamer.ModelGraphEditor = (function (global) {
     ModelGraphEditor.prototype.savePositions = function (data) {
         var vertices = {}
         this.node.each(function (d) {
-            vertices[d.id] = {}
+            vertices[d.id] = {};
             vertices[d.id]['x'] = d.x;
             vertices[d.id]['y'] = d.y;
         });
@@ -339,7 +341,7 @@ dreamer.ModelGraphEditor = (function (global) {
             'vertices': vertices
         });
 
-    }
+    };
 
     /**
      *  Internal functions
@@ -376,7 +378,7 @@ dreamer.ModelGraphEditor = (function (global) {
                     self.removeNode(d, null, showAlert);
                 },
                 edit_mode: true
-            },
+            }
 
         ];
         if(this.customBehavioursOnEvents){

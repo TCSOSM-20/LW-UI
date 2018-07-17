@@ -13,8 +13,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+from django.core.exceptions import PermissionDenied
+
 from .models import OsmUser
 from lib.osm.osmclient.clientv2 import Client
+from .exceptions import OSMAuthException
 
 class OsmBackend(object):
 
@@ -26,27 +29,31 @@ class OsmBackend(object):
         if all(k in kwargs for k in ('username', 'password', 'project_id')):
             username = kwargs['username']
             password = kwargs['password']
-            project_id = kwargs['project_id']
 
             client = Client()
             result = client.auth(kwargs)
-            print "######"
-            print result
 
-            if 'error' in result and result['error'] == True:
-                return None
+            if 'error' in result and result['error'] is True:
+                raise OSMAuthException(result['data'])
             else:
 
                 try:
                     user = OsmUser.objects.get(username=username)
+                    user.psw = password
+                    user.token=result['data']['id']
+                    user.project_id=result['data']['project_id']
+                    user.token_expires=result['data']['expires']
+                    user.session = result['data']
+                    user.save()
 
                 except OsmUser.DoesNotExist:
-                    # Create a new user. There's no need to set a password
-                    # we will keep just some preferences
-                    user = OsmUser(username=username)
-
+                    user = OsmUser(username=username, psw=password, token=result['data']['id'],
+                                                       project_id=result['data']['project_id'],
+                                                       token_expires=result['data']['expires'])
+                    user.session = result['data']
                     user.save()
-                user.session = result['data']
+
+
                 return user
 
         return None

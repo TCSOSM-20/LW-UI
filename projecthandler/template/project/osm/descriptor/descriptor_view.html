@@ -15,8 +15,8 @@ Edit {{ descriptor_type|upper }} Descriptor
 
 {% block breadcrumb_body %}
 {{ block.super }}
-<li><a href="{% url 'projects:open_project' project_id=project_id %}">{{project_id}}</a></li>
-<li><a href="{% url 'projects:open_project' project_id=project_id %}descriptors/{{descriptor_type}}">{{ descriptor_type }} Descriptors</a></li>
+<li><a href="{% url 'projects:open_project' %}">{{project_id}}</a></li>
+<li><a href="{% url 'projects:open_project' %}descriptors/{{descriptor_type}}">{{ descriptor_type }} Descriptors</a></li>
 <li><a>{{descriptor_id}}</a></li>
 {% endblock %}
 
@@ -97,7 +97,7 @@ Edit {{ descriptor_type|upper }} Descriptor
                 break;
         }
         $.ajax({
-            url: "/projects/{{project_id}}/descriptors/{{descriptor_type}}/{{descriptor_id}}/",
+            url: "/projects/descriptors/{{descriptor_type}}/{{descriptor_id}}/",
             type: 'POST',
             dataType: 'json',
             data: {

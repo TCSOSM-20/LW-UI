@@ -22,7 +22,7 @@
 
 {% block breadcrumb_body %}
   	{{ block.super }}
-    <li><a href="{% url 'projects:open_project' project_id=project_id %}">{{project_id}}</a></li>
+    <li><a href="{% url 'projects:open_project' %}">{{project_id}}</a></li>
     <li><a> {% if descriptor_type  %}
      {{ descriptor_type }}
   {% else%}
@@ -47,8 +47,8 @@
   	{{ block.super }}
     <script>
     var csrf_token = '{{csrf_token}}';
-    var descr_list_url = '{% url "projects:list_descriptors"  project_id=project_id descriptor_type=descriptor_type%}';
-    var new_desc_url ="{% url 'projects:new_descriptor' project_id=project_id descriptor_type=descriptor_type %}"
+    var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
+    var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}"
     </script>
     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
     <script src="/static/src/instancehandler/instance_create.js"></script>

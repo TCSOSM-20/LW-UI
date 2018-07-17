@@ -187,8 +187,8 @@ function updateBredCrumb(filter_parameters){
 }
 
 
-function openEditor(project_id) {
-    window.location.href = '/projects/' + project_id + '/descriptors/' + graph_editor.getCurrentView() + 'd/' + graph_editor.getCurrentGroup();
+function openEditor() {
+    window.location.href = '/projects/descriptors/' + graph_editor.getCurrentView() + 'd/' + graph_editor.getCurrentGroup();
 }
 
 
