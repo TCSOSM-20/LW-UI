@@ -59,9 +59,10 @@ def user_projects(request):
     user = osmutils.get_user(request)
     client = Client()
     result = client.project_list(user.get_token())
-    return render(request, 'projectlist.html', {
+    return __response_handler(request,{
         'projects': result['data'] if result and result['error'] is False else [],
-    })
+    },'projectlist.html')
+
 
 
 def open_composer(request):

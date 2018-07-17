@@ -55,6 +55,61 @@ class Client(object):
 
         return result
 
+    def user_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/users".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
+    def user_create(self, token, user_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/users".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=user_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        print r.status_code
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def user_delete(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def project_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
