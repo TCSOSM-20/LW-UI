@@ -25,7 +25,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:instances:list' project_id=project_id type=type %}">{{ type|upper }} Instances</a></li>
+    <li><a href="{% url 'projects:instances:list'  type=type %}">{{ type|upper }} Instances</a></li>
 {% endblock %}
 
 {% block content_body %}

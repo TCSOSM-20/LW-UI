@@ -7,7 +7,7 @@
 
             <button type="button" class="btn btn-default" data-container="body"
                     data-toggle="tooltip" data-placement="top" title="Instantiate NS"
-                    onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}','vim_list_url': '{% url "projects:vims:list" project_id=project_id %}', 'nsd_list_url': '{% url "projects:list_descriptors" project_id=project_id descriptor_type='nsd' %}'})">
+                    onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}','vim_list_url': '{% url "projects:vims:list"  %}', 'nsd_list_url': '{% url "projects:list_descriptors" descriptor_type='nsd' %}'})">
                 <i class="fa fa-paper-plane"></i> <span> New NS</span></button>
 
         </div>
@@ -58,14 +58,20 @@
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default"
-                                    onclick="javascript:showInstanceDetails('{% url 'projects:instances:show' instance_id=i|get:'_id' project_id=project_id type=type %}')"
+                                    onclick="javascript:showInstanceDetails('{% url 'projects:instances:show' instance_id=i|get:'_id'  type=type %}')"
                                     data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">
-                                <i
-                                        class="fa fa-info"></i>
+                                <i class="fa fa-info"></i>
                             </button>
+                            <!--
+                            <button type="button" class="btn btn-default"
+                                    onclick="javascript:showInstanceTopology('{% url 'projects:instances:show_topology' instance_id=i|get:'_id'  type=type %}')"
+                                    data-toggle="tooltip" data-placement="top" data-container="body" title="Show Topology">
+                                <i class="fa fa-sitemap"></i>
+                            </button>
+                            -->
 
                             <button type="button" class="btn btn-default"
-                                    onclick="javascript:deleteNs('{% url 'projects:instances:delete' instance_id=i|get:'_id' project_id=project_id type=type %}')"
+                                    onclick="javascript:deleteNs('{% url 'projects:instances:delete' instance_id=i|get:'_id'  type=type %}')"
                                     data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
                                     class="far fa-trash-alt"></i></button>
 
@@ -74,21 +80,21 @@
                                 <span class="fa fa-caret-down"></span></button>
                             <ul class="dropdown-menu">
                                 <li><a href="#"
-                                       onclick="javascript:performAction('{% url 'projects:instances:action' instance_id=i|get:'_id' project_id=project_id type=type %}')">
+                                       onclick="javascript:performAction('{% url 'projects:instances:action' instance_id=i|get:'_id'  type=type %}')">
                                     <i class="fa fa-magic"></i> Exec NS Primitive</a></li>
                                 <li>
-                                    <a href="{% url 'projects:instances:ns_operations' project_id=project_id type=type instance_id=i|get:'_id' %}">
+                                    <a href="{% url 'projects:instances:ns_operations'  type=type instance_id=i|get:'_id' %}">
                                         <i class="fa fa-list"></i> Active operations</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#"
-                                       onclick="javascript:newAlarmNs('{% url 'projects:instances:ns_create_alarm' instance_id=i|get:'_id' project_id=project_id type=type %}')">
+                                       onclick="javascript:newAlarmNs('{% url 'projects:instances:ns_create_alarm' instance_id=i|get:'_id'  type=type %}')">
                                     <i class="far fa-bell"></i> New Alarm</a></li>
                                 <li><a href="#"
-                                       onclick="javascript:exportMetricNs('{% url 'projects:instances:ns_export_metric' instance_id=i|get:'_id' project_id=project_id type=type %}')">
+                                       onclick="javascript:exportMetricNs('{% url 'projects:instances:ns_export_metric' instance_id=i|get:'_id'  type=type %}')">
                                     <i class="far fa-chart-bar"></i> Export metric</a></li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="javascript:deleteNs('{% url 'projects:instances:delete' instance_id=i|get:'_id' project_id=project_id type=type %}', true)">
+                                    <a href="javascript:deleteNs('{% url 'projects:instances:delete' instance_id=i|get:'_id'  type=type %}', true)">
                                         <i class="far fa-trash-alt" style="color:red" ></i> Force delete</a></li>
                             </ul>
 

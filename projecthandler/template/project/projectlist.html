@@ -57,13 +57,13 @@
 					<tr>
 
 						<td>
-							<a href="javascript:openProject('{{ p.name }}')" >{{ p.name }}</a>
+							<a href="/projects/switch/{{ p.name }}" >{{ p.name }}</a>
 						</td>
 
 						<td>{{ p|get_sub:"_admin,modified"|get_date}}</td>
                         <td>{{ p|get_sub:"_admin,created"|get_date}}</td>
 
-						<td><a href="javascript:deleteProject('{% url 'projects:delete_project'  project_id=p|get:'_id' %}')"> Delete</a></td>
+						<td><a href="javascript:deleteProject('{% url 'projects:delete_project' %}')"> Delete</a></td>
 
 					</tr>
 				{% endfor %}

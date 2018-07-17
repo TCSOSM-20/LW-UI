@@ -30,14 +30,20 @@ def user_login(request):
         print request.POST.get('password')
         next_page = request.POST.get('next')
         next_page = urllib.unquote(next_page).decode('iso-8859-2')
-        user = authenticate(username=request.POST.get('username'),
-                            password=request.POST.get('password'),
-                            project_id=request.POST.get('project_id'))
+        try:
+            user = authenticate(username=request.POST.get('username'),
+                                password=request.POST.get('password'),
+                                project_id=request.POST.get('project_id'))
+        except Exception as e:
+            print e
+            res = HttpResponseRedirect('/auth')
+            res.set_cookie('logout_reason', '', max_age=10)
+            return res
+
         if user and user.is_active:
-            if user.is_authenticated():
+            if user.is_authenticated:
                 login(request, user)
                 request.session['token'] = user.session
-                print request.session['token']
                 if next_page == "" or next_page is None:
                     return HttpResponseRedirect('/home')
                 else:

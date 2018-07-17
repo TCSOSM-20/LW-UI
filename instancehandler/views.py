@@ -21,18 +21,20 @@ import yaml
 import json
 import logging
 from lib.osm.osmclient.clientv2 import Client
+import authosm.utils as osmutils
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('instancehandler/view.py')
 
-
 @login_required
-def list(request, project_id=None, type=None):
+def list(request, type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
     if type == 'ns':
-        instance_list = client.ns_list(request.session['token'])
+        instance_list = client.ns_list(user.get_token())
     elif type == 'vnf':
-        instance_list = client.vnf_list(request.session['token'])
+        instance_list = client.vnf_list(user.get_token())
 
     result = {'instances': instance_list['data'] if instance_list and instance_list['error'] is False else [],
               'type': type, 'project_id': project_id}
@@ -41,7 +43,7 @@ def list(request, project_id=None, type=None):
 
 
 @login_required
-def create(request, project_id=None):
+def create(request):
     result = {}
     ns_data = {
         "nsName": request.POST.get('nsName', 'WithoutName'),
@@ -73,32 +75,36 @@ def create(request, project_id=None):
 
                 ns_data["vnf"] = ns_config["vnf"]
     print ns_data
+    user = osmutils.get_user(request)
     client = Client()
-    result = client.ns_create(request.session['token'], ns_data)
+    result = client.ns_create(user.get_token(), ns_data)
     return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
-                              project_id=project_id)
+                              )
 
 
 @login_required
-def ns_operations(request, project_id=None, instance_id=None, type=None):
+def ns_operations(request, instance_id=None, type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
-    op_list = client.ns_op_list(request.session['token'], instance_id)
+    op_list = client.ns_op_list(user.get_token(), instance_id)
     return __response_handler(request,
                               {'operations': op_list['data'] if op_list and op_list['error'] is False else [],
                                'type': 'ns', 'project_id': project_id}, 'instance_operations_list.html')
 
 
 @login_required
-def ns_operation(request, op_id, project_id=None, instance_id=None, type=None):
+def ns_operation(request, op_id, instance_id=None, type=None):
+    user = osmutils.get_user(request)
     client = Client()
-    result = client.ns_op(request.session['token'], op_id)
+    result = client.ns_op(user.get_token(), op_id)
     return __response_handler(request, result['data'])
 
 
 @login_required
-def action(request, project_id=None, instance_id=None, type=None):
+def action(request, instance_id=None, type=None):
+    user = osmutils.get_user(request)
     client = Client()
-
     # result = client.ns_action(instance_id, action_payload)
     primitive_param_keys = request.POST.getlist('primitive_params_name')
     primitive_param_value = request.POST.getlist('primitive_params_value')
@@ -108,7 +114,7 @@ def action(request, project_id=None, instance_id=None, type=None):
         "primitive_params": {k: v for k, v in zip(primitive_param_keys, primitive_param_value) if len(k) > 0}
     }
 
-    result = client.ns_action(request.session['token'], instance_id, action_payload)
+    result = client.ns_action(user.get_token(), instance_id, action_payload)
     print result
     if result['error']:
         return __response_handler(request, result['data'], url=None,
@@ -119,32 +125,191 @@ def action(request, project_id=None, instance_id=None, type=None):
 
 
 @login_required
-def delete(request, project_id=None, instance_id=None, type=None):
+def delete(request, instance_id=None, type=None):
     force = bool(request.GET.get('force', False))
     result = {}
+    user = osmutils.get_user(request)
     client = Client()
-    result = client.ns_delete(request.session['token'], instance_id, force)
+    result = client.ns_delete(user.get_token(), instance_id, force)
     print result
     return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
-                              project_id=project_id)
+                              )
+
+
+def show_topology(request, instance_id=None, type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
+    raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
+    if 'application/json' in raw_content_types:
+        result = {'vertices': [
+            {"info": {"type": "vnf", "property": {"custom_label": ""},
+                      "group": []}, "id": "ping"},
+            {"info": {"type": "vnf", "property": {"custom_label": ""},
+                      "group": []}, "id": "pong"},
+            {"info": {"type": "vdu", "property": {"custom_label": ""},
+                      "group": ['pong']}, "id": "pong/ubuntu"},
+            {"info": {"type": "vdu", "property": {"custom_label": ""},
+                      "group": ['ping']}, "id": "ping/ubuntu"},
+            {"info": {"type": "cp", "property": {"custom_label": ""},
+                      "group": ['ping']}, "id": "ping/cp0"},
+            {"info": {"type": "cp", "property": {"custom_label": ""},
+                      "group": ['ping']}, "id": "ping/cp1"},
+            {"info": {"type": "cp", "property": {"custom_label": ""},
+                      "group": ['pong']}, "id": "pong/cp0"},
+            {"info": {"type": "cp", "property": {"custom_label": ""},
+                      "group": ['pong']}, "id": "pong/cp1"},
+            {"info": {"type": "ns_vl", "property": {"custom_label": ""},
+                      "group": []}, "id": "mgmt_vl"},
+        ],
+            'edges': [
+                # {"source": "ping", "group": [], "target": "ping/cp0", "view": "Data"},
+                {"source": "pong/ubuntu", "group": ['pong'], "target": "pong/cp0", "view": "vnf"},
+                {"source": "ping/ubuntu", "group": ['ping'], "target": "ping/cp0", "view": "vnf"},
+                {"source": "pong/ubuntu", "group": ['pong'], "target": "pong/cp1", "view": "vnf"},
+                {"source": "ping/ubuntu", "group": ['ping'], "target": "ping/cp1", "view": "vnf"},
+                {"source": "pong", "group": [], "target": "mgmt_vl", "view": "ns"},
+                {"source": "ping", "group": [], "target": "mgmt_vl", "view": "ns"},
+            ], 'graph_parameters': [],
+            'model': {
+                "layer": {
+
+                    "ns": {
+                        "nodes": {
+                            "vnf": {
+                                "addable": {
+                                    "callback": "addNode"
+                                },
+                                "removable": {
+                                    "callback": "removeNode"
+                                },
+                                "expands": "vnf"
+                            },
+                            "ns_vl": {
+                                "addable": {
+                                    "callback": "addNode"
+                                },
+                                "removable": {
+                                    "callback": "removeNode"
+                                }
+                            },
+
+                        },
+                        "allowed_edges": {
+                            "ns_vl": {
+                                "destination": {
+                                    "vnf": {
+                                        "callback": "addLink",
+                                        "direct_edge": False,
+                                        "removable": {
+                                            "callback": "removeLink"
+                                        }
+                                    }
+                                }
+                            },
+                            "vnf": {
+                                "destination": {
+                                    "ns_vl": {
+                                        "callback": "addLink",
+                                        "direct_edge": False,
+                                        "removable": {
+                                            "callback": "removeLink"
+                                        }
+                                    },
+
+                                }
+                            }
+
+                        }
+                    },
+                    "vnf": {
+                        "nodes": {
+                            "vdu": {
+                                "addable": {
+                                    "callback": "addNode"
+                                },
+                                "removable": {
+                                    "callback": "removeNode"
+                                }
+                            },
+                            "cp": {
+                                "addable": {
+                                    "callback": "addNode"
+                                },
+                                "removable": {
+                                    "callback": "removeNode"
+                                }
+                            },
+
+                        },
+                        "allowed_edges": {
+                            "vdu": {
+                                "destination": {
+                                    "cp": {
+                                        "callback": "addLink",
+                                        "direct_edge": False,
+                                        "removable": {
+                                            "callback": "removeLink"
+                                        }
+                                    }
+                                }
+                            },
+                            "cp": {
+                                "destination": {
+                                    "vdu": {
+                                        "callback": "addLink",
+                                        "direct_edge": False,
+                                        "removable": {
+                                            "callback": "removeLink"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "name": "OSM",
+                    "version": 1,
+                    "nodes": {
+                        "vnf": {
+                            "label": "vnf"
+                        },
+                        "ns_vl": {
+                            "label": "vl"
+                        },
+                        "cp": {
+                            "label": "cp"
+                        },
+                        "vdu": {
+                            "label": "vdu"
+                        }
+                    },
+                    "description": "osm"
+                }
+            }}
+        return __response_handler(request, result)
+    else:
+        result = {'type': type, 'project_id': project_id, 'instance_id': instance_id}
+        return __response_handler(request, result, 'instance_topology_view.html')
 
 
 @login_required
-def show(request, project_id=None, instance_id=None, type=None):
+def show(request, instance_id=None, type=None):
     # result = {}
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
     if type == 'ns':
-        result = client.ns_get(request.session['token'], instance_id)
+        result = client.ns_get(user.get_token(), instance_id)
     elif type == 'vnf':
-        result = client.vnf_get(request.session['token'], instance_id)
+        result = client.vnf_get(user.get_token(), instance_id)
     print result
     return __response_handler(request, result)
 
 
 @login_required
-def export_metric(request, project_id=None, instance_id=None, type=None):
+def export_metric(request, instance_id=None, type=None):
     metric_data = request.POST.dict()
-
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
     keys = ["collection_period",
             "vnf_member_index",
@@ -154,7 +319,7 @@ def export_metric(request, project_id=None, instance_id=None, type=None):
             "collection_unit"]
     metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
 
-    result = client.ns_metric_export(request.session['token'], instance_id, metric_data)
+    result = client.ns_metric_export(user.get_token(), instance_id, metric_data)
 
     if result['error']:
         print result
@@ -165,9 +330,11 @@ def export_metric(request, project_id=None, instance_id=None, type=None):
 
 
 @login_required
-def create_alarm(request, project_id=None, instance_id=None, type=None):
+def create_alarm(request, instance_id=None, type=None):
     metric_data = request.POST.dict()
     print metric_data
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
 
     keys = ["threshold_value",
@@ -181,7 +348,7 @@ def create_alarm(request, project_id=None, instance_id=None, type=None):
             "severity"]
     metric_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, metric_data.items()))
 
-    result = client.ns_alarm_create(request.session['token'], instance_id, metric_data)
+    result = client.ns_alarm_create(user.get_token(), instance_id, metric_data)
     if result['error']:
         print result
         return __response_handler(request, result['data'], url=None,

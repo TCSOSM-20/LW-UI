@@ -7,9 +7,9 @@ function openProject(pId) {
 }
 
 
-function openDescriptorView(project_id, descriptor_type, descriptor_id) {
-    console.log("openDescriptorView", project_id, descriptor_type, descriptor_id);
-    window.location.href = '/projects/' + project_id + '/descriptors/' + descriptor_type + '/' + descriptor_id;
+function openDescriptorView( descriptor_type, descriptor_id) {
+    console.log("openDescriptorView", descriptor_type, descriptor_id);
+    window.location.href = '/projects/descriptors/' + descriptor_type + '/' + descriptor_id;
 
 }
 

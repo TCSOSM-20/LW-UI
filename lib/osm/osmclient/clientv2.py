@@ -28,7 +28,23 @@ class Client(object):
         try:
             r = requests.post(token_url, json=args, verify=False, headers=headers)
         except Exception as e:
-            print "saltata"
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
+    def switch_project(self, args):
+        result = {'error': True, 'data': ''}
+        token_url = "{0}/{1}".format(self._base_path, self._token_endpoint)
+        headers = {"Content-Type": "application/yaml", "accept": "application/json"}
+        try:
+            r = requests.post(token_url, json=args, verify=False, headers=headers)
+        except Exception as e:
             log.exception(e)
             result['data'] = str(e)
             return result

@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import json
 import logging
-#from lib.osm.osmclient.client import Client
+import authosm.utils as osmutils
 from lib.osm.osmclient.clientv2 import Client
 
 logging.basicConfig(level=logging.DEBUG)
@@ -27,9 +27,11 @@ log = logging.getLogger('sdnctrlhandler/view.py')
 
 
 @login_required
-def list(request, project_id):
+def list(request):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
-    result = client.sdn_list(request.session['token'])
+    result = client.sdn_list(user.get_token())
 
     result = {
         'project_id': project_id,
@@ -39,7 +41,9 @@ def list(request, project_id):
 
 
 @login_required
-def create(request, project_id):
+def create(request):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     result = {'project_id': project_id}
     if request.method == 'GET':
         return __response_handler(request, result, 'sdn_create.html')
@@ -57,25 +61,29 @@ def create(request, project_id):
         sdn_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_sdn_dict.items()))
         sdn_data['port'] = int(sdn_data['port'])
 
-        result = client.sdn_create(request.session['token'], sdn_data)
+        result = client.sdn_create(user.get_token(), sdn_data)
 
-        return __response_handler(request, result, 'projects:sdns:list', to_redirect=True, project_id=project_id)
+        return __response_handler(request, result, 'projects:sdns:list', to_redirect=True, )
 
 
 @login_required
-def delete(request, project_id, sdn_id=None):
+def delete(request, sdn_id=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     try:
         client = Client()
-        del_res = client.sdn_delete(request.session['token'], sdn_id)
+        del_res = client.sdn_delete(user.get_token(), sdn_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'projects:sdns:list', to_redirect=True, project_id=project_id)
+    return __response_handler(request, {}, 'projects:sdns:list', to_redirect=True, )
 
 
 @login_required
-def show(request, project_id, sdn_id=None):
+def show(request, sdn_id=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
     client = Client()
-    result = client.sdn_get(request.session['token'], sdn_id)
+    result = client.sdn_get(user.get_token(), sdn_id)
     if isinstance(result, dict) and 'error' in result and result['error']:
         return render(request, 'error.html')
     return __response_handler(request, {

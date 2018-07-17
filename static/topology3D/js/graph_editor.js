@@ -184,7 +184,7 @@ dreamer.GraphEditor = (function (global) {
         this.container = chart.parent();
         $(window).on("resize", function() {
 
-            var palette_width = $("#palette").width()
+            var palette_width = ($("#palette").length > 0) ? $("#palette").width() : 0;
             var working_width = self.container.width() - palette_width;
             self.width = (working_width < 0) ? 0 : working_width;
             self.height = self.container.height();
@@ -197,7 +197,7 @@ dreamer.GraphEditor = (function (global) {
 
     GraphEditor.prototype.get_d3_symbol =
         function (myString) {
-            log(myString)
+
             switch (myString) {
             case "circle":
                 return d3.symbolCircle;
@@ -227,7 +227,6 @@ dreamer.GraphEditor = (function (global) {
 
      GraphEditor.prototype.get_name_from_d3_symbol =
         function (mySymbol) {
-            //log(myString)
             switch (mySymbol) {
             case d3.symbolCircle:
                 return "circle";
@@ -372,7 +371,7 @@ dreamer.GraphEditor = (function (global) {
      * @returns {boolean}
      */
     GraphEditor.prototype.addLink = function (link) {
-        console.log(JSON.stringify(link))
+        console.log("addLink" + JSON.stringify(link))
         if (link.source && link.target) {
             this.force.stop();
             this.cleanAll();
@@ -741,6 +740,7 @@ dreamer.GraphEditor = (function (global) {
                     return 80
                 })
                 .type(function (d) {
+                    console.log("popiup")
                     return (self.get_d3_symbol());
                 })
             )
@@ -948,7 +948,7 @@ dreamer.GraphEditor = (function (global) {
                     if (self.lastKeyDown == SHIFT_BUTTON && self._selected_node != undefined) {
                         var source_id = self._selected_node.id;
                         var target_id = d.id;
-                        log(JSON.stringify(self.filter_parameters.link.view));
+                        log("--" + JSON.stringify(self.filter_parameters.link.view));
                         var new_link = {
                             source: source_id,
                             target: target_id,
@@ -1036,7 +1036,7 @@ dreamer.GraphEditor = (function (global) {
      */
     GraphEditor.prototype.resizeSvg = function (width, height) {
         log("resizeSvg");
-        log(event);
+        //log(event);
         this.width = width || this.width;
         this.height = height || this.height;
         this.svg.attr('width', width);

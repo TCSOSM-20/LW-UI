@@ -1,5 +1,5 @@
 #
-#   Copyright 2018 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+#   Copyright 2018 EveryUP Srl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,6 +14,20 @@
 #   limitations under the License.
 #
 
-from django.test import TestCase
+import time
+import authosm.models
 
-# Create your tests here.
+
+def get_user(request):
+    user = authosm.models.OsmUser.objects.get(username=request.session['_auth_user_id'])
+    return user
+
+
+def is_token_valid(token):
+
+    expiration = token['expires'] if 'expires' in token \
+                                     and isinstance(token['expires'], (int, long, float, complex)) else None
+    if expiration is None:
+        return False
+
+    return expiration > time.time()

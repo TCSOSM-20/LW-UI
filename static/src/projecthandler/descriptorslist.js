@@ -1,19 +1,19 @@
-function deletePackage(project_id, descriptor_type, package_id) {
+function deletePackage(descriptor_type, package_id) {
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-            location.href = '/projects/' + project_id + '/descriptors/' + descriptor_type + '/' + package_id + '/delete'
+            location.href = '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete'
         }
     })
 }
 
 
-function openPackageContentList(project_id, type, pkg_id) {
+function openPackageContentList(type, pkg_id) {
     var dialog = bootbox.dialog({
         message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
         closeButton: true
     });
     $.ajax({
-        url: '/projects/' + project_id + '/descriptors/' + type + '/' + pkg_id + '/action/get_package_files_list',
+        url: '/projects/descriptors/' + type + '/' + pkg_id + '/action/get_package_files_list',
         type: 'GET',
         dataType: "json",
         contentType: "application/json;charset=utf-8",

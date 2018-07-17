@@ -17,7 +17,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:sdns:list' project_id=project_id %}">SDN Controllers</a></li>
+    <li><a href="{% url 'projects:sdns:list'  %}">SDN Controllers</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -31,7 +31,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Registered SDN Controllers</h3>
                     <div class="box-tools">
-                        <a href='{% url "projects:sdns:create" project_id=project_id %}' class="btn btn-block btn-primary btn-sm"><i
+                        <a href='{% url "projects:sdns:create"  %}' class="btn btn-block btn-primary btn-sm"><i
                                 class="fa fa-plus"></i><span> New SDN Controller</span></a>
                     </div>
                 </div>
@@ -61,10 +61,10 @@
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default"
-                                                onclick="javascript:showSDN('{{ project_id }}', '{{ s|get:"_id" }}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info"><i
+                                                onclick="javascript:showSDN( '{{ s|get:"_id" }}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info"><i
                                                 class="fa fa-info"></i></button>
                                         <button type="button" class="btn btn-default"
-                                                onclick="javascript:deleteSDN('{{ project_id }}', '{{ s|get:"_id" }}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
+                                                onclick="javascript:deleteSDN('{{ s|get:"_id" }}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
                                                 class="far fa-trash-alt" ></i></button>
                                     </div>
                                 </td>

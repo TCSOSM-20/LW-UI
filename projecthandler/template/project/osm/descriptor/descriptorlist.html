@@ -7,10 +7,13 @@
             <h3 class="box-title">
             </h3>
             <div class="box-tools">
-
-                <a href="{% url 'projects:new_descriptor' project_id=project_id descriptor_type=descriptor_type %}"
+                <div class="btn-group">
+                    <!--
+                <a href="{% url 'projects:open_composer'%}"
                    class="btn btn-block btn-primary btn-sm"><i
-                        class="fa fa-upload"></i><span> Onboard {{ descriptor_type|upper }}</span></a>
+                        class="fa fa-paint-brush" disabled></i><span> Composer</span></a>
+                        -->
+                </div>
             </div>
         </div>
         <div class="box-body">
@@ -39,28 +42,28 @@
                                 {% if descriptor_type == "nsd" %}
                                     <button type="button" class="btn btn-default" data-container="body"
                                             data-toggle="tooltip" data-placement="top" title="Instantiate NS"
-                                            onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}', 'descriptor_type': '{{ descriptor_type }}', 'descriptor_name':'{{ k|get:"name" }}', 'descriptor_id':'{{ k|get:"_id" }}','vim_list_url': '{% url "projects:vims:list" project_id=project_id %}',  'nsd_list_url': '{% url "projects:list_descriptors" project_id=project_id descriptor_type=descriptor_type %}' })">
+                                            onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}', 'descriptor_type': '{{ descriptor_type }}', 'descriptor_name':'{{ k|get:"name" }}', 'descriptor_id':'{{ k|get:"_id" }}','vim_list_url': '{% url "projects:vims:list"  %}',  'nsd_list_url': '{% url "projects:list_descriptors"  descriptor_type=descriptor_type %}' })">
                                         <i class="fa fa-paper-plane"></i></button>
                                 {% endif %}
                                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="Edit"
-                                        onclick="javascript:openDescriptorView('{{ project_id }}', '{{ descriptor_type }}', '{{ k|get:"_id" }}')">
+                                        onclick="javascript:openDescriptorView('{{ descriptor_type }}', '{{ k|get:"_id" }}')">
                                     <i class="fa fa-edit"></i></button>
                                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="Show content"
-                                        onclick="javascript:openPackageContentList('{{ project_id }}', '{{ descriptor_type }}', '{{ k|get:"_id" }}')">
+                                        onclick="javascript:openPackageContentList('{{ descriptor_type }}', '{{ k|get:"_id" }}')">
                                     <i class="fa fa-folder-open"></i></button>
                                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="Show Graph"
-                                        onclick="location.href='/projects/{{ project_id }}/graph?type={{ descriptor_type }}&id={{ k|get:"_id" }}'"
+                                        onclick="location.href='/projects/graph?type={{ descriptor_type }}&id={{ k|get:"_id" }}'"
                                         disabled><i class="fa fa-sitemap fa-fw"></i></button>
                                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="Download package"
-                                        onclick="location.href='{% url 'projects:custom_action' project_id=project_id descriptor_type=descriptor_type descriptor_id=k|get:'_id' action_name='download_pkg' %}'">
+                                        onclick="location.href='{% url 'projects:custom_action'  descriptor_type=descriptor_type descriptor_id=k|get:'_id' action_name='download_pkg' %}'">
                                     <i class="fa fa-download fa-fw"></i></button>
                                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="Delete"
-                                        onclick="javascript:deletePackage('{{ project_id }}', '{{ descriptor_type }}', '{{ k|get:"_id" }}')">
+                                        onclick="javascript:deletePackage( '{{ descriptor_type }}', '{{ k|get:"_id" }}')">
                                     <i class="far fa-trash-alt"></i></button>
                             </div>
 
