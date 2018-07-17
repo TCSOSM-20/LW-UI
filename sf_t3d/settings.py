@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'vimhandler',
     'instancehandler',
     'sdnctrlhandler',
+    'userhandler'
 
 ]
 
@@ -86,6 +87,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'vimhandler', 'template'),
             os.path.join(BASE_DIR, 'instancehandler', 'template'),
             os.path.join(BASE_DIR, 'sdnctrlhandler', 'template'),
+            os.path.join(BASE_DIR, 'userhandler', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

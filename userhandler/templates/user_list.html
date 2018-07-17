@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load get %}
+{% load date_tag %}
+{% load staticfiles %}
+
+
+{% block head_block %}
+    {{ block.super }}
+    <link rel="stylesheet" href="/static/bower_components/select2/dist/css/select2.min.css">
+{% endblock %}
+{% block title_header_big %}
+    {{ block.super }}
+{% endblock %}
+{% block left_sidebar %}
+    {% include 'osm/osm_project_left_sidebar.html' %}
+{% endblock %}
+
+
+{% block breadcrumb_body %}
+    {{ block.super }}
+    <li><a href="#">Users</a></li>
+{% endblock %}
+
+{% block content_body %}
+    {{ block.super }}
+    {% include 'modal/user_details.html' %}
+    {% include 'modal/user_create.html' %}
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Users</h3>
+                    <div class="box-tools">
+                        <button type="button" class="btn btn-default" data-container="body"
+                                onclick="javascript:openModalCreateUser({'projects_list_url': '{% url "projects:projects_list"  %}'})"
+                                        data-toggle="tooltip" data-placement="top" title="New User">
+
+                                    <i class="fa fa-plus"></i> Create User</button>
+
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="users_table" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Projects</th>
+                            <th>Identifier</th>
+                            <th>Modified</th>
+                             <th>Created</th>
+                            <th>Actions</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for s in users %}
+                            <tr>
+
+                                <td>{{ s|get:"username" }}</td>
+                                <td>{{ s|get:"projects" }}</td>
+                                <td>{{ s|get:"_id" }}</td>
+                                <td>{{ s|get_sub:"_admin,modified"|get_date}}</td>
+                                <td>{{ s|get_sub:"_admin,created"|get_date}}</td>
+
+                                <td>
+                                    <div class="btn-group">
+
+                                        <button type="button" class="btn btn-default"
+                                                onclick="javascript:deleteUser('{% url "users:delete" user_id=s|get:"_id"  %}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
+                                                class="far fa-trash-alt" ></i></button>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block resource_block %}
+    {{ block.super }}
+    <!-- moment JS -->
+    <script src="/static/bower_components/select2/dist/js/select2.js"></script>
+    <script src="/static/src/userhandler/user_list.js"></script>
+
+
+{% endblock %}
+
+{% block footer %}
+    {% include "footer.html"  %}
+{% endblock %}
