@@ -21,8 +21,8 @@
                    role="grid">
                 <thead>
                 <tr role="row">
-                    <th>Id</th>
                     <th>Name</th>
+                    <th>Identified</th>
                     <th>Description</th>
                     <th style="width:10%">Vendor</th>
                     <th style="width:5%">Version</th>
@@ -32,8 +32,8 @@
                 <tbody>
                 {% for k in descriptors %}
                     <tr role="row">
-                        <td>{{ k|get:"_id" }}</td>
                         <td>{{ k|get:"short-name" }} </td>
+                        <td>{{ k|get:"_id" }}</td>
                         <td>{{ k|get:"description" }} </td>
                         <td>{{ k|get:"vendor" }} </td>
                         <td>{{ k|get:"version" }} </td>

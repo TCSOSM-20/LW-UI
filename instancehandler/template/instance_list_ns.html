@@ -17,8 +17,8 @@
         <table id="instances_table" class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
+                <th>Identifier</th>
                 <th>Nsd name</th>
                 <th style="width:5%">Operational Status</th>
                 <th style="width:5%">Config Status</th>
@@ -29,9 +29,9 @@
             <tbody>
             {% for i in instances %}
                 <tr>
-
-                    <td>{{ i|get:"_id" }}</td>
                     <td>{{ i|get:"short-name" }}</td>
+                    <td>{{ i|get:"_id" }}</td>
+
                     <td>{{ i|get:"nsd-name-ref" }}</td>
 
                     {% if i|get:"operational-status" == 'failed' %}

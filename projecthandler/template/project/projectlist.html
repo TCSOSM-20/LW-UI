@@ -5,6 +5,7 @@
 
 {% block head_block %}
   	{{ block.super }}
+    <link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
 {% endblock %}
 {% block title_header_big %}
@@ -92,6 +93,14 @@
 
 {% block resource_block %}
   	{{ block.super }}
+    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+    $(document).ready( function () {
+        $('#projects_table').DataTable();
+    } );
+    </script>
     <script>
     function showModalNewProject(){
         $('#modal_new_project').modal('show');
