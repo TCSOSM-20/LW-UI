@@ -5,6 +5,7 @@
 
 {% block head_block %}
     {{ block.super }}
+    <link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
 {% endblock %}
 {% block title_header_big %}
@@ -36,11 +37,11 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <table id="projects_table" class="table table-bordered table-striped">
+                    <table id="sdns_table" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                            <th>Id</th>
                             <th>Name</th>
+                            <th>Identifier</th>
                             <th>Type</th>
                             <th>Operational State</th>
                             <th>IP</th>
@@ -52,8 +53,8 @@
                         <tbody>
                         {% for s in sdns %}
                             <tr>
-                                <td>{{ s|get:"_id" }}</td>
                                 <td>{{ s|get:"name" }}</td>
+                                <td>{{ s|get:"_id" }}</td>
                                 <td>{{ s|get:"type" }}</td>
                                 <td>{{ s|get_sub:"_admin,operationalState"}}</td>
                                 <td>{{ s|get:"ip" }}</td>
@@ -84,10 +85,15 @@
     {{ block.super }}
     <!-- moment JS -->
     <script src="/static/bower_components/moment/moment.js"></script>
-
+    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     <script src="/static/src/sdnctrlhandler/sdn_list.js"></script>
 
-
+     <script>
+    $(document).ready( function () {
+        $('#sdns_table').DataTable();
+    } );
+    </script>
 {% endblock %}
 
 {% block footer %}

@@ -49,6 +49,10 @@
     var csrf_token = '{{csrf_token}}';
     var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
     var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}"
+    $(document).ready( function () {
+        $('#descriptors_table').DataTable();
+    } );
+
     </script>
     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
     <script src="/static/src/instancehandler/instance_create.js"></script>

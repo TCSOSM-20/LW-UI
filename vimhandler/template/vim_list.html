@@ -5,7 +5,7 @@
 
 {% block head_block %}
     {{ block.super }}
-
+    <link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 {% endblock %}
 {% block title_header_big %}
     {{ block.super }}
@@ -38,11 +38,11 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <table id="projects_table" class="table table-bordered table-striped">
+                    <table id="vims_table" class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                            <th>Id</th>
                             <th>Name</th>
+                            <th>Identifier</th>
                             <th>Type</th>
                             <th>Operational State</th>
                             <th>Description</th>
@@ -53,9 +53,8 @@
                         {% for p in datacenters %}
 
                             <tr>
-
-                                <td>{{ p|get:"_id" }}</td>
                                 <td>{{ p|get:"name" }}</td>
+                                <td>{{ p|get:"_id" }}</td>
                                 <td>{{ p|get:"vim_type" }}</td>
                                 <td>{{ p|get_sub:"_admin,operationalState"}}</td>
                                 <td>{{ p|get_sub:"_admin,description" }}</td>
@@ -85,8 +84,13 @@
 
 {% block resource_block %}
     {{ block.super }}
-    <!-- Utility JS -->
-
+    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script>
+    $(document).ready( function () {
+        $('#vims_table').DataTable();
+    } );
+    </script>
     <script>
 
         function deleteVim(url) {
@@ -98,8 +102,4 @@
         }
     </script>
 
-{% endblock %}
-
-{% block footer %}
-    {% include "footer.html"  %}
 {% endblock %}
