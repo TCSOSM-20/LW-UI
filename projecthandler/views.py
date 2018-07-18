@@ -255,6 +255,7 @@ def open_project(request):
 
         client = Client()
         ##TODO change with adhoc api call
+        prj = client.project_get(user.get_token(), project_id)
         nsd = client.nsd_list(user.get_token())
         vnfd = client.vnfd_list(user.get_token())
         ns = client.ns_list(user.get_token())
@@ -262,9 +263,9 @@ def open_project(request):
         project_overview = {
             'owner': user.username,
             'name': project_id,
-            'updated_date': '-',
-            'created_date': '-',
-            'info': '-',
+            'updated_date': prj['data']['_admin']['modified'] if prj and prj['error'] is False else '-',
+            'created_date': prj['data']['_admin']['created'] if prj and prj['error'] is False else '-',
+
             'type': 'osm',
             'nsd': len(nsd['data']) if nsd and nsd['error'] is False else 0,
             'vnfd': len(vnfd['data']) if vnfd and vnfd['error'] is False else 0,
