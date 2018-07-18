@@ -18,7 +18,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:vims:list' %}">VIMS</a></li>
+    <li><a href="{% url 'vims:list' %}">VIMS</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -121,7 +121,7 @@
             </div>
             <div class="box-footer">
                 <div class="">
-                    <button onclick="location.href='{% url 'projects:vims:list' %}'" class="btn btn-primary">Back to VIM Accounts</button>
+                    <button onclick="location.href='{% url 'vims:list' %}'" class="btn btn-primary">Back to VIM Accounts</button>
                 </div>
             </div>
         </div>

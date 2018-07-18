@@ -25,7 +25,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:instances:list'  type=type %}">Instances</a></li>
+    <li><a href="{% url 'instances:list'  type=type %}">Instances</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -74,7 +74,7 @@
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default"
-                                                onclick="javascript:showOperationDetails('{% url 'projects:instances:ns_operation' op_id=i|get:'_id' instance_id=i|get:'nsInstanceId'  type=type %}')"
+                                                onclick="javascript:showOperationDetails('{% url 'instances:ns_operation' op_id=i|get:'_id' instance_id=i|get:'nsInstanceId'  type=type %}')"
                                                 data-toggle="tooltip" data-placement="top" data-container="body" title="More Info"><i
                                                 class="fa fa-info"></i>
                                         </button>

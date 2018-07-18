@@ -23,8 +23,6 @@ function openModalCreateUser(args) {
         }
     });
 
-
-
     $('#modal_new_user').modal('show');
 }
 

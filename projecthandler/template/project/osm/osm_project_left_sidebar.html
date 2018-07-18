@@ -38,8 +38,8 @@
 
                 </ul>
             </li>
-            {% url "projects:instances:list"  type='ns' as  instance_ns_list_url %}
-            {% url "projects:instances:list"  type='vnf' as  instance_vnf_list_url %}
+            {% url "instances:list"  type='ns' as  instance_ns_list_url %}
+            {% url "instances:list"  type='vnf' as  instance_vnf_list_url %}
             <li {% if request.get_full_path == instance_ns_list_url or  request.get_full_path == instance_vnf_list_url %}
                 class="active treeview menu-open" {% else %} class="treeview  menu-open" {% endif %} >
                 <a href="#">
@@ -49,32 +49,32 @@
                     </span>
                 </a>
                 <ul class="treeview-menu" style="display: block;">
-                    {% url "projects:instances:list"  type='ns' as  instance_ns_list_url %}
+                    {% url "instances:list"  type='ns' as  instance_ns_list_url %}
                     <li {% if request.get_full_path == instance_ns_list_url %} class="active" {% endif %} >
-                        <a href='{% url "projects:instances:list"   type="ns" %}'>
+                        <a href='{% url "instances:list"   type="ns" %}'>
                             <i class="fa fa-sitemap fa-fw"></i> <span>NS Instances</span>
                         </a>
 
                     </li>
-                    {% url "projects:instances:list"  type='vnf' as  instance_vnf_list_url %}
+                    {% url "instances:list"  type='vnf' as  instance_vnf_list_url %}
                     <li {% if request.get_full_path == instance_vnf_list_url %} class="active" {% endif %} >
-                        <a href='{% url "projects:instances:list"   type="vnf" %}'>
+                        <a href='{% url "instances:list"   type="vnf" %}'>
                             <i class="far fa-hdd fa-fw"></i> <span>VNF Instances</span>
                         </a>
                     </li>
                 </ul>
             </li>
 
-            {% url "projects:sdns:list"   as sdn_list_url %}
+            {% url "sdns:list"   as sdn_list_url %}
             <li {% if request.get_full_path == sdn_list_url %} class="active" {% endif %}>
-                <a href='{% url "projects:sdns:list"   %}'>
+                <a href='{% url "sdns:list"   %}'>
                     <i class="fas fa-globe fa-fw"></i> <span>SDN Controllers</span>
                 </a>
             </li>
 
-            {% url "projects:vims:list"   as  vim_list_url %}
+            {% url "vims:list"   as  vim_list_url %}
             <li {% if request.get_full_path == vim_list_url %} class="active" {% endif %}>
-                <a href='{% url "projects:vims:list"   %}'>
+                <a href='{% url "vims:list"   %}'>
                     <i class="fa fa-server fa-fw"></i> <span>VIM Accounts</span>
                 </a>
             </li>

@@ -63,7 +63,7 @@ def create(request):
 
         result = client.sdn_create(user.get_token(), sdn_data)
 
-        return __response_handler(request, result, 'projects:sdns:list', to_redirect=True, )
+        return __response_handler(request, result, 'sdns:list', to_redirect=True, )
 
 
 @login_required
@@ -75,7 +75,7 @@ def delete(request, sdn_id=None):
         del_res = client.sdn_delete(user.get_token(), sdn_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'projects:sdns:list', to_redirect=True, )
+    return __response_handler(request, {}, 'sdns:list', to_redirect=True, )
 
 
 @login_required

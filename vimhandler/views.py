@@ -76,7 +76,7 @@ def create(request):
                 print e
         result = client.vim_create(user.get_token(), vim_data)
         # TODO  'vim:show', to_redirect=True, vim_id=vim_id
-        return __response_handler(request, result, 'projects:vims:list', to_redirect=True, )
+        return __response_handler(request, result, 'vims:list', to_redirect=True, )
 
 @login_required
 def delete(request, vim_id=None):
@@ -86,7 +86,7 @@ def delete(request, vim_id=None):
         del_res = client.vim_delete(user.get_token(), vim_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'projects:vims:list', to_redirect=True, )
+    return __response_handler(request, {}, 'vims:list', to_redirect=True, )
 
 @login_required
 def show(request, vim_id=None):

@@ -37,7 +37,7 @@
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default"
-                                    onclick="javascript:showInstanceDetails('{% url 'projects:instances:show' instance_id=i|get:'_id'  type=type %}')"
+                                    onclick="javascript:showInstanceDetails('{% url 'instances:show' instance_id=i|get:'_id'  type=type %}')"
                                     data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">
                                 <i class="fa fa-info"></i>
                             </button>

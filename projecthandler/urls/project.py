@@ -36,8 +36,6 @@ urlpatterns = [
         name='new_descriptor'),
     url(r'^composer$', views.open_composer, name='open_composer'),
     url(r'^availablenodes', views.get_available_nodes, name='get_available_nodes'),
-    url(r'^sdn/', include('sdnctrlhandler.urls', namespace='sdns'), name='sdns_base'),
-    url(r'^vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
-    url(r'^instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),
+
 
 ]
