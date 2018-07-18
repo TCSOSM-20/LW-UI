@@ -89,6 +89,14 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
             return {'id': self.token, 'expires': self.token_expires, 'project_id': self.project_id}
         return None
 
+    def get_projects(self):
+        client = Client()
+        result = client.get_user_info(self.get_token(), self.username)
+        if 'error' in result and result['error'] is True:
+            return []
+        else:
+            return result['data']['projects']
+
     def switch_project(self, project_id):
         client = Client()
         result = client.switch_project({'project_id': project_id, 'username': self.username, 'password': self.psw})

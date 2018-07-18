@@ -49,31 +49,67 @@
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
             {% if user.get_username %}
+                <li class="dropdown tasks-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="far fa-folder-open"> </span>
+                       <span>{{ user.project_id }}</span>
+                        <span class="fa fa-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">Projects:</li>
+                        <li>
+                            <!-- inner menu: contains the actual data -->
+                            <ul class="menu">
+                                {% for p in request.session.projects %}
+                                    {% if p == user.project_id %}
+                                        <li>
+                                            <a href="#">
+                                                <h3>
+                                                    <i class="fa fa-folder-open"></i> <span>{{ p }}</span>
+                                                </h3>
+
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <a href="{% url 'projects:switch_project' project_id=p %}">
+                                                <h3>
+                                                    <i class="fa fa-folder"></i> <span>{{ p }}</span>
+                                                </h3>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="/static/assets/img/account_circle.png" class="user-image" alt="User Image">
                         <span class="hidden-xs">{{ user.username }}</span>
             </a>
-            <ul class="dropdown-menu">
-                        <!-- User image -->
-                        <li class="user-header">
-                            <img src="/static/assets/img/account_circle.png" class="img-circle" alt="User Image">
-                            <p id="user_menu_name_role">
-                                {{ user.get_username }}
-                                <small id="user_menu_role">{{ user.get_user_role_name }}</small>
-                            </p>
-                        </li>
-                        <!-- Menu Footer-->
-                        <li class="user-footer">
-                            <div class="pull-left">
-                              <a href="#" class="btn btn-default btn-flat" disabled>Settings</a>
-                            </div>
-                            <div class="pull-right">
-                                <a href="/auth" class="btn btn-default btn-flat">Sign out</a>
-                            </div>
-                        </li>
-                    </ul>
+              <ul class="dropdown-menu">
+                  <!-- User image -->
+                  <li class="user-header">
+                      <img src="/static/assets/img/account_circle.png" class="img-circle" alt="User Image">
+                      <p id="user_menu_name_role">
+                          {{ user.get_username }}
+                          <small id="user_menu_role">{{ user.get_user_role_name }}</small>
+                      </p>
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                      <div class="pull-left">
+                          <a href="#" class="btn btn-default btn-flat" disabled>Settings</a>
+                      </div>
+                      <div class="pull-right">
+                          <a href="/auth" class="btn btn-default btn-flat">Sign out</a>
+                      </div>
+                  </li>
+              </ul>
           </li>
             {% endif %}
         </ul>

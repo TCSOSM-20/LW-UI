@@ -1,4 +1,5 @@
 {% extends "project_details.html" %}
+{% load date_tag %}
 {% block head_base %}
     {{ block.super }}
 {% endblock %}
@@ -24,13 +25,12 @@
                     <li><a><b>Project Name:</b> <span
                         class="pull-right">{{project_overview.name}}</span></a>
                     </li>
-                    <li><a><b>Info:</b> <span
-                            class="pull-right">{{project_overview.info}}</span></a></li>
-                    <li><a><b>Last updated:</b> <span
-                        class="pull-right">{{project_overview.updated_date}}</span></a>
+                    <li><a><b>Created:</b> <span
+                            class="pull-right">{{project_overview.created_date|get_date}}</span></a></li>
+                    <li><a><b>Modified:</b> <span
+                        class="pull-right">{{project_overview.updated_date|get_date}}</span></a>
                     </li>
-                    <li><a><b>Owner:</b> <span
-                            class="pull-right">{{project_overview.owner}}</span></a></li>
+
                 </ul>
 
             </div>

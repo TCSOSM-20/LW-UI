@@ -19,8 +19,8 @@ from .models import OsmUser
 from lib.osm.osmclient.clientv2 import Client
 from .exceptions import OSMAuthException
 
-class OsmBackend(object):
 
+class OsmBackend(object):
     def authenticate(self, **kwargs):
         '''
         kwargs will receive the python dict that may contain
@@ -40,19 +40,16 @@ class OsmBackend(object):
                 try:
                     user = OsmUser.objects.get(username=username)
                     user.psw = password
-                    user.token=result['data']['id']
-                    user.project_id=result['data']['project_id']
-                    user.token_expires=result['data']['expires']
-                    user.session = result['data']
+                    user.token = result['data']['id']
+                    user.project_id = result['data']['project_id']
+                    user.token_expires = result['data']['expires']
+                    user.is_admin = bool(result['data']['admin'])
                     user.save()
-
                 except OsmUser.DoesNotExist:
                     user = OsmUser(username=username, psw=password, token=result['data']['id'],
-                                                       project_id=result['data']['project_id'],
-                                                       token_expires=result['data']['expires'])
-                    user.session = result['data']
+                                   project_id=result['data']['project_id'],
+                                   token_expires=result['data']['expires'], is_admin=result['data']['admin'])
                     user.save()
-
 
                 return user
 
