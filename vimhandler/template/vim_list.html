@@ -19,7 +19,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url "projects:vims:list"   %}">VIMS</a></li>
+    <li><a href="{% url "vims:list"   %}">VIMS</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -33,7 +33,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Registered VIM</h3>
                     <div class="box-tools">
-                        <a href='{% url "projects:vims:create"   %}' class="btn btn-block btn-primary btn-sm"><i
+                        <a href='{% url "vims:create"   %}' class="btn btn-block btn-primary btn-sm"><i
                                 class="fa fa-plus"></i><span> New VIM</span></a>
                     </div>
                 </div>
@@ -64,10 +64,10 @@
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default"
-                                                onclick="location.href='{% url "projects:vims:show"   vim_id=p|get:"_id" %}'" data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info"><i
+                                                onclick="location.href='{% url "vims:show"   vim_id=p|get:"_id" %}'" data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info"><i
                                                 class="fa fa-info"></i></button>
                                         <button type="button" class="btn btn-default"
-                                                onclick="javascript:deleteVim('{% url "projects:vims:delete"   vim_id=p|get:"_id" %}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
+                                                onclick="javascript:deleteVim('{% url "vims:delete"   vim_id=p|get:"_id" %}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
                                                 class="far fa-trash-alt" ></i></button>
                                     </div>
                                 </td>

@@ -78,7 +78,7 @@ def create(request):
     user = osmutils.get_user(request)
     client = Client()
     result = client.ns_create(user.get_token(), ns_data)
-    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
+    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns',
                               )
 
 
@@ -132,7 +132,7 @@ def delete(request, instance_id=None, type=None):
     client = Client()
     result = client.ns_delete(user.get_token(), instance_id, force)
     print result
-    return __response_handler(request, result, 'projects:instances:list', to_redirect=True, type='ns',
+    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns',
                               )
 
 

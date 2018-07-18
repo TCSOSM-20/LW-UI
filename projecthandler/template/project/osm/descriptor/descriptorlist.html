@@ -42,7 +42,7 @@
                                 {% if descriptor_type == "nsd" %}
                                     <button type="button" class="btn btn-default" data-container="body"
                                             data-toggle="tooltip" data-placement="top" title="Instantiate NS"
-                                            onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}', 'descriptor_type': '{{ descriptor_type }}', 'descriptor_name':'{{ k|get:"name" }}', 'descriptor_id':'{{ k|get:"_id" }}','vim_list_url': '{% url "projects:vims:list"  %}',  'nsd_list_url': '{% url "projects:list_descriptors"  descriptor_type=descriptor_type %}' })">
+                                            onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}', 'descriptor_type': '{{ descriptor_type }}', 'descriptor_name':'{{ k|get:"name" }}', 'descriptor_id':'{{ k|get:"_id" }}','vim_list_url': '{% url "vims:list"  %}',  'nsd_list_url': '{% url "projects:list_descriptors"  descriptor_type=descriptor_type %}' })">
                                         <i class="fa fa-paper-plane"></i></button>
                                 {% endif %}
                                 <button type="button" class="btn btn-default" data-container="body"

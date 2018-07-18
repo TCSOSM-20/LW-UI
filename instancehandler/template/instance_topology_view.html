@@ -24,7 +24,7 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:instances:list'  type=type %}">{{ type|upper }} Instances</a></li>
+    <li><a href="{% url 'instances:list'  type=type %}">{{ type|upper }} Instances</a></li>
     <li><a href="#"><i class="fa fa-sitemap"></i> {{ type|upper }} Topology</a></li>
 {% endblock %}
 
