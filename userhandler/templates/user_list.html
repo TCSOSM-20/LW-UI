@@ -65,12 +65,20 @@
                                 <td>{{ s|get_sub:"_admin,created"|get_date}}</td>
 
                                 <td>
-                                    <div class="btn-group">
 
-                                        <button type="button" class="btn btn-default"
-                                                onclick="javascript:deleteUser('{% url "users:delete" user_id=s|get:"_id"  %}')" data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i
-                                                class="far fa-trash-alt" ></i></button>
-                                    </div>
+                                    <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown" aria-expanded="false">Actions
+                                <span class="fa fa-caret-down"></span></button>
+                            <ul class="dropdown-menu">
+
+                                <li>
+                                    <a href="#" onclick="javascript:deleteUser('{% url "users:delete" user_id=s|get:"_id"  %}')" style="color:red">
+                                        <i class="fa fa-trash"  ></i> Delete</a>
+
+                                </li>
+                            </ul>
+                            </div>
                                 </td>
 
                             </tr>

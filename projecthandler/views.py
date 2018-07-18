@@ -281,9 +281,9 @@ def open_project(request):
 
 
 @login_required
-def delete_project(request):
+def delete_project(request, project_id):
     user = osmutils.get_user(request)
-    project_id = user.project_id
+
     client = Client()
     result = client.project_delete(user.get_token(), project_id)
     if isinstance(result, dict) and 'error' in result and result['error']:
@@ -299,6 +299,23 @@ def switch_project(request, project_id):
     user = osmutils.get_user(request)
     user.switch_project(project_id)
     return redirect('projects:open_project')
+
+
+@login_required
+def edit_project(request, project_id):
+    if request.method == 'POST':
+        user = osmutils.get_user(request)
+        client = Client()
+        project_dict = request.POST.dict()
+        keys = ["name"]
+        project_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, project_dict.items()))
+        result = client.project_edit(user.get_token(), project_id, project_data)
+        if isinstance(result, dict) and 'error' in result and result['error']:
+            print result
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
