@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 # delete the copy of the database inside the container (if exists)
 RUN rm -f db.sqlite3
 
-RUN python manage.py makemigrations sf_user projecthandler instancehandler vimhandler
+RUN python manage.py makemigrations authosm
 RUN python manage.py migrate
 
 

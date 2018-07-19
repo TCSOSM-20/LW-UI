@@ -43,7 +43,7 @@ static/bower_components
 
 #migrations
 projecthandler/migrations/
-sf_user/migrations/
 instancehandler/migrations
 sdnctrlhandler/migrations
 authosm/migrations
+userhandler/migrations
