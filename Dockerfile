@@ -17,8 +17,6 @@ RUN rm -f db.sqlite3
 RUN python manage.py makemigrations sf_user projecthandler instancehandler vimhandler
 RUN python manage.py migrate
 
-RUN python manage.py shell -c "from projecthandler.osm_model import OsmProject; from sf_user.models import CustomUser; CustomUser.objects.create_superuser('admin', 'admin'); admin = CustomUser.objects.get(username='admin'); OsmProject.create_project('admin',admin,True, 'project admin','')"
-
 
 EXPOSE 80
 CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
