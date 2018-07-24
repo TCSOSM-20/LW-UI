@@ -39,47 +39,57 @@ def list(request, type=None):
     result = {'instances': instance_list['data'] if instance_list and instance_list['error'] is False else [],
               'type': type, 'project_id': project_id}
 
+    if "OSM_ERROR" in request.session:
+        result['alert_error'] = request.session["OSM_ERROR"]
+        del request.session["OSM_ERROR"]
+
     return __response_handler(request, result, 'instance_list.html')
 
 
 @login_required
 def create(request):
     result = {}
-    ns_data = {
-        "nsName": request.POST.get('nsName', 'WithoutName'),
-        "nsDescription": request.POST.get('nsDescription', ''),
-        "nsdId": request.POST.get('nsdId', ''),
-        "vimAccountId": request.POST.get('vimAccountId', ''),
-    }
-    if 'ssh_key' in request.POST and request.POST.get('ssh_key') != '':
-        ns_data["ssh-authorized-key"] = [request.POST.get('ssh_key')]
+    try:
 
-    if 'config' in request.POST:
-        ns_config = yaml.load(request.POST.get('config'))
-        if isinstance(ns_config, dict):
-            if "vim-network-name" in ns_config:
-                ns_config["vld"] = ns_config.pop("vim-network-name")
-            if "vld" in ns_config:
-                for vld in ns_config["vld"]:
-                    if vld.get("vim-network-name"):
-                        if isinstance(vld["vim-network-name"], dict):
-                            vim_network_name_dict = {}
-                            for vim_account, vim_net in vld["vim-network-name"].items():
-                                vim_network_name_dict[ns_data["vimAccountId"]] = vim_net
-                            vld["vim-network-name"] = vim_network_name_dict
-                ns_data["vld"] = ns_config["vld"]
-            if "vnf" in ns_config:
-                for vnf in ns_config["vnf"]:
-                    if vnf.get("vim_account"):
-                        vnf["vimAccountId"] = ns_data["vimAccountId"]
+        ns_data = {
+            "nsName": request.POST.get('nsName', 'WithoutName'),
+            "nsDescription": request.POST.get('nsDescription', ''),
+            "nsdId": request.POST.get('nsdId', ''),
+            "vimAccountId": request.POST.get('vimAccountId', ''),
+        }
+        if 'ssh_key' in request.POST and request.POST.get('ssh_key') != '':
+            ns_data["ssh-authorized-key"] = [request.POST.get('ssh_key')]
 
-                ns_data["vnf"] = ns_config["vnf"]
+        if 'config' in request.POST:
+            ns_config = yaml.load(request.POST.get('config'))
+            if isinstance(ns_config, dict):
+                if "vim-network-name" in ns_config:
+                    ns_config["vld"] = ns_config.pop("vim-network-name")
+                if "vld" in ns_config:
+                    print ns_config
+                    for vld in ns_config["vld"]:
+                        if vld.get("vim-network-name"):
+                            if isinstance(vld["vim-network-name"], dict):
+                                vim_network_name_dict = {}
+                                for vim_account, vim_net in vld["vim-network-name"].items():
+                                    vim_network_name_dict[ns_data["vimAccountId"]] = vim_net
+                                vld["vim-network-name"] = vim_network_name_dict
+                    ns_data["vld"] = ns_config["vld"]
+                if "vnf" in ns_config:
+                    for vnf in ns_config["vnf"]:
+                        if vnf.get("vim_account"):
+                            vnf["vimAccountId"] = ns_data["vimAccountId"]
+
+                    ns_data["vnf"] = ns_config["vnf"]
+    except Exception as e:
+        request.session["OSM_ERROR"] = "Error creating the NS; Invalid parameters provided."
+        return __response_handler(request, {}, 'instances:list', to_redirect=True, type='ns', )
+
     print ns_data
     user = osmutils.get_user(request)
     client = Client()
     result = client.ns_create(user.get_token(), ns_data)
-    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns',
-                              )
+    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns',)
 
 
 @login_required
