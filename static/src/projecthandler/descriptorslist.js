@@ -1,7 +1,25 @@
 function deletePackage(descriptor_type, package_id) {
+    var dialog = bootbox.dialog({
+        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+        closeButton: true
+    });
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-            location.href = '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete'
+
+            $.ajax({
+                url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete',
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    dialog.modal('hide');
+                    location.reload();
+                },
+                error: function (result) {
+                    dialog.modal('hide');
+                    bootbox.alert("An error occurred.");
+                }
+            });
         }
     })
 }

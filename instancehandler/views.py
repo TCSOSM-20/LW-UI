@@ -132,8 +132,7 @@ def delete(request, instance_id=None, type=None):
     client = Client()
     result = client.ns_delete(user.get_token(), instance_id, force)
     print result
-    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns',
-                              )
+    return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns')
 
 
 def show_topology(request, instance_id=None, type=None):
@@ -360,7 +359,7 @@ def create_alarm(request, instance_id=None, type=None):
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
     if 'application/json' in raw_content_types or url is None:
-        return HttpResponse(json.dumps(data_res), content_type="application/json", *args, **kwargs)
+        return HttpResponse(json.dumps(data_res), content_type="application/json")
     elif to_redirect:
         return redirect(url, *args, **kwargs)
     else:

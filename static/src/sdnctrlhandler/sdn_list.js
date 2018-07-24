@@ -1,7 +1,30 @@
 function deleteSDN(sdn_uuid) {
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-            location.href = '/sdn/' + sdn_uuid + '/delete'
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
+            $.ajax({
+                url: '/sdn/' + sdn_uuid + '/delete',
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    if (result['error'] == true){
+                        dialog.modal('hide');
+                        bootbox.alert("An error occurred.");
+                    }
+                    else {
+                        dialog.modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function (error) {
+                    dialog.modal('hide');
+                    bootbox.alert("An error occurred.");
+                }
+            });
         }
     })
 }
@@ -14,7 +37,6 @@ function showSDN(sdn_uuid) {
 
     $.ajax({
         url: '/sdn/' + sdn_uuid ,
-        //url: '/sdn/' + sdn_uuid,
         type: 'GET',
         dataType: "json",
         contentType: "application/json;charset=utf-8",

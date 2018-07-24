@@ -37,9 +37,32 @@ function newAlarmNs(url) {
 function deleteNs(url, force) {
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-            if(force)
+            if (force)
                 url = url + '?force=true';
-            location.href = url
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    if (result['error'] == true){
+                        dialog.modal('hide');
+                        bootbox.alert("An error occurred.");
+                    }
+                    else {
+                        dialog.modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function (error) {
+                    dialog.modal('hide');
+                    bootbox.alert("An error occurred.");
+                }
+            });
         }
     })
 }
@@ -77,13 +100,13 @@ function showInstanceDetails(url_info) {
         contentType: "application/json;charset=utf-8",
         success: function (result) {
 
-            if(result['data'] !== undefined) {
+            if (result['data'] !== undefined) {
                 editorJSON.setValue(JSON.stringify(result['data'], null, "\t"));
                 editorJSON.setOption("autoRefresh", true);
                 dialog.modal('hide');
                 $('#modal_show_instance').modal('show');
             }
-            else{
+            else {
                 dialog.modal('hide');
                 bootbox.alert("An error occurred while retrieving the information.");
             }
@@ -146,20 +169,20 @@ $(document).ready(function () {
             },
             contentType: false,
             processData: false
-        }).done(function (response,textStatus, jqXHR) {
+        }).done(function (response, textStatus, jqXHR) {
             $('#modal_instance_new_action').modal('hide');
             bootbox.alert({
-                    title: "Action",
-                    message: "Action received."
-                });
-        }).fail(function(result){
-            var data  = result.responseJSON;
-            var title = "Error " + (data.code ? data.code: 'unknown');
-                var message = data.detail ? data.detail: 'No detail available.';
-                bootbox.alert({
-                    title: title,
-                    message: message
-                });
+                title: "Action",
+                message: "Action received."
+            });
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
         });
     });
 
@@ -178,20 +201,20 @@ $(document).ready(function () {
             },
             contentType: false,
             processData: false
-        }).done(function (response,textStatus, jqXHR) {
+        }).done(function (response, textStatus, jqXHR) {
             $('#modal_instance_new_action').modal('hide');
             bootbox.alert({
-                    title: "Metric",
-                    message: "Alarm created."
-                });
-        }).fail(function(result){
-            var data  = result.responseJSON;
-            var title = "Error " + (data.code ? data.code: 'unknown');
-                var message = data.detail ? data.detail: 'No detail available.';
-                bootbox.alert({
-                    title: title,
-                    message: message
-                });
+                title: "Metric",
+                message: "Alarm created."
+            });
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
         });
     });
 
@@ -210,20 +233,20 @@ $(document).ready(function () {
             },
             contentType: false,
             processData: false
-        }).done(function (response,textStatus, jqXHR) {
+        }).done(function (response, textStatus, jqXHR) {
             $('#modal_instance_new_action').modal('hide');
             bootbox.alert({
-                    title: "Metric",
-                    message: "Metric exported."
-                });
-        }).fail(function(result){
-            var data  = result.responseJSON;
-            var title = "Error " + (data.code ? data.code: 'unknown');
-                var message = data.detail ? data.detail: 'No detail available.';
-                bootbox.alert({
-                    title: title,
-                    message: message
-                });
+                title: "Metric",
+                message: "Metric exported."
+            });
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
         });
     });
 

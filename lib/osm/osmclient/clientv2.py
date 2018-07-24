@@ -1,3 +1,19 @@
+#
+#   Copyright 2018 EveryUP Srl
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an  BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
 import requests
 import logging
 import json
@@ -317,9 +333,10 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r:
             result['error'] = False
-        result['data'] = Util.json_loads_byteified(r.text)
+        if r.status_code != requests.codes.no_content:
+            result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def nsd_onboard(self, token, package):
@@ -646,9 +663,10 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r:
             result['error'] = False
-        result['data'] = Util.json_loads_byteified(r.text)
+        if r.status_code != requests.codes.no_content:
+            result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def ns_get(self, token, id):

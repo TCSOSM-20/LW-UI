@@ -86,7 +86,7 @@ def delete(request, vim_id=None):
         del_res = client.vim_delete(user.get_token(), vim_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'vims:list', to_redirect=True, )
+    return __response_handler(request, del_res, 'vims:list', to_redirect=True, )
 
 @login_required
 def show(request, vim_id=None):

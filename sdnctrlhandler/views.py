@@ -75,7 +75,7 @@ def delete(request, sdn_id=None):
         del_res = client.sdn_delete(user.get_token(), sdn_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'sdns:list', to_redirect=True, )
+    return __response_handler(request, del_res, 'sdns:list', to_redirect=True, )
 
 
 @login_required

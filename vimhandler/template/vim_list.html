@@ -96,7 +96,30 @@
         function deleteVim(url) {
             bootbox.confirm("Are you sure want to delete?", function (result) {
                 if (result) {
-                    location.href = url//'/vims/' + vim_uuid + '/delete'
+                    var dialog = bootbox.dialog({
+                        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                        closeButton: true
+                    });
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: "json",
+                        contentType: "application/json;charset=utf-8",
+                        success: function (result) {
+                            if (result['error'] == true) {
+                                dialog.modal('hide');
+                                bootbox.alert("An error occurred.");
+                            }
+                            else {
+                                dialog.modal('hide');
+                                location.reload();
+                            }
+                        },
+                        error: function (error) {
+                            dialog.modal('hide');
+                            bootbox.alert("An error occurred.");
+                        }
+                    });
                 }
             })
         }
