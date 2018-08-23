@@ -64,17 +64,17 @@ Edit {{ descriptor_type|upper }} Descriptor
         editorJSON = CodeMirror(function (elt) {
             myJsonTextArea.parentNode.replaceChild(elt, myJsonTextArea);
         }, json_editor_settings);
-
-
         editorJSON.setValue(JSON.stringify({{descriptor_strings.descriptor_string_json | safe}}, null, "\t"));
         editorJSON.setOption("autoRefresh", true);
+        editorJSON.setSize("auto", "auto");
+
         var myYamlTextArea = document.getElementById("code_editor_yaml");
         editorYaml = CodeMirror(function (elt) {
             myYamlTextArea.parentNode.replaceChild(elt, myYamlTextArea);
         }, yaml_editor_settings);
         var des_strings = {{descriptor_strings | safe}};
         editorYaml.setValue(des_strings.descriptor_string_yaml);
-
+        editorYaml.setSize("auto", "auto");
     });
 
 
