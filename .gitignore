@@ -29,6 +29,9 @@ pip-delete-this-directory.txt
 # Django stuff:
 *.log
 
+#uwsgi
+*.pid
+
 # Sphinx documentation
 docs/_build/
 
