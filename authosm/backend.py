@@ -21,6 +21,7 @@ from .exceptions import OSMAuthException
 
 
 class OsmBackend(object):
+
     def authenticate(self, **kwargs):
         '''
         kwargs will receive the python dict that may contain

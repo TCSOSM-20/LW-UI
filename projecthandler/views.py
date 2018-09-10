@@ -18,7 +18,7 @@ import json
 import logging
 
 import yaml
-from django.contrib.auth.decorators import login_required
+from sf_t3d.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
@@ -62,7 +62,6 @@ def user_projects(request):
     return __response_handler(request,{
         'projects': result['data'] if result and result['error'] is False else [],
     },'projectlist.html')
-
 
 
 def open_composer(request):

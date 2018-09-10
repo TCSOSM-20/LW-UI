@@ -1,11 +1,11 @@
 function deletePackage(descriptor_type, package_id) {
-    var dialog = bootbox.dialog({
-        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
-        closeButton: true
-    });
+
     bootbox.confirm("Are you sure want to delete?", function (result) {
         if (result) {
-
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
             $.ajax({
                 url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete',
                 type: 'GET',

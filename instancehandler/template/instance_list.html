@@ -75,9 +75,174 @@
     <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 
     <script>
-    $(document).ready( function () {
-        $('#instances_table').DataTable();
-    } );
+        var instance_type = '{{ type }}';
+        var row_builder = {
+            'ns': [
+                {
+                    "render": function (data, type, row) {
+                        return row["short-name"];
+                    },
+                    "targets": 0
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["_id"];
+                    },
+                    "targets": 1
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["nsd-name-ref"];
+                    },
+                    "targets": 2
+                },
+                {
+                 //   "width": "5%",
+                    "render": function (data, type, row) {
+                        if(row["operational-status"] === 'failed')
+                           return '<span class="label label-danger">'+ row["operational-status"] +'</span>';
+                        if(row["operational-status"] === 'init')
+                           return '<span class="label label-warning">'+ row["operational-status"] +'</span>';
+                        if(row["operational-status"] === 'running')
+                           return '<span class="label label-success">'+ row["operational-status"] +'</span>';
+                        return  ''+row["operational-status"]+'';
+                    },
+                    "targets": 3
+                },
+                {
+                //    "width": "5%",
+                    "render": function (data, type, row) {
+                         if(row["config-status"] === 'failed')
+                           return '<span class="label label-danger">'+ row["config-status"] +'</span>';
+                        if(row["config-status"] === 'init')
+                           return '<span class="label label-warning">'+ row["config-status"] +'</span>';
+                        if(row["config-status"] === 'running')
+                           return '<span class="label label-success">'+ row["config-status"] +'</span>';
+                        if(row["config-status"] === 'configured')
+                           return '<span class="label label-success">'+ row["config-status"] +'</span>';
+                        return  ''+row["operational-status"]+'';
+                    },
+                    "targets": 4
+                },
+                {
+                   // "className": "ellipsis",
+                    "render": function (data, type, row) {
+                        return row["detailed-status"];
+                    },
+                    "targets": 5
+                },{
+                   //  "width": "10%",
+                    "render": function (data, type, row) {
+                        return '<div class="btn-group">\n' +
+                            ' <button type="button" class="btn btn-default"\n' +
+                            '         onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"\n' +
+                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">\n' +
+                            '     <i class="fa fa-info"></i>\n' +
+                            ' </button>\n' +
+                            ' <button type="button" class="btn btn-default"\n' +
+                            '         onclick="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')"\n' +
+                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i\n' +
+                            '         class="far fa-trash-alt"></i></button>\n' +
+                            ' <button type="button" class="btn btn-default dropdown-toggle"\n' +
+                            '         data-toggle="dropdown" aria-expanded="false">Actions\n' +
+                            '     <span class="fa fa-caret-down"></span></button>\n' +
+                            ' <ul class="dropdown-menu">\n' +
+                            '     <li><a href="#"\n' +
+                            '            onclick="javascript:performAction(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">\n' +
+                            '         <i class="fa fa-magic"></i> Exec NS Primitive</a></li>\n' +
+                            '     <li>\n' +
+                            '         <a href="/instances/ns/' +row["_id"] +'/operation">\n' +
+                            '             <i class="fa fa-list"></i> Active operations</a></li>\n' +
+                            '     <li class="divider"></li>\n' +
+                            '     <li><a href="#"\n' +
+                            '            onclick="javascript:newAlarmNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">\n' +
+                            '         <i class="far fa-bell"></i> New Alarm</a></li>\n' +
+                            '     <li><a href="#"\n' +
+                            '            onclick="javascript:exportMetricNs(\''+ row["short-name"] +'\', \''+row["_id"]+ '\')">\n' +
+                            '         <i class="far fa-chart-bar"></i> Export metric</a></li>\n' +
+                            '     <li class="divider"></li>\n' +
+                            '     <li>\n' +
+                            '         <a href="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\', true)">\n' +
+                            '             <i class="far fa-trash-alt" style="color:red" ></i> Force delete</a></li>\n' +
+                            ' </ul>\n' +
+                            '</div>';
+                    },
+                    "targets": 5
+                },
+
+            ],
+            'vnf': [ {
+                    "render": function (data, type, row) {
+                        return row["_id"];
+                    },
+                    "targets": 0
+                },
+                {
+                    "render": function (data, type, row) {
+                        return '<a href="javascript:openDescriptorView(\'vnfd\', \'' + row["_id"]+'\')"> ' + row["vnfd-ref"] +' </a>';
+                    },
+                    "targets": 1
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["member-vnf-index-ref"];
+                    },
+                    "targets": 2
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["nsr-id-ref"];
+                    },
+                    "targets": 3
+                },
+                {
+                    "render": function (data, type, row) {
+                        return moment.unix(row['created-time']).format('YYYY-MM-DD hh:mm:ss a');
+                    },
+                    "targets": 4
+                }, 
+                {
+                    "render": function (data, type, row) {
+                        return '<div class="btn-group">\n' +
+                            '     <button type="button" class="btn btn-default"\n' +
+                            '             onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"\n' +
+                            '             data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">\n' +
+                            '         <i class="fa fa-info"></i>\n' +
+                            '     </button>\n' +
+                            ' </div>';
+                    },
+                    "targets": 5
+                },
+            ]
+        };
+        $(document).ready(function () {
+            var table = $('#instances_table').DataTable({
+                responsive: true,
+                "ajax": {
+                    "url": "/instances/" + instance_type + "/list/",
+                    "dataSrc": function (json) {
+                        return json.instances;
+                    },
+                    statusCode: {
+                        401: function(){
+                            console.log("no auth");
+                            moveToLogin(window.location.pathname);
+                        }
+                    },
+                    "error": function(hxr, error, thrown){
+                        console.log(error);
+                    }
+
+                },
+                "columns": row_builder[instance_type]
+            });
+
+
+            setInterval(function () {
+                table.ajax.reload();
+            }, 10000);
+        });
+
     </script>
 
 {% endblock %}

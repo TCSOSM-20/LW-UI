@@ -2,8 +2,8 @@ function generateUID() {
     return ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4)
 }
 
-function openProject(pId) {
-    window.location.href = '/projects/' + pId;
+function moveToLogin(next) {
+    window.location.href =  (next) ? "/auth/?next="+next : '/auth/';
 }
 
 

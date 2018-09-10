@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from sf_t3d.decorators import login_required
 from django.http import HttpResponse
 import json
 import logging

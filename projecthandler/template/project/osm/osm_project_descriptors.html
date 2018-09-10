@@ -48,11 +48,104 @@
     <script>
     var csrf_token = '{{csrf_token}}';
     var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
-    var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}"
+    var vim_list_url = '{% url "vims:list"  %}';
+    var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}";
+    var descriptor_type = '{{ descriptor_type }}';
+    var project_id = '{{ project_id }}';
     $(document).ready( function () {
-        $('#descriptors_table').DataTable();
-    } );
+        var table = $('#descriptors_table').DataTable({
+            responsive: true,
+            "ajax": {
+                "url": "/projects/descriptors/" +descriptor_type+"/list",
+                "dataSrc": function (json) {
+                    return json['descriptors'];
+                },
+                statusCode: {
+                    401: function () {
+                        console.log("no auth");
+                        moveToLogin(window.location.pathname);
+                    }
+                },
+                "error": function (hxr, error, thrown) {
+                    console.log(hxr)
+                    console.log(thrown)
+                    console.log(error);
+                }
 
+            },
+            "columns": [
+                {
+                    "render": function (data, type, row) {
+                       return row['short-name'];
+                    },
+                    "targets": 0
+                },
+                {
+                    "render": function (data, type, row) {
+                       return row['_id'];
+                    },
+                    "targets": 1
+                },
+                {
+                    "render": function (data, type, row) {
+                       return row['description'] || '';
+                    },
+                    "targets": 2
+                },
+                {
+                    "render": function (data, type, row) {
+                       return row['vendor'] || '';
+                    },
+                    "targets": 3
+                },
+                {
+                    "render": function (data, type, row) {
+                       return row['version'] || '';
+                    },
+                    "targets": 4
+                },
+                {
+                    "render": function (data, type, row) {
+                       var result = '<div class="btn-group">\n' ;
+                       if(descriptor_type == "nsd")
+                           result += '    <button type="button" class="btn btn-default" data-container="body"\n' +
+                               'data-toggle="tooltip" data-placement="top" title="Instantiate NS"\n' +
+                               'onclick="javascript:openModalCreateNS({ \'project_id\':\'' + project_id +'\', \'descriptor_type\': \''+ descriptor_type +'\', \'descriptor_name\':\''+row["name"]+'\', \'descriptor_id\':\''+row["_id"]+'\',\'vim_list_url\': \''+vim_list_url+'\',  \'nsd_list_url\': \''+descr_list_url+'\' })">\n' +
+                               '<i class="fa fa-paper-plane"></i></button>\n';
+                        result += '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Edit"\n' +
+                           '        onclick="javascript:openDescriptorView(\''+descriptor_type+'\', \''+row["_id"]+'\')">\n' +
+                           '    <i class="fa fa-edit"></i></button>\n' +
+                           '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Show content"\n' +
+                           '        onclick="javascript:openPackageContentList(\''+ descriptor_type +'\', \''+row["_id"]+'\')">\n' +
+                           '    <i class="fa fa-folder-open"></i></button>\n' +
+                           '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Show Graph"\n' +
+                           '        onclick="location.href=\'/projects/graph?type='+descriptor_type+'&id='+row["_id"] +'\'"\n' +
+                           '        disabled><i class="fa fa-sitemap fa-fw"></i></button>\n' +
+                           '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Download package"\n' +
+                           '        onclick="location.href=\'/projects/descriptors/'+descriptor_type+'/'+ row["_id"] +'/action/download_pkg\'">\n' +
+                           '    <i class="fa fa-download fa-fw"></i></button>\n' +
+                           '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Delete"\n' +
+                           '        onclick="javascript:deletePackage( \'' + descriptor_type + '\', \''+row["_id"] + '\')">\n' +
+                           '    <i class="far fa-trash-alt"></i></button>\n' +
+                           '</div>';
+
+                               return result
+                    },
+                    "targets": 5
+                }]
+
+
+        });
+
+        setInterval(function () {
+                table.ajax.reload();
+            }, 10000);
+    });
     </script>
     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
     <script src="/static/src/instancehandler/instance_create.js"></script>

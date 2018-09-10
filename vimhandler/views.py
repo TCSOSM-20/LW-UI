@@ -15,7 +15,7 @@
 #
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from sf_t3d.decorators import login_required
 from django.http import HttpResponse
 import json
 from lib.osm.osmclient.clientv2 import Client
@@ -31,13 +31,13 @@ log = logging.getLogger('vimhandler.py')
 def list(request):
     user = osmutils.get_user(request)
     project_id = user.project_id
+    result = {'type': 'ns', 'project_id': project_id}
+    raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
+    if 'application/json' not in raw_content_types:
+        return __response_handler(request, result, 'vim_list.html')
     client = Client()
-    result = client.vim_list(user.get_token())
-    print result
-    result = {
-        "project_id": project_id,
-        "datacenters": result['data'] if result and result['error'] is False else []
-    }
+    result_client = client.vim_list(user.get_token())
+    result["datacenters"] = result_client['data'] if result_client and result_client['error'] is False else []
     return __response_handler(request, result, 'vim_list.html')
 
 

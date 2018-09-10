@@ -14,28 +14,27 @@
    limitations under the License.
 */
 
-function performAction(url) {
+function performAction(instance_name, instance_id) {
+    var url = '/instances/ns/'+instance_id+'/action';
     $("#formActionNS").attr("action", url);
     $('#modal_instance_new_action').modal('show');
 }
 
-function exportMetricNs(url) {
-    console.log(url)
+function exportMetricNs(instance_name, instance_id) {
+    var url = '/instances/ns/'+instance_id+'/monitoring/metric';
     $("#formExportMetricNS").attr("action", url);
     $('#modal_instance_export_metric').modal('show');
 }
 
-function showInstanceTopology(url) {
-    window.location.href = url;
-}
-
-function newAlarmNs(url) {
+function newAlarmNs(instance_name, instance_id) {
+    var url = '/instances/ns/'+instance_id+'/monitoring/alarm';
     $("#formAlarmNS").attr("action", url);
     $('#modal_instance_new_alarm').modal('show');
 }
 
-function deleteNs(url, force) {
-    bootbox.confirm("Are you sure want to delete?", function (result) {
+function deleteNs(instance_name, instance_id, force) {
+    var url = '/instances/ns/'+instance_id+'/delete';
+    bootbox.confirm("Are you sure want to delete " + instance_name + "?", function (result) {
         if (result) {
             if (force)
                 url = url + '?force=true';
@@ -88,7 +87,8 @@ var removeFormGroup = function (event) {
     $formGroup.remove();
 };
 
-function showInstanceDetails(url_info) {
+function showInstanceDetails(type, instance_id) {
+    var url_info = '/instances/'+type+'/'+instance_id;
     var dialog = bootbox.dialog({
         message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
         closeButton: true

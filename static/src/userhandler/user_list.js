@@ -26,8 +26,9 @@ function openModalCreateUser(args) {
     $('#modal_new_user').modal('show');
 }
 
-function deleteUser(delete_url) {
-    bootbox.confirm("Are you sure want to delete?", function (confirm) {
+function deleteUser(user_id, name) {
+    var delete_url = '/admin/users/'+user_id+'/delete';
+    bootbox.confirm("Are you sure want to delete "+name+"?", function (confirm) {
         if (confirm) {
             var dialog = bootbox.dialog({
                 message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',

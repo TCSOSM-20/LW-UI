@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="/static/bower_components/codemirror/addon/dialog/dialog.css">
     <link rel="stylesheet" href="/static/bower_components/codemirror/addon/display/fullscreen.css">
     <link rel="stylesheet" href="/static/bower_components/select2/dist/css/select2.min.css">
+        <link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
 {% endblock %}
 {% block title_header_big %}
     {{ block.super }}
@@ -26,6 +28,7 @@
 {% block breadcrumb_body %}
     {{ block.super }}
     <li><a href="{% url 'instances:list'  type=type %}">Instances</a></li>
+    <li><a href="#">Operations</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -41,7 +44,7 @@
 
                 </div>
                 <div class="box-body">
-                    <table id="instances_table" class="table table-bordered table-striped">
+                    <table id="operations_table" class="table table-bordered table-striped">
                         <thead>
                         <tr>
                             <th>Id</th>
@@ -53,40 +56,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for i in operations %}
-                            <tr>
 
-                                <td>{{ i|get:"_id" }}</td>
-                                <td>{{ i|get:"lcmOperationType" }}</td>
-
-                                {% if i|get:"operationState" == 'FAILED' %}
-                                    <td><span class="label label-danger">{{ i|get:"operationState"  }}</span> </td>
-                                {% elif i|get:"operationState" == 'PROCESSING' %}
-                                     <td><span class="label label-warning">{{ i|get:"operationState"  }}</span> </td>
-                                {% elif i|get:"operationState" == 'COMPLETED' %}
-                                     <td><span class="label label-success">{{ i|get:"operationState"  }}</span> </td>
-                                {% else  %}
-                                    <td>{{ i|get:"operationState"  }}</td>
-                                {% endif %}
-
-                                <td >{{ i.startTime|get_date }}</td>
-                                <td >{{ i.statusEnteredTime|get_date }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default"
-                                                onclick="javascript:showOperationDetails('{% url 'instances:ns_operation' op_id=i|get:'_id' instance_id=i|get:'nsInstanceId'  type=type %}')"
-                                                data-toggle="tooltip" data-placement="top" data-container="body" title="More Info"><i
-                                                class="fa fa-info"></i>
-                                        </button>
-
-
-                                    </div>
-
-                                </td>
-
-
-                            </tr>
-                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -114,7 +84,93 @@
     <script src="/static/bower_components/codemirror/addon/edit/closebrackets.js"></script>
     <script src="/static/bower_components/codemirror/addon/display/fullscreen.js"></script>
     <script src="/static/bower_components/codemirror/keymap/sublime.js"></script>
+    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     <script src="/static/src/instancehandler/instance_operations_list.js"></script>
+
+    <script>
+    var instance_type = '{{ type }}';
+    var instance_id = '{{ instance_id }}';
+    $(document).ready(function () {
+            var table = $('#operations_table').DataTable({
+                responsive: true,
+                "ajax": {
+                    "url": "/instances/" + instance_type + "/" +instance_id + "/operation",
+                    "dataSrc": function (json) {
+                        return json['operations'];
+                    },
+                    statusCode: {
+                        401: function(){
+                            console.log("no auth");
+                            moveToLogin(window.location.pathname);
+                        }
+                    },
+                    "error": function(hxr, error, thrown){
+                        console.log(error);
+                    }
+
+                },
+                "columns": [
+                    {
+                    "render": function (data, type, row) {
+                        return row["_id"];
+                    },
+                    "targets": 0
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row['lcmOperationType'];
+                    },
+                    "targets": 1
+                },
+                {
+                    "render": function (data, type, row) {
+
+                        if(row["operationState"] === 'FAILED')
+                           return '<span class="label label-danger">'+ row["operationState"] +'</span>';
+                        else if(row["operationState"] === 'PROCESSING')
+                           return '<span class="label label-warning">'+ row["operationState"] +'</span>';
+                        else if(row["operationState"] === 'COMPLETED')
+                           return '<span class="label label-success">'+ row["operationState"] +'</span>';
+                        else
+                         return row["operationState"];
+                    },
+                    "targets": 2
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["startTime"];
+                    },
+                    "targets": 3
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["statusEnteredTime"];
+                    },
+                    "targets": 4
+                },
+                {
+                    "render": function (data, type, row) {
+                        return '<div class="btn-group">\n' +
+                            '     <button type="button" class="btn btn-default"\n' +
+                            '             onclick="javascript:showOperationDetails(\''+row["nsInstanceId"]+'\', \''+row["_id"]+'\')"\n' +
+                            '             data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">\n' +
+                            '         <i class="fa fa-info"></i>\n' +
+                            '     </button>\n' +
+                            ' </div>';
+                    },
+                    "targets": 5
+                }
+                ]
+            });
+
+
+            setInterval(function () {
+                table.ajax.reload();
+            }, 10000);
+        });
+
+    </script>
 
 {% endblock %}
 

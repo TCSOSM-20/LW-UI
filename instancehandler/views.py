@@ -15,33 +15,39 @@
 #
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 import yaml
 import json
 import logging
 from lib.osm.osmclient.clientv2 import Client
 import authosm.utils as osmutils
+from sf_t3d.decorators import login_required
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('instancehandler/view.py')
 
+
 @login_required
 def list(request, type=None):
+
     user = osmutils.get_user(request)
     project_id = user.project_id
     client = Client()
+    result = {'type': type, 'project_id': project_id}
+    if "OSM_ERROR" in request.session:
+        result['alert_error'] = request.session["OSM_ERROR"]
+        del request.session["OSM_ERROR"]
+    raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
+    if 'application/json' not in raw_content_types:
+        return __response_handler(request, result, 'instance_list.html')
+    instance_list = None
     if type == 'ns':
         instance_list = client.ns_list(user.get_token())
     elif type == 'vnf':
         instance_list = client.vnf_list(user.get_token())
 
-    result = {'instances': instance_list['data'] if instance_list and instance_list['error'] is False else [],
-              'type': type, 'project_id': project_id}
-
-    if "OSM_ERROR" in request.session:
-        result['alert_error'] = request.session["OSM_ERROR"]
-        del request.session["OSM_ERROR"]
+    result['instances'] = instance_list['data'] if instance_list and instance_list['error'] is False else []
 
     return __response_handler(request, result, 'instance_list.html')
 
@@ -96,12 +102,16 @@ def create(request):
 def ns_operations(request, instance_id=None, type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
+
+    result = {'type': 'ns', 'project_id': project_id, 'instance_id': instance_id}
+    raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
+    if 'application/json' not in raw_content_types:
+        return __response_handler(request, result, 'instance_operations_list.html')
     client = Client()
     op_list = client.ns_op_list(user.get_token(), instance_id)
-    return __response_handler(request,
-                              {'operations': op_list['data'] if op_list and op_list['error'] is False else [],
-                               'type': 'ns', 'project_id': project_id}, 'instance_operations_list.html')
+    result['operations'] = op_list['data'] if op_list and op_list['error'] is False else []
 
+    return __response_handler(request, result, 'instance_operations_list.html')
 
 @login_required
 def ns_operation(request, op_id, instance_id=None, type=None):

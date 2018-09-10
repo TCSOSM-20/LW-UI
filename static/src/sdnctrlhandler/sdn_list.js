@@ -1,5 +1,5 @@
-function deleteSDN(sdn_uuid) {
-    bootbox.confirm("Are you sure want to delete?", function (result) {
+function deleteSDN(sdn_uuid, name) {
+    bootbox.confirm("Are you sure want to delete " + name +"?", function (result) {
         if (result) {
             var dialog = bootbox.dialog({
                 message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
