@@ -76,7 +76,7 @@
             "columns": [
                 {
                     "render": function (data, type, row) {
-                       return row['short-name'];
+                       return row['short-name'] || '';
                     },
                     "targets": 0
                 },
@@ -120,6 +120,10 @@
                            '        data-toggle="tooltip" data-placement="top" title="Show content"\n' +
                            '        onclick="javascript:openPackageContentList(\''+ descriptor_type +'\', \''+row["_id"]+'\')">\n' +
                            '    <i class="fa fa-folder-open"></i></button>\n' +
+                            '<button type="button" class="btn btn-default" data-container="body"\n' +
+                           '        data-toggle="tooltip" data-placement="top" title="Clone"\n' +
+                           '        onclick="javascript:clonePackage(\''+ descriptor_type +'\', \''+row["_id"]+'\')">\n' +
+                           '    <i class="fa fa-clone"></i></button>\n' +
                            '<button type="button" class="btn btn-default" data-container="body"\n' +
                            '        data-toggle="tooltip" data-placement="top" title="Show Graph"\n' +
                            '        onclick="location.href=\'/projects/graph?type='+descriptor_type+'&id='+row["_id"] +'\'"\n' +
@@ -130,7 +134,7 @@
                            '    <i class="fa fa-download fa-fw"></i></button>\n' +
                            '<button type="button" class="btn btn-default" data-container="body"\n' +
                            '        data-toggle="tooltip" data-placement="top" title="Delete"\n' +
-                           '        onclick="javascript:deletePackage( \'' + descriptor_type + '\', \''+row["_id"] + '\')">\n' +
+                           '        onclick="javascript:deletePackage( \'' + descriptor_type + '\', \''+row["_id"] + '\', \''+row["name"] + '\')">\n' +
                            '    <i class="far fa-trash-alt"></i></button>\n' +
                            '</div>';
 

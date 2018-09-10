@@ -1,6 +1,6 @@
-function deletePackage(descriptor_type, package_id) {
+function deletePackage(descriptor_type, package_id, package_name) {
 
-    bootbox.confirm("Are you sure want to delete?", function (result) {
+    bootbox.confirm("Are you sure want to delete " + package_name + "?", function (result) {
         if (result) {
             var dialog = bootbox.dialog({
                 message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
@@ -8,6 +8,32 @@ function deletePackage(descriptor_type, package_id) {
             });
             $.ajax({
                 url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete',
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    dialog.modal('hide');
+                    location.reload();
+                },
+                error: function (result) {
+                    dialog.modal('hide');
+                    bootbox.alert("An error occurred.");
+                }
+            });
+        }
+    })
+}
+
+function clonePackage(descriptor_type, package_id) {
+
+    bootbox.confirm("Are you sure want to clone?", function (result) {
+        if (result) {
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
+            $.ajax({
+                url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/clone',
                 type: 'GET',
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",

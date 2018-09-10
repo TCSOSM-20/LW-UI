@@ -102,7 +102,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
@@ -190,7 +189,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
@@ -210,7 +208,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.no_content:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
@@ -379,6 +376,61 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def nsd_clone(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        # get the package onboarded
+        tar_pkg = self.get_nsd_pkg(token, id)
+        tarf = tarfile.open(fileobj=tar_pkg)
+        tarf = self._descriptor_clone(tarf, 'nsd')
+        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
+
+        _url = "{0}/nsd/v1/ns_descriptors_content/".format(self._base_path)
+
+        try:
+            r = requests.post(_url, data=open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'), verify=False,
+                             headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        if r.status_code == requests.codes.conflict:
+            result['data'] = "Invalid ID."
+
+        return result
+
+    def vnfd_clone(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        # get the package onboarded
+        tar_pkg = self.get_vnfd_pkg(token, id)
+        tarf = tarfile.open(fileobj=tar_pkg)
+
+        tarf = self._descriptor_clone(tarf, 'vnfd')
+        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
+
+        _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
+
+        try:
+            r = requests.post(_url, data=open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'), verify=False,
+                             headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        if r.status_code == requests.codes.conflict:
+            result['data'] = "Invalid ID."
+
+        return result
+
     def nsd_update(self, token, id, data):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/gzip", "accept": "application/json",
@@ -456,7 +508,6 @@ class Client(object):
         _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(self._base_path, id)
         try:
             r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
-            print r.status_code
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -468,7 +519,6 @@ class Client(object):
         return result
 
     def _descriptor_update(self, tarf, data):
-        print tarf.getnames()
         # extract the package on a tmp directory
         tarf.extractall('/tmp')
 
@@ -479,14 +529,43 @@ class Client(object):
                 break
 
         tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + ".tar.gz", "w:gz")
-        # tarf_temp = tarfile.open("pippo.tar.gz", "w:gz")
-        print tarf_temp.getnames()
-        # tarf_temp.add('/tmp/'+tarf.getnames()[0])
+
         for tarinfo in tarf:
-            # if tarinfo.name.startswith(tarf.getnames()[0]):
-            #    new_name = tarinfo.name[len(tarf.getnames()[0]):]
             tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
-        print tarf_temp.getnames()
+        tarf_temp.close()
+        return tarf
+
+    def _descriptor_clone(self, tarf, descriptor_type):
+        # extract the package on a tmp directory
+        tarf.extractall('/tmp')
+
+        for name in tarf.getnames():
+            if name.endswith(".yaml") or name.endswith(".yml"):
+                with open('/tmp/' + name, 'r') as outfile:
+                    yaml_object = yaml.load(outfile)
+
+                    if descriptor_type == 'nsd':
+                        nsd_list = yaml_object['nsd:nsd-catalog']['nsd']
+                        for nsd in nsd_list:
+                            nsd['id'] = 'clone_' + nsd['id']
+                            nsd['name'] = 'clone_' +nsd['name']
+                            nsd['short-name'] = 'clone_' +nsd['short-name']
+                    elif descriptor_type == 'vnfd':
+                        vnfd_list = yaml_object['vnfd:vnfd-catalog']['vnfd']
+                        for vnfd in vnfd_list:
+                            vnfd['id'] = 'clone_' + vnfd['id']
+                            vnfd['name'] = 'clone_' + vnfd['name']
+                            vnfd['short-name'] = 'clone_' + vnfd['short-name']
+
+
+                    with open('/tmp/' + name, 'w') as yaml_file:
+                        yaml_file.write(yaml.dump(yaml_object, default_flow_style=False))
+                break
+
+        tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", "w:gz")
+
+        for tarinfo in tarf:
+            tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
         tarf_temp.close()
         return tarf
 
@@ -643,7 +722,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
@@ -714,7 +792,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.ok:
             result['error'] = False
         #result['data'] = Util.json_loads_byteified(r.text)
@@ -732,7 +809,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.ok:
             result['error'] = False
         #result['data'] = Util.json_loads_byteified(r.text)
@@ -767,7 +843,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.accepted:
             result['error'] = False
         else:
@@ -806,7 +881,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
@@ -839,7 +913,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.accepted:
             result['error'] = False
         else:
@@ -877,7 +950,6 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        print r.status_code
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)

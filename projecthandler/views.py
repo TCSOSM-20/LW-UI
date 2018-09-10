@@ -376,6 +376,32 @@ def delete_descriptor(request, descriptor_type=None, descriptor_id=None):
     }, url)
 
 
+@login_required
+def clone_descriptor(request, descriptor_type=None, descriptor_id=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
+
+    try:
+        client = Client()
+        if descriptor_type == 'nsd':
+            result = client.nsd_clone(user.get_token(), descriptor_id)
+        elif descriptor_type == 'vnfd':
+            result = client.vnfd_clone(user.get_token(), descriptor_id)
+        else:
+            log.debug('Update descriptor: Unknown data type')
+            result = {'error': True, 'data': 'Update descriptor: Unknown data type'}
+    except Exception as e:
+        log.exception(e)
+        result = {'error': True, 'data': str(e)}
+    print result
+    if result['error'] == True:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+
+    else:
+        return __response_handler(request, {}, url=None, status=200)
+
+
 
 @login_required
 def new_descriptor(request, descriptor_type=None):
