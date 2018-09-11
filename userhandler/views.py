@@ -46,6 +46,22 @@ def delete(request, user_id=None):
         log.exception(e)
     return __response_handler(request, {}, 'users:list', to_redirect=True, )
 
+@login_required
+def update(request, user_id=None):
+    user = osmutils.get_user(request)
+    try:
+        client = Client()
+        user_data = {
+            "projects": request.POST.getlist('projects')
+        }
+        print user_data
+        update_res = client.user_update(user.get_token(), user_id, user_data)
+    except Exception as e:
+        log.exception(e)
+    return __response_handler(request, {}, 'users:list', to_redirect=True, )
+
+
+
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')

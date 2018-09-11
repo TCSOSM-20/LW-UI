@@ -1,6 +1,5 @@
 function openModalCreateUser(args) {
-    console.log(args)
-    // load projects list
+
     select2_groups = $('#projects').select2({
         placeholder: 'Select Projects',
         width: '100%',
@@ -24,6 +23,57 @@ function openModalCreateUser(args) {
     });
 
     $('#modal_new_user').modal('show');
+}
+
+function openModalEditUser(args) {
+    var url = '/admin/users/'+args.user_id;
+    console.log(url)
+    $("#formEditUser").attr("action", url);
+    select2_groups = $('#projects_edit').select2({
+        placeholder: 'Select Projects',
+        width: '100%',
+        ajax: {
+            url: '/projects/list',
+            dataType: 'json',
+            processResults: function (data) {
+                projects = [];
+                if (data['projects']) {
+                    for (d in data['projects']) {
+                        var project = data['projects'][d];
+                        projects.push({id: project['_id'], text: project['name']})
+                    }
+                }
+
+                return {
+                    results: projects
+                };
+            }
+        }
+    });
+
+    select2_single = $('#default_project_edit').select2({
+        placeholder: 'Select Default Project',
+        width: '100%',
+        ajax: {
+            url: '/projects/list',
+            dataType: 'json',
+            processResults: function (data) {
+                projects = [];
+                if (data['projects']) {
+                    for (d in data['projects']) {
+                        var project = data['projects'][d];
+                        projects.push({id: project['_id'], text: project['name']})
+                    }
+                }
+
+                return {
+                    results: projects
+                };
+            }
+        }
+    });
+
+    $('#modal_edit_user').modal('show');
 }
 
 function deleteUser(user_id, name) {

@@ -6,7 +6,7 @@
                     <span aria-hidden="true">×</span></button>
                 <h4 class="modal-title">New User</h4>
             </div>
-            <form id="formCreateNS" action='{% url "users:create"   %}'
+            <form id="formCreateUser" action='{% url "users:create"   %}'
                   class="form-horizontal"
                   method="post" enctype="multipart/form-data">
                 {% csrf_token %}
