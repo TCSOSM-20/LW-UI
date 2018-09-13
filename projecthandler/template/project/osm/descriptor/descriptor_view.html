@@ -31,6 +31,7 @@ Edit {{ descriptor_type|upper }} Descriptor
     <li class="pull-right"><button id="save" type="button" class="btn btn-block btn-primary btn-sm"  onclick="update(this.id)" ><i class="fa fa-save"></i> Update</button></li>
     <li class="pull-right"><button id="save_show_graph" type="button" class="btn btn-block btn-primary btn-sm"  onclick="update(this.id)" disabled><i class="fa fa-save"></i> Update and Show Graph</button></li>
     <li class="pull-right"><button type="button" class="btn btn-block btn-primary btn-sm"  onclick="goToGraph()" disabled><i class="fa fa-sitemap"></i> Show Graph</button></li>
+
 {% endblock %}
 
 {% block tab_pane_list %}
@@ -107,7 +108,12 @@ Edit {{ descriptor_type|upper }} Descriptor
             },
             success: function (result) {
                 dialog.modal('hide');
+                $("#success-alert").fadeTo(2000, 500).slideDown(500, function(){
+                    setTimeout(function () {
+                        $("#success-alert").slideUp(500);
+                    }, 2000);
 
+                });
             },
             error: function (result) {
                 console.log(result);

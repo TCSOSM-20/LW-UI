@@ -22,8 +22,8 @@
   	{{ block.super }}
 <div class="row">
     <div class="col-md-12">
-    <div class="nav-tabs-custom">
-    <ul class="nav nav-tabs">
+    <div class="nav-tabs-custom" style="position: relative;">
+    <ul class="nav nav-tabs" >
         {% block tab_pane_button_list %}
 
         {% endblock %}
@@ -33,6 +33,16 @@
         {% endblock %}
 
     </ul>
+        <div class="alert alert-success" id="success-alert" style="position: absolute; z-index: 100; top: 44px; left: 0;
+    width: 100%;
+    border-radius: 1px;
+    background-color: rgba(0, 166, 90, 0.8) !important;
+    text-align: center;
+    border-color: rgba(0, 141, 76, 0.4);" hidden>
+            <button type="button" class="close" onclick="$('#success-alert').toggle()">x</button>
+            <strong>Success! </strong>
+            Descriptor updated!
+        </div>
     <div class="tab-content">
         {% block tab_pane_list %}
 

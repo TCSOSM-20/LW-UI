@@ -47,7 +47,6 @@ def create_new_project(request):
         project_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_project_dict.items()))
         result = client.project_create(user.get_token(), project_data)
         if isinstance(result, dict) and 'error' in result and result['error']:
-            print result
             return __response_handler(request, result['data'], url=None,
                                       status=result['data']['status'] if 'status' in result['data'] else 500)
         else:
@@ -275,7 +274,6 @@ def open_project(request):
                       {'project_overview': project_overview, 'project_id': project_id})
 
     except Exception as e:
-        print e
         return render(request, 'error.html', {'error_msg': 'Error open project! Please retry.'})
 
 
@@ -286,7 +284,6 @@ def delete_project(request, project_id):
     client = Client()
     result = client.project_delete(user.get_token(), project_id)
     if isinstance(result, dict) and 'error' in result and result['error']:
-        print result
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
     else:
@@ -310,7 +307,6 @@ def edit_project(request, project_id):
         project_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, project_dict.items()))
         result = client.project_edit(user.get_token(), project_id, project_data)
         if isinstance(result, dict) and 'error' in result and result['error']:
-            print result
             return __response_handler(request, result['data'], url=None,
                                       status=result['data']['status'] if 'status' in result['data'] else 500)
         else:
@@ -322,7 +318,6 @@ def show_descriptors(request, descriptor_type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
     client = Client()
-    print request.GET.dict()
     try:
         if descriptor_type == 'nsd':
             descriptors = client.nsd_list(user.get_token())
@@ -393,7 +388,6 @@ def clone_descriptor(request, descriptor_type=None, descriptor_id=None):
     except Exception as e:
         log.exception(e)
         result = {'error': True, 'data': str(e)}
-    print result
     if result['error'] == True:
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
@@ -418,7 +412,6 @@ def new_descriptor(request, descriptor_type=None):
         }, page)
     elif request.method == 'POST':
         data_type = request.POST.get('type')
-        print "TYPE", data_type
         if data_type == "file":
             file_uploaded = request.FILES['file']
 
@@ -439,7 +432,6 @@ def new_descriptor(request, descriptor_type=None):
             result = {'error': True, 'data': 'Create descriptor: Unknown data type'}
 
         if result['error']:
-            print result
             return __response_handler(request, result['data'], url=None, status=result['data']['status'] if 'status' in result['data'] else 500)
         else:
             return __response_handler(request, {}, url=None, status=200)
@@ -450,7 +442,6 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
     if request.method == 'POST':
-        print "edit_descriptor"
         new_data = request.POST.get('text'),
         data_type = request.POST.get('type')
         #print new_data
@@ -461,14 +452,12 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
                     new_data = yaml.load(request.POST.get('text'))
                 elif data_type == 'json':
                     new_data = json.loads(request.POST.get('text'))
-                print new_data
                 result = client.nsd_update(user.get_token(), descriptor_id, new_data)
             elif descriptor_type == 'vnfd':
                 if data_type == 'yaml':
                     new_data = yaml.load(request.POST.get('text'))
                 elif data_type == 'json':
                     new_data = json.loads(request.POST.get('text'))
-                print new_data
                 result = client.vnfd_update(user.get_token(), descriptor_id, new_data)
 
             else:
@@ -477,7 +466,6 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
         except Exception as e:
             log.exception(e)
             result = {'error': True, 'data': str(e)}
-        print result
         if result['error'] == True:
             return __response_handler(request, result['data'], url=None, status=result['data']['status'] if 'status' in result['data'] else 500)
 
@@ -491,11 +479,9 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
             client = Client()
             if descriptor_type == 'nsd':
                 result = client.nsd_get(user.get_token(), descriptor_id)
-                print result
             elif descriptor_type == 'vnfd':
                 result = client.vnfd_get(user.get_token(), descriptor_id)
 
-                print result
         except Exception as e:
             log.exception(e)
             result = {'error': True, 'data': str(e)}
@@ -558,7 +544,6 @@ def download_pkg(request, descriptor_id, descriptor_type):
 @login_required
 def custom_action(request, descriptor_id=None, descriptor_type=None, action_name=None):
     if request.method == 'GET':
-        print "Custom action: " + action_name
         return globals()[action_name](request, descriptor_id, descriptor_type)
 
 
