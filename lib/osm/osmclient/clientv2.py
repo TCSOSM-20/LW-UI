@@ -24,10 +24,13 @@ import StringIO
 from lib.util import Util
 import hashlib
 import os
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-logging.basicConfig(level=logging.DEBUG)
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('helper.py')
-
+logging.getLogger("urllib3").setLevel(logging.INFO)
 
 class Client(object):
     def __init__(self):
@@ -113,8 +116,6 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
         _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
-        print _url
-        print user_data
         try:
             r = requests.post(_url, json=user_data, verify=False, headers=headers)
         except Exception as e:
