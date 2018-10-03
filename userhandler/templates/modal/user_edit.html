@@ -10,14 +10,15 @@
                   class="form-horizontal"
                   method="post" enctype="multipart/form-data">
                 {% csrf_token %}
+                <input type="hidden"  id="projects_old" name="projects_old" value="asdasd">
                 <div class="modal-body" id="modal_edit_user_body">
-                    <div class="form-group">
+                    {% comment %}<div class="form-group">
                         <label for="username_edit" class="col-sm-3 control-label">Username *</label>
                         <div class="col-sm-6">
                             <input class="form-control" id="username_edit" name="username"
                                    placeholder="Username" required>
                         </div>
-                    </div>
+                    </div>{% endcomment %}
                     <div class="form-group">
                         <label for=projects" class="col-sm-3 control-label">Default project *</label>
                         <div class="col-sm-6">

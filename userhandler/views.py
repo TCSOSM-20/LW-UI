@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 
 @login_required
-def list(request):
+def user_list(request):
     user = osmutils.get_user(request)
     client = Client()
     result = client.user_list(user.get_token())
@@ -51,16 +51,27 @@ def update(request, user_id=None):
     user = osmutils.get_user(request)
     try:
         client = Client()
-        user_data = {
-            "projects": request.POST.getlist('projects')
-        }
-        print user_data
-        update_res = client.user_update(user.get_token(), user_id, user_data)
+        projects_old = request.POST.get('projects_old').split(',')
+        projects_new = request.POST.getlist('projects')
+        default_project = request.POST.get('default_project')
+        projects_new.append(default_project)
+        projects_to_add = list(set(projects_new) - set(projects_old))
+        projects_to_remove = list(set(projects_old) - set(projects_new))
+
+        payload = {}
+
+        for p in projects_to_remove:
+            payload["$"+str(p)] = None
+        for p in projects_to_add:
+            if p not in projects_old:
+                payload["$+"+str(p)] = str(p)
+        payload["$" + default_project] = None
+        payload["$+[0]"] = default_project
+
+        update_res = client.user_update(user.get_token(), user_id, {"projects": payload})
     except Exception as e:
         log.exception(e)
     return __response_handler(request, {}, 'users:list', to_redirect=True, )
-
-
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):

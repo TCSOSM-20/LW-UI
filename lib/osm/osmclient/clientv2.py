@@ -117,14 +117,15 @@ class Client(object):
 
         _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
         try:
-            r = requests.post(_url, json=user_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=user_data, verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code == requests.codes.no_content:
             result['error'] = False
-        result['data'] = Util.json_loads_byteified(r.text)
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def user_delete(self, token, id):
