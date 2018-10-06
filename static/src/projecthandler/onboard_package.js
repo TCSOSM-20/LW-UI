@@ -52,6 +52,10 @@ function create(fs, dropzone) {
     data.append('text', text);
     data.append('id', '{{descriptor_id}}');
     console.log(text);
+    var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Onboarding...</div>',
+                closeButton: true
+            });
     $.ajax({
         url: new_desc_url,
         type: 'POST',
@@ -60,12 +64,11 @@ function create(fs, dropzone) {
         contentType: false,
         processData: false,
         success: function (result) {
-            console.log(result);
-
-            window.location.href = descr_list_url
-
+            dialog.modal('hide');
+            refreshTable();
         },
         error: function (result) {
+            dialog.modal('hide');
             showAlert(result);
         }
     });

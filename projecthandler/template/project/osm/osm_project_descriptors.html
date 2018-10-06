@@ -45,6 +45,11 @@
 
 {% block resource_block %}
   	{{ block.super }}
+     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
+    <script src="/static/src/instancehandler/instance_create.js"></script>
+    <script src="/static/src/projecthandler/descriptorslist.js"></script>
+    <script src="/static/src/projecthandler/onboard_package.js"></script>
+
     <script>
     var csrf_token = '{{csrf_token}}';
     var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
@@ -52,8 +57,14 @@
     var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}";
     var descriptor_type = '{{ descriptor_type }}';
     var project_id = '{{ project_id }}';
+    var table;
+
+    function refreshTable() {
+        table.ajax.reload();
+    }
+
     $(document).ready( function () {
-        var table = $('#descriptors_table').DataTable({
+        table = $('#descriptors_table').DataTable({
             responsive: true,
             "ajax": {
                 "url": "/projects/descriptors/" +descriptor_type+"/list",
@@ -146,15 +157,10 @@
 
         });
 
-        setInterval(function () {
-                table.ajax.reload();
-            }, 10000);
+        setInterval(refreshTable, 10000);
     });
     </script>
-    <script src="/static/bower_components/select2/dist/js/select2.js"></script>
-    <script src="/static/src/instancehandler/instance_create.js"></script>
-    <script src="/static/src/projecthandler/descriptorslist.js"></script>
-    <script src="/static/src/projecthandler/onboard_package.js"></script>
+
 
 {% endblock %}
 

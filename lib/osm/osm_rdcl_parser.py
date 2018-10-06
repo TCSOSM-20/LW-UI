@@ -1,5 +1,5 @@
 #
-#   Copyright 2017 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+#   Copyright 2018 EveryUP Srl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,29 +18,17 @@ import json
 import pyaml
 import yaml
 from lib.util import Util
+from lib.parser import Parser
 import logging
 import traceback
 import glob
 import os
 
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('OsmParser')
 
-class Parser(object):
-    """Parser methods base class
+
+class OsmParser(Parser):
+    """Parser methods for osm project type
 
     """
-
-    def __init__(self):
-        pass
-    
-    @classmethod        
-    def importprojectdir(cls,dir_project, type):
-        """Imports all files under a given folder
-
-        Returns an empty project
-        """
-
-        project = {}
-        return project
-
-    def get_all_ns_descriptors(self, nsd_id, project_data):
-        raise NotImplementedError
