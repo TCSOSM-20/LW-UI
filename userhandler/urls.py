@@ -20,7 +20,7 @@ from userhandler import views
 urlpatterns = [
     url(r'^list$', views.user_list, name='list'),
     url(r'^create$', views.create, name='create'),
-    url(r'^(?P<user_id>[0-9a-zA-Z]+)', views.update, name='update'),
-    url(r'^(?P<user_id>[0-9a-zA-Z]+)/delete$', views.delete, name='delete')
+    url(r'^(?P<user_id>[0-9a-zA-Z]+)/delete$', views.delete, name='delete'),
+    url(r'^(?P<user_id>[0-9a-zA-Z]+)', views.update, name='update')
 
 ]

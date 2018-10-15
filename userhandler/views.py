@@ -58,20 +58,31 @@ def update(request, user_id=None):
         projects_to_add = list(set(projects_new) - set(projects_old))
         projects_to_remove = list(set(projects_old) - set(projects_new))
 
-        payload = {}
+        project_payload = {}
 
         for p in projects_to_remove:
-            payload["$"+str(p)] = None
+            project_payload["$"+str(p)] = None
         for p in projects_to_add:
             if p not in projects_old:
-                payload["$+"+str(p)] = str(p)
-        payload["$" + default_project] = None
-        payload["$+[0]"] = default_project
+                project_payload["$+"+str(p)] = str(p)
+        project_payload["$" + default_project] = None
+        project_payload["$+[0]"] = default_project
+        payload = {}
+        if project_payload:
+            payload["projects"] = project_payload
+        if request.POST.get('password') and request.POST.get('password') is not '':
+            payload["password"] = request.POST.get('password')
 
-        update_res = client.user_update(user.get_token(), user_id, {"projects": payload})
+        update_res = client.user_update(user.get_token(), user_id, payload)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'users:list', to_redirect=True, )
+        update_res = {'error': True, 'data': str(e)}
+    if update_res['error']:
+        return __response_handler(request, update_res['data'], url=None,
+                                  status=update_res['data']['status'] if 'status' in update_res['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
+        #return __response_handler(request, {}, 'users:list', to_redirect=True, )
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):

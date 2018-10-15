@@ -32,7 +32,7 @@ function openModalEditUser(args) {
     $("#projects_old").val(user_projects.toString());
     $('#projects_edit').val(null).trigger('change');
     $('#default_project_edit').val(null).trigger('change');
-
+    $('#edit_password').val('');
     if (user_projects.length > 0) {
             // Create a DOM Option and pre-select by default
             var newOption = new Option(user_projects[0], user_projects[0], true, true);
