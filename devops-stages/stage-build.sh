@@ -1,3 +1,3 @@
 #!/bin/sh
-#make clean all
+./build-debpkg.sh
 echo "BUILD DONE"
