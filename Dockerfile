@@ -7,5 +7,5 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && apt-get -y install git make libcurl4-gnutls-dev \
-    libgnutls-dev debhelper apt-utils
+    libgnutls-dev debhelper apt-utils dh-make
 
