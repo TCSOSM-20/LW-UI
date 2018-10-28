@@ -1,5 +1,6 @@
 /*
    Copyright 2017 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+   Copyright 2018 EveryUP srl
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,23 +14,20 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-if (typeof dreamer === 'undefined') {
-    var dreamer = {};
-}
-var level = {}
 
-dreamer.GraphEditor = (function (global) {
+if (typeof TCD3 === 'undefined') {
+    var TCD3 = {};
+}
+
+TCD3.GraphEditor = (function () {
     'use strict';
 
     var DEBUG = true;
     var SHIFT_BUTTON = 16;
     var CANC_BUTTON = 46;
-    var default_link_color = "#888";
-    var nominal_text_size = 15;
+    var nominal_text_size = 14;
     var nominal_stroke = 1.5;
-    var EventHandler = dreamer.Event;
-    //    var IMAGE_PATH = "/static/assets/img/";
-
+    var EventHandler = TCD3.Event;
 
 
     /**
@@ -65,19 +63,13 @@ dreamer.GraphEditor = (function (global) {
     }
 
 
-
     GraphEditor.prototype.init = function (args) {
-        args = args || {}
+        args = args || {};
         var self = this;
-        this.width = 550//args.width || 500;
-        this.height = 550// args.height || 500;
+        this.width = args.width || 1500;
+        this.height = args.height || 1500;
         this.forceSimulationActive = false;
 
-        //FixMe
-        this.width = this.width - this.width * 0.007;
-        this.height = this.height - this.height * 0.07;
-
-        //console.log("this.width", this.width, "this.height", this.height);
         var min_zoom = 0.1;
         var max_zoom = 7;
         this._setupBehaviorsOnEvents();
@@ -86,35 +78,36 @@ dreamer.GraphEditor = (function (global) {
         this.type_property = {
             "unrecognized": {
                 "shape": d3.symbolCircle,
-                "color": "white",
-                "node_label_color": "black",
+                "color": "#fff",
+                "node_label_color": "#000",
                 "size": 15
             },
         };
 
         this.type_property_link = {
             "unrecognized": {
-                "color": "#888",
-                //"color": "red",
+                "color": "lightgray",
             },
         };
 
         this.force = d3.forceSimulation()
-            .force("collide", d3.forceCollide().radius(40))
-            .force("link", d3.forceLink().distance(80).iterations(1).id(function (d) {
+            .force("charge", d3.forceManyBody())
+            .force("collide", d3.forceCollide().radius(80))
+           // .force("link", d3.forceLink().distance(80).iterations(1).id(function (d) {
+            .force("link", d3.forceLink().distance(100).id(function (d) {
                 return d.id;
             }))
             .force("center", d3.forceCenter(this.width / 2, this.height / 2));
 
-        var zoom = d3.zoom().scaleExtent([min_zoom, max_zoom])
+        var zoom = d3.zoom().scaleExtent([min_zoom, max_zoom]);
 
         var size = d3.scalePow().exponent(2)
             .domain([1, 100])
             .range([8, 24]);
 
-        this.svg = d3.select("#graph_ed_container").append("svg")
+        this.svg = d3.select("#graph_editor_container").append("svg")
             .attr("id", "graph_svg")
-            .attr("perserveAspectRatio", "xMinYMid")
+            .attr("preserveAspectRatio", "xMinYMid")
             .attr("width", this.width)
             .attr("height", this.height);
 
@@ -142,9 +135,9 @@ dreamer.GraphEditor = (function (global) {
                 //d3.event.preventDefault();
                 if (self.lastKeyDown !== -1) return;
                 self.lastKeyDown = d3.event.keyCode;
-                if (self.lastKeyDown === CANC_BUTTON && self._selected_node != undefined) {
+                if (self.lastKeyDown === CANC_BUTTON && self._selected_node !== undefined) {
                     self.removeNode(self._selected_node, null, showAlert);
-                } else if (self.lastKeyDown === CANC_BUTTON && self._selected_link != undefined) {
+                } else if (self.lastKeyDown === CANC_BUTTON && self._selected_link !== undefined) {
                     self.removeLink(self._selected_link, null, showAlert);
                 }
 
@@ -159,37 +152,35 @@ dreamer.GraphEditor = (function (global) {
             .attr("opacity", "0")
             .attr("transform", "translate(1 1)")
             .call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
 
         function dragstarted(d) {
-          //d3.select(this).raise().classed("active", true);
+            //d3.select(this).raise().classed("active", true);
         }
 
         function dragged(d) {
             //console.log(JSON.stringify(d))
-          d3.select(this).attr("transform", function () {
-                return "translate("+d3.event.x+","+d3.event.y+")";
+            d3.select(this).attr("transform", function () {
+                return "translate(" + d3.event.x + "," + d3.event.y + ")";
 
             })
         }
 
         function dragended(d) {
-          //d3.select(this).classed("active", false);
+            //d3.select(this).classed("active", false);
         }
 
         var chart = $("#graph_svg");
         this.aspect = chart.width() / chart.height();
-        this.container = chart.parent();
-        $(window).on("resize", function() {
+        this.container = $("#graph_editor_container");
+        $(window).on("resize", function () {
 
-            var palette_width = ($("#palette").length > 0) ? $("#palette").width() : 0;
-            var working_width = self.container.width() - palette_width;
-            self.width = (working_width < 0) ? 0 : working_width;
+            self.width = self.container.width();
             self.height = self.container.height();
-            chart.attr("width", self.width);
-            chart.attr("height", self.height);
+            chart.attr("width", self.container.width());
+            chart.attr("height", self.container.height());
         }).trigger("resize");
 
     }
@@ -199,60 +190,47 @@ dreamer.GraphEditor = (function (global) {
         function (myString) {
 
             switch (myString) {
-            case "circle":
-                return d3.symbolCircle;
-                break;
-            case "square":
-                return d3.symbolSquare;
-                break;
-            case "diamond":
-                return d3.symbolDiamond;
-                break;
-            case "triangle":
-                return d3.symbolTriangle;
-                break;
-            case "star":
-                return d3.symbolStar;
-                break;
-            case "cross":
-                return d3.symbolCross;
-                break;
-            default:
-                // if the string is not recognized
-                return d3.symbolCross;
-                //return d3.symbolCircleUnknown;
+                case "circle":
+                    return d3.symbolCircle;
+                case "square":
+                    return d3.symbolSquare;
+                case "diamond":
+                    return d3.symbolDiamond;
+                case "triangle":
+                    return d3.symbolTriangle;
+                case "star":
+                    return d3.symbolStar;
+                case "cross":
+                    return d3.symbolCross;
+                default:
+                    // if the string is not recognized
+                    return d3.symbolCross;
             }
 
-        }
+        };
 
-     GraphEditor.prototype.get_name_from_d3_symbol =
+    GraphEditor.prototype.get_name_from_d3_symbol =
         function (mySymbol) {
             switch (mySymbol) {
-            case d3.symbolCircle:
-                return "circle";
-                break;
-            case d3.symbolSquare:
-                return "square";
-                break;
-            case d3.symbolDiamond:
-                return "diamond";
-                break;
-            case d3.symbolTriangle:
-                return "triangle";
-                break;
-            case d3.symbolStar:
-                return "star";
-                break;
-            case d3.symbolCross:
-                return "cross";
-                break;
-            default:
-                // if the string is not recognized
-                return "unknown";
+                case d3.symbolCircle:
+                    return "circle";
+                case d3.symbolSquare:
+                    return "square";
+                case d3.symbolDiamond:
+                    return "diamond";
+                case d3.symbolTriangle:
+                    return "triangle";
+                case d3.symbolStar:
+                    return "star";
+                case d3.symbolCross:
+                    return "cross";
+                default:
+                    // if the string is not recognized
+                    return "unknown";
                 //return d3.symbolCircleUnknown;
             }
 
-        }
+        };
 
     /**
      * Start or Stop force layout
@@ -280,9 +258,8 @@ dreamer.GraphEditor = (function (global) {
      *
      */
     GraphEditor.prototype.handleFiltersParams = function (filtersParams, notFireEvent) {
-        console.log("handleFiltersParams", filtersParams)
-        this.filter_parameters = (filtersParams != undefined) ? filtersParams : this.filter_parameters;
-        this.current_view_id = (this.filter_parameters != undefined && this.filter_parameters.link.view[0] != undefined) ? this.filter_parameters.link.view[0] : this.current_view_id
+        this.filter_parameters = (filtersParams !== undefined) ? filtersParams : this.filter_parameters;
+        this.current_view_id = (this.filter_parameters !== undefined && this.filter_parameters.link.view[0] !== undefined) ? this.filter_parameters.link.view[0] : this.current_view_id
         this.cleanAll();
         this.refresh();
         this.startForce();
@@ -334,20 +311,17 @@ dreamer.GraphEditor = (function (global) {
         if (node != undefined) {
             var node_id = node.id;
             this.d3_graph['nodes'].forEach(function (n, index, object) {
-                if (n.id == node_id) {
+                if (n.id === node_id) {
                     object.splice(index, 1);
-
                 }
-
             });
-            //TODO trovare una metodo piu efficace
+
             var self = this;
             var links_to_remove = [];
             this.d3_graph['links'].forEach(function (l, index, object) {
                 if (node_id === l.source.id || node_id === l.target.id) {
                     links_to_remove.push(index);
                 }
-
             });
             var links_removed = 0;
             links_to_remove.forEach(function (l_index) {
@@ -371,7 +345,7 @@ dreamer.GraphEditor = (function (global) {
      * @returns {boolean}
      */
     GraphEditor.prototype.addLink = function (link) {
-        console.log("addLink" + JSON.stringify(link))
+        console.log("addLink" + JSON.stringify(link));
         if (link.source && link.target) {
             this.force.stop();
             this.cleanAll();
@@ -456,7 +430,7 @@ dreamer.GraphEditor = (function (global) {
                 .filter(this.node_filter_cb))
 
             .filter(function (d) {
-                return (d.info.type == undefined) || (self._node_property_by_type(d.info.type, 'image', d) == undefined)
+                return (d.info.type === undefined) || (self._node_property_by_type(d.info.type, 'image', d) === undefined)
             })
 
             .append("svg:path")
@@ -551,11 +525,9 @@ dreamer.GraphEditor = (function (global) {
                 .on("end", dragended));
 
 
-
         this.node = this.svg.selectAll('.node')
             .data(self.d3_graph.nodes
                 .filter(this.node_filter_cb)).selectAll("image, path, circle");
-
 
 
         this.node.on("contextmenu", self.behavioursOnEvents.nodes["contextmenu"])
@@ -571,34 +543,27 @@ dreamer.GraphEditor = (function (global) {
             .on("mouseout", self.behavioursOnEvents.links["mouseout"]);
 
 
-
         this.text = this.svg.selectAll(".node")
             .data(self.d3_graph.nodes
                 .filter(this.node_filter_cb))
             .append("svg:text")
-            .attr("class", "nodetext")
-            .attr("class", "cleanable")
-            .attr("dy", function(d) { 
-                if (self._node_property_by_type(d.info.type, 'image', d) == undefined) {
-                    //shape
-                    return "-5"
-                }
-                else {
-                    //image
-                    return (-self._node_property_by_type(d.info.type, 'size', d)/2).toString()
-                }
+            .attr("class", "node_text cleanable")
+            .attr("dy", function (d) {
+                    return "-5";
             })
             .attr("pointer-events", "none")
             .style("font-size", nominal_text_size + "px")
-            .style("font-family", "Lucida Console")
+            .style("font-family", "'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif")
             .style("fill", function (d) {
                 return self._node_property_by_type(d.info.type, 'node_label_color', d);
             })
-            .style("text-anchor", "middle")
+            //.style("text-anchor", "middle")
             .text(function (d) {
-                return d.id;
+                if(d.info && d.info.property.custom_label && d.info.property.custom_label !==''){
+                    return d.info.property.custom_label
+                } else
+                    return d.id;
             });
-
 
 
         function dragstarted(d) {
@@ -636,8 +601,8 @@ dreamer.GraphEditor = (function (global) {
      *
      */
     GraphEditor.prototype.startForce = function () {
-        //this.force.stop();
-        var self = this
+        this.force.stop();
+        var self = this;
         this.force
             .nodes(this.d3_graph.nodes)
             .on("tick", ticked);
@@ -649,8 +614,8 @@ dreamer.GraphEditor = (function (global) {
 
         function ticked() {
             self.node.attr("cx", function (d) {
-                    return d.x = Math.max(self._node_property_by_type(d.info.type, 'size', d), Math.min(self.width - self._node_property_by_type(d.info.type, 'size', d), d.x));
-                })
+                return d.x = Math.max(self._node_property_by_type(d.info.type, 'size', d), Math.min(self.width - self._node_property_by_type(d.info.type, 'size', d), d.x));
+            })
                 .attr("cy", function (d) {
                     return d.y = Math.max(self._node_property_by_type(d.info.type, 'size', d), Math.min(self.height - self._node_property_by_type(d.info.type, 'size', d), d.y));
                 });
@@ -666,11 +631,10 @@ dreamer.GraphEditor = (function (global) {
                 return "translate(" + d.x + "," + d.y + ")";
             });
             self.text.attr("transform", function (d) {
-                var label_pos_y = d.y + self._node_property_by_type(d.info.type, 'size', d) + 10;
+                var label_pos_y = d.y + self._node_property_by_type(d.info.type, 'size', d)/2 +nominal_text_size;
                 return "translate(" + d.x + "," + label_pos_y + ")";
             });
-        };
-
+        }
 
 
     };
@@ -683,7 +647,7 @@ dreamer.GraphEditor = (function (global) {
      */
     GraphEditor.prototype.addListener = function (event_name, cb) {
         this.eventHandler.addL(event_name, cb);
-    }
+    };
 
     /**
      * This method removes an event handler that has been attached with the addListener() method.
@@ -693,7 +657,7 @@ dreamer.GraphEditor = (function (global) {
      */
     GraphEditor.prototype.removeListener = function (event_name, cb) {
 
-    }
+    };
 
 
     GraphEditor.prototype.setNodeClass = function (class_name, filter_cb) {
@@ -702,7 +666,7 @@ dreamer.GraphEditor = (function (global) {
         this.svg.selectAll('.node').classed(class_name, false);
         this.svg.selectAll('.node')
             .classed(class_name, filter_cb);
-    }
+    };
 
     GraphEditor.prototype.setLinkClass = function (class_name, filter_cb) {
         log("setLinkClass");
@@ -710,13 +674,14 @@ dreamer.GraphEditor = (function (global) {
         this.svg.selectAll('.link').classed(class_name, false);
         this.svg.selectAll('.link')
             .classed(class_name, filter_cb);
-    }
+    };
 
-    GraphEditor.prototype.showNodeInfo = function(args){
+    GraphEditor.prototype.showNodeInfo = function (args) {
         this.addLinesToPopup(args['node_info'], "Info about node selected")
         this.handlePopupVisibility(true, 'right')
-    }
-    GraphEditor.prototype.addLinesToPopup = function(data, title) {
+    };
+
+    GraphEditor.prototype.addLinesToPopup = function (data, title) {
         var self = this;
         var index = 1;
         var translate_y = 0;
@@ -740,7 +705,7 @@ dreamer.GraphEditor = (function (global) {
                     return 80
                 })
                 .type(function (d) {
-                    console.log("popiup")
+                    console.log("popup")
                     return (self.get_d3_symbol());
                 })
             )
@@ -752,7 +717,7 @@ dreamer.GraphEditor = (function (global) {
             .attr("stroke-width", 2.4)
             .attr("id", "close_popup")
             .attr("class", "popupcleanable cleanable")
-            .on("click", function(d) {
+            .on("click", function (d) {
                 self.handlePopupVisibility(false);
             });
 
@@ -766,7 +731,7 @@ dreamer.GraphEditor = (function (global) {
             //console.log(i, data, data[i])
             //var typeofvalue = typeof data[i];
             var record = data[i];
-            index = this._addRecordToPopup(i, record,index)
+            index = this._addRecordToPopup(i, record, index)
 
         }
 
@@ -775,47 +740,49 @@ dreamer.GraphEditor = (function (global) {
     GraphEditor.prototype._addRecordToPopup = function (key, record, index, tab) {
         //console.log("_addRecordToPopup", key, record, index)
         var translate_y = 23 * index;
-            var summary = d3.select(".popup").append("g")
-                    .attr("class", "popup summary d popupcleanable cleanable")
-                    .attr("transform", "translate(10 " + translate_y + ")");
-        if(Object.prototype.toString.call( record ) !== '[object Array]'){ //is a record simple key:value
+        var summary = d3.select(".popup").append("g")
+            .attr("class", "popup summary d popupcleanable cleanable")
+            .attr("transform", "translate(10 " + translate_y + ")");
+        if (Object.prototype.toString.call(record) !== '[object Array]') { //is a record simple key:value
             //console.log(key, record)
             var summary_g = summary.append("g");
-                summary_g.append("rect")
-                    .attr("class", "popup summary bg popupcleanable cleanable")
-                    .attr("width", "380")
-                    .attr("height", "20");
+            summary_g.append("rect")
+                .attr("class", "popup summary bg popupcleanable cleanable")
+                .attr("width", "380")
+                .attr("height", "20");
 
-                summary_g.append("text")
-                    .attr("class", "popup summary  popupcleanable cleanable")
-                    .attr("x", (tab)? tab: 10)
-                    .attr("y", "17")
-                    .attr("width", "100")
-                    .text(function(d){
-                        return key.toUpperCase() + ":";
-                    });
+            summary_g.append("text")
+                .attr("class", "popup summary  popupcleanable cleanable")
+                .attr("x", (tab) ? tab : 10)
+                .attr("y", "17")
+                .attr("width", "100")
+                .text(function (d) {
+                    return key.toUpperCase() + ":";
+                });
 
-                summary_g.append("text")
-                    .attr("class", "popup summary  popupcleanable cleanable")
-                    .attr("x", "370")
-                    .attr("y", "17")
-                    .attr("text-anchor", "end")
-                    .text(function(d){return record});
+            summary_g.append("text")
+                .attr("class", "popup summary  popupcleanable cleanable")
+                .attr("x", "370")
+                .attr("y", "17")
+                .attr("text-anchor", "end")
+                .text(function (d) {
+                    return record
+                });
         }
         else {//is a record simple complex: have a list of sub record key:value
-                //index ++;
-                this._addRecordToPopup(key, "", index)
-                for(var r in record){
-                    //console.log(i, r, record, record[r])
-                    for(var k in record[r]){
-                        //console.log(i, r, k, record[r][k])
-                        var curr_key = k;
-                        var recordValue = record[r][k]
+            //index ++;
+            this._addRecordToPopup(key, "", index)
+            for (var r in record) {
+                //console.log(i, r, record, record[r])
+                for (var k in record[r]) {
+                    //console.log(i, r, k, record[r][k])
+                    var curr_key = k;
+                    var recordValue = record[r][k]
 
-                        index ++;
-                        this._addRecordToPopup(curr_key, recordValue, index, 20)
-                    }
+                    index++;
+                    this._addRecordToPopup(curr_key, recordValue, index, 20)
                 }
+            }
 
         }
 
@@ -823,7 +790,6 @@ dreamer.GraphEditor = (function (global) {
         d3.select('#popupbg').attr("height", translate_y);
         return index;
     };
-
 
 
     /**
@@ -945,7 +911,7 @@ dreamer.GraphEditor = (function (global) {
                 'click': function (d) {
                     d3.event.preventDefault();
                     log('click', d);
-                    if (self.lastKeyDown == SHIFT_BUTTON && self._selected_node != undefined) {
+                    if (self.lastKeyDown === SHIFT_BUTTON && self._selected_node !== undefined) {
                         var source_id = self._selected_node.id;
                         var target_id = d.id;
                         log("--" + JSON.stringify(self.filter_parameters.link.view));
@@ -965,7 +931,8 @@ dreamer.GraphEditor = (function (global) {
                 'mouseover': function (d) {
 
                 },
-                'mouseout': function (d) {},
+                'mouseout': function (d) {
+                },
                 'dblclick': function (d) {
                     d3.event.preventDefault();
                     log('dblclick');
@@ -1014,6 +981,11 @@ dreamer.GraphEditor = (function (global) {
         this._deselectAllLinks();
         d3.select(node_instance).classed(activeClass, !alreadyIsActive);
         this._selected_node = (alreadyIsActive) ? undefined : node_instance.__data__;
+        if(this._selected_node){
+            this.eventHandler.fire("node:selected", this._selected_node)
+        } else {
+             this.eventHandler.fire("node:deselected", this._selected_node)
+        }
     };
 
     /**
@@ -1044,10 +1016,10 @@ dreamer.GraphEditor = (function (global) {
 
     }
 
-    GraphEditor.prototype.handlePopupVisibility = function(visible, side) {
+    GraphEditor.prototype.handlePopupVisibility = function (visible, side) {
         var opacity = (visible) ? 1 : 0;
 
-        var translate_op = (side == "left") ? "translate(50 50)" : "translate("+(this.width - 450).toString()+" 50)";
+        var translate_op = (side === "left") ? "translate(50 50)" : "translate(" + (this.width - 450).toString() + " 50)";
 
         if (!visible) {
             d3.selectAll(".popupcleanable").remove();
@@ -1062,7 +1034,7 @@ dreamer.GraphEditor = (function (global) {
 
     GraphEditor.prototype.refreshGraphParameters = function (graphParameters) {
         this.eventHandler.fire("refresh_graph_parameters", graphParameters);
-    }
+    };
 
     /**
      * Log utility
@@ -1073,12 +1045,11 @@ dreamer.GraphEditor = (function (global) {
     }
 
 
-
     return GraphEditor;
 
 
 }(this));
 
 if (typeof module === 'object') {
-    module.exports = dreamer.GraphEditor;
+    module.exports = TCD3.GraphEditor;
 }

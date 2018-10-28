@@ -131,41 +131,54 @@
                     },
                     "targets": 5
                 },{
-                   //  "width": "10%",
+                     "width": "20%",
                     "render": function (data, type, row) {
-                        return '<div class="btn-group">\n' +
-                            ' <button type="button" class="btn btn-default"\n' +
-                            '         onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"\n' +
-                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">\n' +
-                            '     <i class="fa fa-info"></i>\n' +
-                            ' </button>\n' +
-                            ' <button type="button" class="btn btn-default"\n' +
-                            '         onclick="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')"\n' +
-                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i\n' +
-                            '         class="far fa-trash-alt"></i></button>\n' +
-                            ' <button type="button" class="btn btn-default dropdown-toggle"\n' +
-                            '         data-toggle="dropdown" aria-expanded="false">Actions\n' +
-                            '     <span class="fa fa-caret-down"></span></button>\n' +
-                            ' <ul class="dropdown-menu">\n' +
-                            '     <li><a href="#"\n' +
-                            '            onclick="javascript:performAction(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">\n' +
-                            '         <i class="fa fa-magic"></i> Exec NS Primitive</a></li>\n' +
-                            '     <li>\n' +
-                            '         <a href="/instances/ns/' +row["_id"] +'/operation">\n' +
-                            '             <i class="fa fa-list"></i> Active operations</a></li>\n' +
-                            '     <li class="divider"></li>\n' +
-                            '     <li><a href="#"\n' +
-                            '            onclick="javascript:newAlarmNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">\n' +
-                            '         <i class="far fa-bell"></i> New Alarm</a></li>\n' +
-                            '     <li><a href="#"\n' +
-                            '            onclick="javascript:exportMetricNs(\''+ row["short-name"] +'\', \''+row["_id"]+ '\')">\n' +
-                            '         <i class="far fa-chart-bar"></i> Export metric</a></li>\n' +
-                            '     <li class="divider"></li>\n' +
-                            '     <li>\n' +
-                            '         <a href="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\', true)">\n' +
-                            '             <i class="far fa-trash-alt" style="color:red" ></i> Force delete</a></li>\n' +
-                            ' </ul>\n' +
+                          var template = '<div class="btn-group">' +
+                            ' <button type="button" class="btn btn-default"' +
+                            '         onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"' +
+                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">' +
+                            '     <i class="fa fa-info"></i>';
+                            if (row["operational-status"] === "running") {
+                                template += ' <button type="button" class="btn btn-default"' +
+                                '         onclick="javascript:showTopology(\'' + instance_type + '\', \'' + row["_id"] + '\')"' +
+                                '         data-toggle="tooltip" data-placement="top" data-container="body" title="Show Graph">' +
+                                '     <i class="fa fa-sitemap"></i>' +
+                                ' </button>';
+                            }else{
+                                template += ' <button type="button" disabled class="btn btn-default"' +
+                                '         onclick="javascript:showTopology(\'' + instance_type + '\', \'' + row["_id"] + '\')"' +
+                                '         data-toggle="tooltip" data-placement="top" data-container="body" title="Show Graph">' +
+                                '     <i class="fa fa-sitemap"></i>' +
+                                ' </button>';
+                            }
+                            template += ' <button type="button" class="btn btn-default"' +
+                            '         onclick="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')"' +
+                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i' +
+                            '         class="far fa-trash-alt"></i></button>' +
+                            ' <button type="button" class="btn btn-default dropdown-toggle"' +
+                            '         data-toggle="dropdown" aria-expanded="false">Actions' +
+                            '     <span class="fa fa-caret-down"></span></button>' +
+                            ' <ul class="dropdown-menu">' +
+                            '     <li><a href="#"' +
+                            '            onclick="javascript:performAction(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">' +
+                            '         <i class="fa fa-magic"></i> Exec NS Primitive</a></li>' +
+                            '     <li>' +
+                            '         <a href="/instances/ns/' +row["_id"] +'/operation">' +
+                            '             <i class="fa fa-list"></i> Active operations</a></li>' +
+                            '     <li class="divider"></li>' +
+                            '     <li><a href="#"' +
+                            '            onclick="javascript:newAlarmNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\')">' +
+                            '         <i class="far fa-bell"></i> New Alarm</a></li>' +
+                            '     <li><a href="#"' +
+                            '            onclick="javascript:exportMetricNs(\''+ row["short-name"] +'\', \''+row["_id"]+ '\')">' +
+                            '         <i class="far fa-chart-bar"></i> Export metric</a></li>' +
+                            '     <li class="divider"></li>' +
+                            '     <li>' +
+                            '         <a href="javascript:deleteNs(\''+ row["short-name"] +'\', \''+row["_id"]+'\', true)">' +
+                            '             <i class="far fa-trash-alt" style="color:red" ></i> Force delete</a></li>' +
+                            ' </ul>' +
                             '</div>';
+                          return template;
                     },
                     "targets": 5
                 },
@@ -203,12 +216,12 @@
                 }, 
                 {
                     "render": function (data, type, row) {
-                        return '<div class="btn-group">\n' +
-                            '     <button type="button" class="btn btn-default"\n' +
-                            '             onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"\n' +
-                            '             data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">\n' +
-                            '         <i class="fa fa-info"></i>\n' +
-                            '     </button>\n' +
+                        return '<div class="btn-group">' +
+                            '     <button type="button" class="btn btn-default"' +
+                            '             onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"' +
+                            '             data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">' +
+                            '         <i class="fa fa-info"></i>' +
+                            '     </button>' +
                             ' </div>';
                     },
                     "targets": 5

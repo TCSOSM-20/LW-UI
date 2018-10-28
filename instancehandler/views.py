@@ -21,6 +21,7 @@ import yaml
 import json
 import logging
 from lib.osm.osmclient.clientv2 import Client
+from lib.osm.osm_rdcl_parser import OsmParser
 import authosm.utils as osmutils
 from sf_t3d.decorators import login_required
 
@@ -154,156 +155,33 @@ def delete(request, instance_id=None, type=None):
     print result
     return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns')
 
-
+@login_required
 def show_topology(request, instance_id=None, type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
     raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
     if 'application/json' in raw_content_types:
-        result = {'vertices': [
-            {"info": {"type": "vnf", "property": {"custom_label": ""},
-                      "group": []}, "id": "ping"},
-            {"info": {"type": "vnf", "property": {"custom_label": ""},
-                      "group": []}, "id": "pong"},
-            {"info": {"type": "vdu", "property": {"custom_label": ""},
-                      "group": ['pong']}, "id": "pong/ubuntu"},
-            {"info": {"type": "vdu", "property": {"custom_label": ""},
-                      "group": ['ping']}, "id": "ping/ubuntu"},
-            {"info": {"type": "cp", "property": {"custom_label": ""},
-                      "group": ['ping']}, "id": "ping/cp0"},
-            {"info": {"type": "cp", "property": {"custom_label": ""},
-                      "group": ['ping']}, "id": "ping/cp1"},
-            {"info": {"type": "cp", "property": {"custom_label": ""},
-                      "group": ['pong']}, "id": "pong/cp0"},
-            {"info": {"type": "cp", "property": {"custom_label": ""},
-                      "group": ['pong']}, "id": "pong/cp1"},
-            {"info": {"type": "ns_vl", "property": {"custom_label": ""},
-                      "group": []}, "id": "mgmt_vl"},
-        ],
-            'edges': [
-                # {"source": "ping", "group": [], "target": "ping/cp0", "view": "Data"},
-                {"source": "pong/ubuntu", "group": ['pong'], "target": "pong/cp0", "view": "vnf"},
-                {"source": "ping/ubuntu", "group": ['ping'], "target": "ping/cp0", "view": "vnf"},
-                {"source": "pong/ubuntu", "group": ['pong'], "target": "pong/cp1", "view": "vnf"},
-                {"source": "ping/ubuntu", "group": ['ping'], "target": "ping/cp1", "view": "vnf"},
-                {"source": "pong", "group": [], "target": "mgmt_vl", "view": "ns"},
-                {"source": "ping", "group": [], "target": "mgmt_vl", "view": "ns"},
-            ], 'graph_parameters': [],
-            'model': {
-                "layer": {
+        client = Client()
+        nsr_object = {'nsr': {}, 'vnfr': {}, 'vnfd': {}}
+        if type == 'ns':
 
-                    "ns": {
-                        "nodes": {
-                            "vnf": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                },
-                                "expands": "vnf"
-                            },
-                            "ns_vl": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
+            nsr_resp = client.ns_get(user.get_token(), instance_id)
+            nsr_object['nsr'] = nsr_resp['data']
+            if 'constituent-vnfr-ref' in nsr_object['nsr'] :
+                for vnfr_id in nsr_object['nsr']['constituent-vnfr-ref']:
+                    vnfr_resp = client.vnf_get(user.get_token(), vnfr_id)
+                    vnfr = vnfr_resp['data']
+                    nsr_object['vnfr'][vnfr['id']] = vnfr
+                    if vnfr['vnfd-id'] not in nsr_object['vnfd']:
+                        vnfd_resp = client.vnfd_get(user.get_token(), vnfr['vnfd-id'])
+                        nsr_object['vnfd'][vnfr['vnfd-id']] = vnfd_resp['vnfd:vnfd-catalog']['vnfd'][0]
 
-                        },
-                        "allowed_edges": {
-                            "ns_vl": {
-                                "destination": {
-                                    "vnf": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            },
-                            "vnf": {
-                                "destination": {
-                                    "ns_vl": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    },
 
-                                }
-                            }
 
-                        }
-                    },
-                    "vnf": {
-                        "nodes": {
-                            "vdu": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
-                            "cp": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
+        test = OsmParser()
+        #print nsr_object
 
-                        },
-                        "allowed_edges": {
-                            "vdu": {
-                                "destination": {
-                                    "cp": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            },
-                            "cp": {
-                                "destination": {
-                                    "vdu": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "name": "OSM",
-                    "version": 1,
-                    "nodes": {
-                        "vnf": {
-                            "label": "vnf"
-                        },
-                        "ns_vl": {
-                            "label": "vl"
-                        },
-                        "cp": {
-                            "label": "cp"
-                        },
-                        "vdu": {
-                            "label": "vdu"
-                        }
-                    },
-                    "description": "osm"
-                }
-            }}
+        result = test.nsr_to_graph(nsr_object)
         return __response_handler(request, result)
     else:
         result = {'type': type, 'project_id': project_id, 'instance_id': instance_id}

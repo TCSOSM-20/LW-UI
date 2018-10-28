@@ -14,21 +14,254 @@
 #   limitations under the License.
 #
 
-import json
-import pyaml
-import yaml
-from lib.util import Util
-from lib.parser import Parser
+
 import logging
-import traceback
-import glob
-import os
+# from lib.rdcl_graph import RdclGraph
+import copy
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('OsmParser')
 
 
-class OsmParser(Parser):
-    """Parser methods for osm project type
+class RdclGraph(object):
+    """ Operates on the graph representation used for the GUI graph views """
+    node_ids = []
+    node_t3d_base = {
+        'info': {
+            'property': {
+                'custom_label': '',
+            },
+            'type': '',
+            'group': []
+        }
+    }
 
-    """
+    def __init__(self):
+        pass
+
+    def add_link(self, source, target, view, group, graph_object, optional={}):
+        if (source is None or source not in self.node_ids) or (target is None or target not in self.node_ids):
+            return
+        edge_obj = {
+            'source': source,
+            'target': target,
+            'view': view,
+            'group': [group],
+        }
+
+        edge_obj.update(optional)
+        if edge_obj not in graph_object['edges']:
+            graph_object['edges'].append(edge_obj)
+
+    def add_node(self, id, type, group, positions, graph_object, optional={}):
+        if id is None:
+            return
+        node = next((x for x in graph_object['vertices'] if x['id'] == id), None)
+        if node is not None:
+            node['info']['group'].append(group)
+        else:
+            node = copy.deepcopy(self.node_t3d_base)
+            node['id'] = id
+            node['info']['type'] = type
+            if group is not None:
+                node['info']['group'].append(group)
+            if positions and id in positions['vertices'] and 'x' in positions['vertices'][id] and 'y' in \
+                    positions['vertices'][id]:
+                node['fx'] = positions['vertices'][id]['x']
+                node['fy'] = positions['vertices'][id]['y']
+            node['info'].update(optional)
+            graph_object['vertices'].append(node)
+            self.node_ids.append(id)
+
+    def is_directed_edge(self, source_type=None, target_type=None, layer=None, model={}):
+        if source_type is None or target_type is None or layer is None:
+            return None
+        if layer in model['layer'] and 'allowed_edges' in model['layer'][layer]:
+            if source_type in model['layer'][layer]['allowed_edges'] and target_type in \
+                    model['layer'][layer]['allowed_edges'][source_type]['destination']:
+                edge_pro = model['layer'][layer]['allowed_edges'][source_type]['destination'][target_type]
+                return edge_pro['direct_edge'] if 'direct_edge' in edge_pro else False
+
+        return None
+
+
+class OsmParser(RdclGraph):
+    """ Operates on the graph representation used for the GUI graph views """
+
+    def nsr_to_graph(self, nsr_full):
+
+        graph = {'vertices': [], 'edges': [], 'model': {
+            "layer": {
+
+                "nsr": {
+                    "nodes": {
+                        "vnfr": {
+                            "addable": {},
+                            "removable": {},
+                            "expands": "vnfr"
+                        },
+                        "ns_vl": {
+                            "addable": {},
+                            "removable": {}
+                        },
+                        "ns_cp": {
+                            "addable": {},
+                            "removable": {}
+                        },
+
+                    },
+                    "allowed_edges": {
+                        "ns_vl": {
+                            "destination": {
+                                "vnfr": {
+                                    "callback": "addLink",
+                                    "direct_edge": False,
+                                    "removable": {}
+                                }
+                            }
+                        },
+                        "vnfr": {
+                            "destination": {
+                                "ns_vl": {
+                                    "callback": "addLink",
+                                    "direct_edge": False,
+                                    "removable": {}
+                                },
+
+                            }
+                        }
+
+                    }
+                },
+
+                "vnfr": {
+                    "nodes": {
+                        "vdur": {},
+                        "cp": {},
+                        "int_cp": {},
+                        "vnf_vl": {}
+
+                    },
+                    "allowed_edges": {
+                        "vdur": {
+                            "destination": {
+                                "cp": {
+                                    "direct_edge": False,
+                                },
+                                "int_cp": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "cp": {
+                            "destination": {
+                                "vdur": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "int_cp": {
+                            "destination": {
+                                "vdur": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "vnf_vl": {
+                            "destination": {
+                                "vdur": {
+                                    "direct_edge": False
+                                }
+                            }
+                        }
+                    }
+                },
+                "name": "OSM",
+                "version": 1,
+                "description": "osm"
+            }
+        }, 'graph_parameters': {'view': {'nsr': {}, 'vnfr': {}}}}
+
+        nsr = nsr_full['nsr']
+
+        graph['graph_parameters']['view']['nsr'] = {}
+        nsr_graph_param = graph['graph_parameters']['view']['nsr']
+        nsr_graph_param['id'] = nsr['_id'] if '_id' in nsr else None
+        nsr_graph_param['nsdId'] = nsr['nsdId'] if 'nsdId' in nsr else None
+        nsr_graph_param['name-ref'] = nsr['name-ref'] if 'name-ref' in nsr else None
+        nsr_graph_param['operational-status'] = nsr['operational-status'] if 'operational-status' in nsr else None
+        nsr_graph_param['config-status'] = nsr['config-status'] if 'config-status' in nsr else None
+        nsr_graph_param['detailed-status'] = nsr['detailed-status'] if 'detailed-status' in nsr else None
+        nsr_graph_param['create-time'] = nsr['create-time'] if 'create-time' in nsr else None
+        nsr_graph_param['instantiate_params'] = nsr['instantiate_params'] if 'instantiate_params' in nsr else None
+
+        map_vnf_index_to_id = {}
+        for vnfr_id in nsr['constituent-vnfr-ref']:
+            current_vnfr = nsr_full['vnfr'][vnfr_id]
+
+            graph['graph_parameters']['view']['vnfr'][vnfr_id] = {}
+            vnfr_graph_param = graph['graph_parameters']['view']['vnfr'][vnfr_id]
+            vnfr_graph_param['id'] = vnfr_id
+            vnfr_graph_param['vnfd-id'] = current_vnfr['vnfd-id']
+            vnfr_graph_param['vnfd-ref'] = current_vnfr['vnfd-ref']
+            vnfr_graph_param['member-vnf-index-ref'] = current_vnfr['member-vnf-index-ref']
+            vnfr_graph_param['vim-account-id'] = current_vnfr['vim-account-id']
+            vnfr_graph_param['created-time'] = current_vnfr['created-time']
+
+            vnfr_label = current_vnfr['vnfd-ref'] + ':' + current_vnfr['member-vnf-index-ref']
+            map_vnf_index_to_id[current_vnfr['member-vnf-index-ref']] = vnfr_id
+            self.add_node(vnfr_id, 'vnfr', None, None, graph,
+                          {'property': {'custom_label': vnfr_label}, 'osm': current_vnfr})
+
+            for cp in current_vnfr['connection-point']:
+                if cp['id']:
+                    cp_id = vnfr_label + ':' + cp['id']
+                    self.add_node(cp_id, 'cp', vnfr_id, None, graph, {'osm': cp})
+
+            for vdur in current_vnfr['vdur']:
+                vdur_id = vnfr_label + ':' + vdur['vdu-id-ref']
+                self.add_node(vdur_id, 'vdur', vnfr_id, None, graph, {'osm': vdur})
+                if current_vnfr['vnfd-id'] in nsr_full['vnfd']:
+                    for vdu in nsr_full['vnfd'][current_vnfr['vnfd-id']]['vdu']:
+                        if vdu['id'] == vdur['vdu-id-ref']:
+                            if 'internal-connection-point' in vdu:
+                                for int_cp in vdu['internal-connection-point']:
+                                    cp_id = vnfr_label + ':' + int_cp['id']
+                                    self.add_node(cp_id, 'int_cp', vnfr_id, None, graph, {'osm': int_cp})
+                            for interface in vdu['interface']:
+                                if interface['type'] == "EXTERNAL":
+                                    cp_id = vnfr_label + ':' + interface['external-connection-point-ref']
+                                    self.add_link(cp_id, vdur_id, 'vnfr', vnfr_id, graph)
+                                elif interface['type'] == "INTERNAL":
+                                    cp_id = vnfr_label + ':' + interface['internal-connection-point-ref']
+                                    self.add_link(cp_id, vdur_id, 'vnfr', vnfr_id, graph)
+
+            if current_vnfr['vnfd-id'] in nsr_full['vnfd'] and 'internal-vld' in nsr_full['vnfd'][
+                current_vnfr['vnfd-id']]:
+                for vnfd_vld in nsr_full['vnfd'][current_vnfr['vnfd-id']]['internal-vld']:
+                    vld_id = vnfr_label + ':' + vnfd_vld['id']
+                    self.add_node(vld_id, 'vnf_vl', vnfr_id, None, graph, {'osm': vnfd_vld})
+                    if vnfd_vld['internal-connection-point']:
+                        for int_cp in vnfd_vld['internal-connection-point']:
+                            int_cp_id = vnfr_label + ':' + int_cp['id-ref']
+                            self.add_link(vld_id, int_cp_id, 'vnfr', vnfr_id, graph)
+
+        for ns_vld in nsr['nsd']['vld']:
+            self.add_node(ns_vld['id'], 'ns_vl', None, None, graph,
+                          {'property': {'custom_label': ns_vld['name']}, 'osm': ns_vld})
+            for cp_ref in ns_vld['vnfd-connection-point-ref']:
+                self.add_link(map_vnf_index_to_id[str(cp_ref['member-vnf-index-ref'])], ns_vld['id'], 'nsr', None,
+                              graph)
+
+        return graph
+
+
+if __name__ == '__main__':
+    parser = OsmParser()
+    print parser.nsr_to_graph({})

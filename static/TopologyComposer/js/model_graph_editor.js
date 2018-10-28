@@ -1,5 +1,6 @@
 /*
    Copyright 2017 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+   Copyright 2018 EveryUP srl
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,23 +14,21 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-if (typeof dreamer === 'undefined') {
-    var dreamer = {};
+if (typeof TCD3 === 'undefined') {
+    var TCD3 = {};
 }
-var level = {}
 
-dreamer.ModelGraphEditor = (function (global) {
+TCD3.ModelGraphEditor = (function () {
     'use strict';
 
     var DEBUG = true;
     var SHIFT_BUTTON = 16;
     var IMAGE_PATH = "/static/assets/img/";
-    var GUI_VERSION = "v1";
 
 
-    ModelGraphEditor.prototype = new dreamer.GraphEditor();
+    ModelGraphEditor.prototype = new TCD3.GraphEditor();
     ModelGraphEditor.prototype.constructor = ModelGraphEditor;
-    ModelGraphEditor.prototype.parent = dreamer.GraphEditor.prototype;
+    ModelGraphEditor.prototype.parent = TCD3.GraphEditor.prototype;
 
     /**
      * Constructor
@@ -43,73 +42,54 @@ dreamer.ModelGraphEditor = (function (global) {
 
     ModelGraphEditor.prototype.init = function (args) {
         this.parent.init.call(this, args);
+        var self = this;
+        this.desc_id = args.desc_id || undefined; //TODO remove it
 
-        if (args.gui_properties[GUI_VERSION] != undefined) {
-            args.gui_properties = args.gui_properties[GUI_VERSION];
-        }
-
-        this.desc_id = args.desc_id || undefined;
         this.type_property = {};
-        this.type_property["unrecognized"] = args.gui_properties["default"];
-        this.type_property["unrecognized"]["default_node_label_color"] = args.gui_properties["default"]["label_color"];
-        //this.type_property["unrecognized"]["shape"] = d3.symbolCross;
-        this._edit_mode = (args.edit_mode != undefined) ? args.edit_mode : this._edit_mode;
+        this.type_property["unrecognized"] = args.gui_properties["nodes"]["default"];
+
+        this._edit_mode = args.edit_mode || false;
 
         Object.keys(args.gui_properties["nodes"]).forEach(function (key, index) {
-            console.log(key + " ####")
+
             this.type_property[key] = args.gui_properties["nodes"][key];
-            if ( this.type_property[key]['property'] != undefined){
-                for(var c_prop in this.type_property[key]){
-                    if(c_prop != 'property'){
 
-                        this.type_property[key][c_prop]['shape'] = this.parent.get_d3_symbol(this.type_property[key][c_prop]['shape']);
-                        if(this.type_property[key][c_prop]["image"] != undefined){
-                            this.type_property[key][c_prop]["image"] = IMAGE_PATH + this.type_property[key][c_prop]["image"]
-                        }
-                    }
-                }
+            this.type_property[key]["shape"] = this.parent.get_d3_symbol(this.type_property[key]["shape"]);
+            if (this.type_property[key]["image"] !== undefined) {
+                this.type_property[key]["image"] = IMAGE_PATH + this.type_property[key]["image"];
             }
-            else{
-
-                this.type_property[key]["shape"] = this.parent.get_d3_symbol(this.type_property[key]["shape"]);
-                if (this.type_property[key]["image"] != undefined) {
-                    this.type_property[key]["image"] = IMAGE_PATH + this.type_property[key]["image"];
-                }
-            }
-
-
 
         }, this);
-        if(args.gui_properties["edges"]){
+
+        if (args.gui_properties["edges"]) {
             this.type_property_link = args.gui_properties["edges"];
-            var self = this;
             var link_types = ['unrecognized'].concat(Object.keys(self.type_property_link))
-                this.defs.selectAll("marker")
-                    .data(link_types)
-                    .enter()
-                    .append("svg:marker")    // This section adds in the arrows
-                    .attr("id", function(d){
-                        return d;
-                    })
-                    .attr("viewBox", "-5 -5 10 10")
-                    .attr("refX", 13) /*must be smarter way to calculate shift*/
-                    .attr("refY", 0)
-                    .attr("markerUnits", "userSpaceOnUse")
-                    .attr("markerWidth", 12)
-                    .attr("markerHeight", 12)
-                    .attr("orient", "auto")
-                    .append("path")
-                    .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z")
-                    .attr('fill', function(d){
-                        return self.type_property_link[d].color;
-                    });
+            this.defs.selectAll("marker")
+                .data(link_types)
+                .enter()
+                .append("svg:marker")    // This section adds in the arrows
+                .attr("id", function (d) {
+                    return d;
+                })
+                .attr("viewBox", "-5 -5 10 10")
+                .attr("refX", 13) /*must be smarter way to calculate shift*/
+                .attr("refY", 0)
+                .attr("markerUnits", "userSpaceOnUse")
+                .attr("markerWidth", 12)
+                .attr("markerHeight", 12)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z")
+                .attr('fill', function (d) {
+                    return self.type_property_link[d].color;
+                });
         }
 
         this.customBehavioursOnEvents = args.behaviorsOnEvents || undefined;
 
-        var self = this;
-        var data_url = (args.data_url) ? args.data_url : "graph_data/";
-        if (!args.graph_data) {
+
+        var data_url =  args.data_url || undefined;
+        if (!args.graph_data && args.data_url) {
             d3.json(data_url, function (error, data) {
                 //console.log(JSON.stringify(data))
                 self.d3_graph.nodes = data.vertices;
@@ -122,17 +102,8 @@ dreamer.ModelGraphEditor = (function (global) {
                 //if(args.filter_base != undefined)
 
                 setTimeout(function () {
-                    //self.handleForce(self.forceSimulationActive);
-                    //var f_t = {"node":{"type":[],"group":["vlan_r3u0"]},"link":{"group":["vlan_r3u0"],"view":[""]}}
-                    //var f_t ={"node":{"type":["vnf_vl","vnf_ext_cp","vnf_vdu_cp","vnf_vdu","vnf_click_vdu"],"group":["vlan_r3u0"]},"link":{"group":["vlan_r3u0"],"view":["vnf"]}}
+               self.handleForce(true);
                     self.handleFiltersParams(args.filter_base);
-                    //self.handleFiltersParams(f_t);
-                    //console.log(JSON.stringify(args.filter_base))
-                    //console.log(self.d3_graph.nodes.length)
-                    //console.log(JSON.stringify(self.d3_graph.nodes))
-                    //self.d3_graph.nodes.forEach(function(key, index){
-                    //console.log(key, index);
-                    //})
                 }, 500);
 
             });
@@ -179,7 +150,7 @@ dreamer.ModelGraphEditor = (function (global) {
         if (self.model.layer[current_layer] && self.model.layer[current_layer].nodes[node_type] && self.model.layer[current_layer].nodes[node_type].addable) {
             if (self.model.layer[current_layer].nodes[node_type].addable.callback) {
                 var c = self.model.callback[self.model.layer[current_layer].nodes[node_type].addable.callback].class;
-                var controller = new dreamer[c]();
+                var controller = new TCD3[c]();
                 controller[self.model.layer[current_layer].nodes[node_type].addable.callback](self, node, function () {
                     self.parent.addNode.call(self, node);
                     success && success();
@@ -196,7 +167,6 @@ dreamer.ModelGraphEditor = (function (global) {
             error && error("You can't add a " + node.info.type + " in a current layer " + current_layer);
         }
     };
-
 
 
     /**
@@ -219,13 +189,13 @@ dreamer.ModelGraphEditor = (function (global) {
         var self = this;
         var current_layer = self.getCurrentView();
         var node_type = node.info.type;
-        if (node.info.desc_id == undefined){
+        if (node.info.desc_id == undefined) {
             node.info.desc_id = self.desc_id;
         }
         if (self.model.layer[current_layer] && self.model.layer[current_layer].nodes[node_type] && self.model.layer[current_layer].nodes[node_type].removable) {
             if (self.model.layer[current_layer].nodes[node_type].removable.callback) {
                 var c = self.model.callback[self.model.layer[current_layer].nodes[node_type].removable.callback].class;
-                var controller = new dreamer[c]();
+                var controller = new TCD3[c]();
                 controller[self.model.layer[current_layer].nodes[node_type].removable.callback](self, node, function () {
                     self.parent.removeNode.call(self, node);
                     success && success();
@@ -270,7 +240,7 @@ dreamer.ModelGraphEditor = (function (global) {
                 var direct_edge = 'direct_edge' in self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type] ? self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type]['direct_edge'] : false;
                 link.directed_edge = direct_edge;
                 var c = self.model.callback[callback].class;
-                var controller = new dreamer[c]();
+                var controller = new TCD3[c]();
                 controller[callback](self, link, function () {
                     self._deselectAllNodes();
                     self.parent.addLink.call(self, link);
@@ -308,7 +278,7 @@ dreamer.ModelGraphEditor = (function (global) {
             if (self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable.callback) {
                 var callback = self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable.callback;
                 var c = self.model.callback[callback].class;
-                var controller = new dreamer[c]();
+                var controller = new TCD3[c]();
                 controller[callback](self, link, function () {
                     self._deselectAllNodes();
                     self._deselectAllLinks();
@@ -331,13 +301,13 @@ dreamer.ModelGraphEditor = (function (global) {
 
 
     ModelGraphEditor.prototype.savePositions = function (data) {
-        var vertices = {}
+        var vertices = {};
         this.node.each(function (d) {
             vertices[d.id] = {};
             vertices[d.id]['x'] = d.x;
             vertices[d.id]['y'] = d.y;
         });
-        new dreamer.GraphRequests().savePositions({
+        new TCD3.GraphRequests().savePositions({
             'vertices': vertices
         });
 
@@ -345,11 +315,6 @@ dreamer.ModelGraphEditor = (function (global) {
 
     /**
      *  Internal functions
-     */
-
-    /**
-     *
-     *
      */
 
     ModelGraphEditor.prototype._setupBehaviorsOnEvents = function (layer) {
@@ -363,15 +328,15 @@ dreamer.ModelGraphEditor = (function (global) {
             edit_mode: true
         }];
         var contextMenuNodesAction = [{
-                title: 'Edit',
-                action: function (elm, d, i) {
-                    if (d.info.type != undefined) {
-                        self.eventHandler.fire("edit_descriptor", self.project_id, d);
-                    }
-                },
-                nodes: [],
-                edit_mode: true
+            title: 'Edit',
+            action: function (elm, d, i) {
+                if (d.info.type != undefined) {
+                    self.eventHandler.fire("edit_descriptor", self.project_id, d);
+                }
             },
+            nodes: [],
+            edit_mode: true
+        },
             {
                 title: 'Delete',
                 action: function (elm, d, i) {
@@ -381,12 +346,12 @@ dreamer.ModelGraphEditor = (function (global) {
             }
 
         ];
-        if(this.customBehavioursOnEvents){
+        if (this.customBehavioursOnEvents) {
             contextMenuNodesAction = contextMenuNodesAction.concat(this.customBehavioursOnEvents['behaviors'].nodes);
         }
 
 
-        if ( self.model && self.model.layer && self.model.layer[layer] && self.model.layer[layer].action && self.model.layer[layer].action.node) {
+        if (self.model && self.model.layer && self.model.layer[layer] && self.model.layer[layer].action && self.model.layer[layer].action.node) {
             for (var i in self.model.layer[layer].action.node) {
                 var action = self.model.layer[layer].action.node[i]
                 contextMenuNodesAction.push({
@@ -394,16 +359,16 @@ dreamer.ModelGraphEditor = (function (global) {
                     action: function (elm, d, i) {
                         var callback = action.callback;
                         var c = self.model.callback[callback].class;
-                        var controller = new dreamer[c]();
+                        var controller = new TCD3[c]();
                         var args = {
                             elm: elm,
                             d: d,
                             i: i
-                        }
+                        };
 
                         controller[callback](self, args);
                     },
-                    edit_mode: (action.edit_mode != undefined) ? action.edit_mode: undefined
+                    edit_mode: (action.edit_mode !== undefined) ? action.edit_mode : undefined
                 });
             }
         }
@@ -414,7 +379,7 @@ dreamer.ModelGraphEditor = (function (global) {
 
                     d3.event.preventDefault();
 
-                    if (self._edit_mode && self.lastKeyDown == SHIFT_BUTTON && self._selected_node != undefined) {
+                    if (self._edit_mode && self.lastKeyDown === SHIFT_BUTTON && self._selected_node !== undefined) {
                         self.addLink(self._selected_node, d, null, showAlert);
                     } else {
                         self._selectNodeExclusive(this, d);
@@ -450,7 +415,7 @@ dreamer.ModelGraphEditor = (function (global) {
                     d3.select(this).style('stroke-width', 4);
                 },
                 'mouseout': function (d) {
-                    if (d != self._selected_link)
+                    if (d !== self._selected_link)
                         d3.select(this).style('stroke-width', 2);
                 },
                 'contextmenu': d3.contextMenu(contextMenuLinksAction, {
@@ -465,21 +430,18 @@ dreamer.ModelGraphEditor = (function (global) {
     ModelGraphEditor.prototype.handleFiltersParams = function (filtersParams, notFireEvent) {
 
         this.parent.handleFiltersParams.call(this, filtersParams, notFireEvent);
-        this._setupBehaviorsOnEvents(filtersParams.link.view[0]);
+        if (filtersParams && filtersParams.link && filtersParams.link.view)
+            this._setupBehaviorsOnEvents(filtersParams.link.view[0]);
     };
 
     ModelGraphEditor.prototype.getAvailableNodes = function () {
         log('getAvailableNodes');
-        log(this.model)
-        if (this.model && this.model.layer[this.getCurrentView()] != undefined)
+        log(this.model);
+        if (this.model && this.model.layer[this.getCurrentView()] !== undefined)
             return this.model.layer[this.getCurrentView()].nodes;
         return [];
-    }
-
-
-    ModelGraphEditor.prototype.exploreLayer = function (args) {
-
     };
+
 
     ModelGraphEditor.prototype.getTypeProperty = function () {
         return this.type_property;
@@ -488,12 +450,19 @@ dreamer.ModelGraphEditor = (function (global) {
     ModelGraphEditor.prototype.getCurrentGroup = function () {
         return this.filter_parameters.node.group[0];
 
-    }
+    };
 
     ModelGraphEditor.prototype.getCurrentView = function () {
         return this.filter_parameters.link.view[0];
+    };
+    ModelGraphEditor.prototype.getCurrentFilters = function () {
+        return this.filter_parameters;
+    };
 
-    }
+    ModelGraphEditor.prototype.getGraphParams = function () {
+        return this.d3_graph.graph_parameters;
+    };
+
     /**
      * Log utility
      */
@@ -503,12 +472,11 @@ dreamer.ModelGraphEditor = (function (global) {
     }
 
 
-
     return ModelGraphEditor;
 
 
 }(this));
 
 if (typeof module === 'object') {
-    module.exports = dreamer.ModelGraphEditor;
+    module.exports = TCD3.ModelGraphEditor;
 }

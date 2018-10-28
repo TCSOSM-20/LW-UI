@@ -55,7 +55,7 @@
     var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
     var vim_list_url = '{% url "vims:list"  %}';
     var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}";
-    var descriptor_type = '{{ descriptor_type }}';
+    var descriptor_type = '{{ descriptor_type | safe }}';
     var project_id = '{{ project_id }}';
     var table;
 
@@ -78,9 +78,7 @@
                     }
                 },
                 "error": function (hxr, error, thrown) {
-                    console.log(hxr)
-                    console.log(thrown)
-                    console.log(error);
+
                 }
 
             },

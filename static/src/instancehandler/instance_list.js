@@ -87,6 +87,11 @@ var removeFormGroup = function (event) {
     $formGroup.remove();
 };
 
+function showTopology(type, instance_id) {
+    var url = '/instances/'+type+'/'+instance_id+'/topology';
+    window.location = url;
+}
+
 function showInstanceDetails(type, instance_id) {
     var url_info = '/instances/'+type+'/'+instance_id;
     var dialog = bootbox.dialog({

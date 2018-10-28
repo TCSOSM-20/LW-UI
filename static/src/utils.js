@@ -29,20 +29,19 @@ function savePositions(el) {
 function buildPalette(args) {
     $("#paletteContainer").empty();
     var type_property = graph_editor.getTypeProperty();
-    if (args.length > 0) {
-        args.forEach(function (category) {
 
+    if (args.length > 0) {
+        $('#paletteContainer').append('<div id="palette-header">Legenda</div>');
+
+        args.forEach(function (category) {
             var category_id = "category_" + category.category_name.replace(/[\s.*+?^${}()\/|[\]\\]/g, "_");//.replace(/\s/g, '');
             var content_id = "palette-content-" + category.category_name.replace(/[\s.*+?^${}()\/|[\]\\]/g, "_");//.replace(/\s/g, '');
 
-            $("#paletteContainer").append('<div id="' + category_id + '" class="palette-category" ><div class="palette-header" onClick="handlePaletteCat(this);" category_id="' + category_id + '"> ' +
-                '<i class="fa fa-chevron-down "></i>' +
-                '<span>  ' + category.category_name + '</span>' +
-                '</div>' +
+            $("#paletteContainer").append('<div id="' + category_id + '" class="palette-category" >' +
                 '<div id="' + content_id + '" class="palette-content">' +
-
                 '</div>' +
                 '</div>');
+
             category.types.forEach(function (type) {
                 console.log(graph_editor.get_name_from_d3_symbol(d3.symbolCircle))
                 var type_id = type.id.replace(/[\s.*+?^${}()|[\]\\]/g, "_");
@@ -66,7 +65,7 @@ function buildPalette(args) {
                     '<div class="palette-node-icon-container">' +
                     palette_node_icon +
                     '</div>' +
-                    '</div>'
+                    '</div>';
                 $("#" + content_id).append(html_to_append);
             });
 
@@ -74,12 +73,11 @@ function buildPalette(args) {
     }
     togglePaletteSpinner(true);
 
-
 }
 
 function handlePaletteCat(item) {
     console.log("handlePaletteContainer")
-    var category_id = $(item).attr("category_id")
+    var category_id = $(item).attr("category_id");
     $('#' + category_id).toggleClass("palette-close");
 
 }
@@ -90,11 +88,11 @@ function togglePaletteSpinner(addOrRemove) {
 
 function showAlert(msg) {
     // modal_alert_text
-    var alert_msg = ""
-    if (typeof msg == "string")
-        alert_msg = msg
+    var alert_msg = "";
+    if (typeof msg === "string")
+        alert_msg = msg;
     else
-        alert_msg = JSON.stringify(msg)
+        alert_msg = JSON.stringify(msg);
     $('#modal_alert_text').text(alert_msg);
     $('#modal_alert').modal('show');
 }
@@ -113,25 +111,17 @@ function buildHtmlShape(args) {
     switch (mySymbol) {
         case d3.symbolCircle:
             return '<div class="palette-node-icon"> <div class="palette-node-circle" style="background:' + args.color + ';"></div></div>';
-            break;
         case d3.symbolSquare:
             return '<div class="palette-node-icon"> <div class="palette-node-square" style="background:' + args.color + ';"></div></div>';
-            break;
         case d3.symbolDiamond:
             return '<div class="palette-node-icon" style="background-color:' + args.color + '"></div>';
-            ;
-            break;
+
         case d3.symbolTriangle:
             return '<div class="palette-node-icon"> <div class="palette-node-triangle" style="border-color: transparent transparent ' + args.color + ' transparent;"></div></div>';
-            break;
         case d3.symbolStar:
             return '<div class="palette-node-icon" style="background-color:' + args.color + '"></div>';
-            ;
-            break;
         case d3.symbolCross:
             return '<div class="palette-node-icon" style="background-color:' + args.color + '"></div>';
-            ;
-            break;
         default:
             // if the string is not recognized
             return "unknown";
@@ -145,7 +135,7 @@ if (!String.format) {
     String.format = function (format) {
         var args = Array.prototype.slice.call(arguments, 1);
         return format.replace(/{(\d+)}/g, function (match, number) {
-            return typeof args[number] != 'undefined' ?
+            return typeof args[number] !== 'undefined' ?
                 args[number] :
                 match;
         });
