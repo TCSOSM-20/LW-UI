@@ -30,9 +30,8 @@
 {% block content_body %}
     {{ block.super }}
     {% csrf_token %}
-    {% include 'osm/descriptor/modal/create_link_chooser.html' %}
-{% include 'osm/descriptor/modal/choose_node_id.html' %}
-{% include 'osm/modal/modal_keyboard_info.html' %}
+    {% include 'modal/create_link_chooser.html' %}
+    {% include 'modal/choose_node_id.html' %}
     <div class="row" >
         <div class="col-md-12">
             {% block topology_toolbar %}

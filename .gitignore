@@ -46,6 +46,7 @@ static/bower_components
 
 #migrations
 projecthandler/migrations/
+descriptorhandler/migrations/
 instancehandler/migrations
 sdnctrlhandler/migrations
 authosm/migrations

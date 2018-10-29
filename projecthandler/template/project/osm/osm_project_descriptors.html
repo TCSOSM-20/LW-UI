@@ -36,7 +36,7 @@
 {% include 'osm/modal/files_list.html' %}
 {% include 'modal/instance_create.html' %}
 <div class="row">
-    {% include "osm/descriptor/descriptorlist.html" %}
+    {% include "descriptorlist.html" %}
 </div>
 {% endblock %}
 
@@ -52,9 +52,9 @@
 
     <script>
     var csrf_token = '{{csrf_token}}';
-    var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
+    var descr_list_url = '{% url "projects:descriptors:list_descriptors"   descriptor_type=descriptor_type%}';
     var vim_list_url = '{% url "vims:list"  %}';
-    var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}";
+    var new_desc_url ="{% url 'projects:descriptors:new_descriptor'  descriptor_type=descriptor_type %}";
     var descriptor_type = '{{ descriptor_type | safe }}';
     var project_id = '{{ project_id }}';
     var table;

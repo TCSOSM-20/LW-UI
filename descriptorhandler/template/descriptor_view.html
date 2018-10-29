@@ -1,4 +1,4 @@
-{% extends "descriptor/descriptor_view_base.html" %}
+{% extends "descriptor_view_base.html" %}
 
 {% load staticfiles %}
 
@@ -16,7 +16,7 @@ Edit {{ descriptor_type|upper }} Descriptor
 {% block breadcrumb_body %}
 {{ block.super }}
 <li><a href="{% url 'projects:open_project' %}">{{project_id}}</a></li>
-<li><a href="{% url 'projects:list_descriptors' descriptor_type=descriptor_type %}">{{ descriptor_type }} Descriptors</a></li>
+<li><a href="{% url 'projects:descriptors:list_descriptors' descriptor_type=descriptor_type %}">{{ descriptor_type }} Descriptors</a></li>
 <li><a>{{descriptor_id}}</a></li>
 {% endblock %}
 
@@ -128,5 +128,5 @@ Edit {{ descriptor_type|upper }} Descriptor
 
 
 {% block footer %}
-    {% include "footer.html"  %}
+    {% include "footer.html" %}
 {% endblock %}

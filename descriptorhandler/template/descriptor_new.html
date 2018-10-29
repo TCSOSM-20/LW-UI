@@ -1,4 +1,4 @@
-{% extends "descriptor/descriptor_view_base.html" %}
+{% extends "/descriptor_view_base.html" %}
 
 {% load staticfiles %}
 
@@ -50,9 +50,9 @@ Onboard new {{ descriptor_type }} package
 {{ block.super }}
 
 <script>
-    var descr_list_url = '{% url "projects:list_descriptors"   descriptor_type=descriptor_type%}';
+    var descr_list_url = '{% url "projects:descriptors:list_descriptors"   descriptor_type=descriptor_type%}';
     var csrf_token = '{{csrf_token}}';
-    var new_desc_url ="{% url 'projects:new_descriptor'  descriptor_type=descriptor_type %}"
+    var new_desc_url ="{% url 'projects:descriptors:new_descriptor'  descriptor_type=descriptor_type %}"
 
     function cancel(id) {
         window.location.href = descr_list_url

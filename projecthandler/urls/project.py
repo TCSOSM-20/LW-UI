@@ -21,25 +21,13 @@ urlpatterns = [
     url(r'^$', views.open_project, name='open_project'),
     url(r'^list/', views.user_projects, name='projects_list'),
     url(r'^new/', views.create_new_project, name='new_project'),
+    url(r'^descriptors/', include('descriptorhandler.urls', namespace='descriptors'), name='descriptor_base'),
     url(r'^(?P<project_id>[\w ]+)/delete$', views.delete_project, name='delete_project'),
     url(r'^(?P<project_id>[\w ]+)/switch', views.switch_project, name='switch_project'),
     url(r'^(?P<project_id>[\w ]+)/edit', views.edit_project, name='edit_project'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/list$', views.show_descriptors, name='list_descriptors'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)(/$)',
-        views.edit_descriptor, name='edit_descriptor'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/delete$',
-        views.delete_descriptor,
-        name='delete_descriptor'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/clone',
-        views.clone_descriptor,
-        name='clone_descriptor'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/(?P<descriptor_id>[-\w]+)/action/(?P<action_name>[-\w]+)',
-        views.custom_action,
-        name='custom_action'),
-    url(r'^descriptors/(?P<descriptor_type>\w+)/new$', views.new_descriptor,
-        name='new_descriptor'),
-    url(r'^composer$', views.open_composer, name='open_composer'),
-    url(r'^availablenodes', views.get_available_nodes, name='get_available_nodes'),
+
+
+
 
 
 ]

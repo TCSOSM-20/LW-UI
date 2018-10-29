@@ -92,6 +92,7 @@
     position: relative;
     min-height: 100vh;
     border-right: 1px solid #AFAFAF;
+    border-left: 1px solid #AFAFAF;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
@@ -123,6 +124,15 @@
     height: 20px;
     border-radius: 1px;
     margin-right: 10px;
+}
+
+#leftside {
+    flex: 0 0 auto;
+    max-width: 500px;
+    min-width: 300px;
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
 }
 
 #side {

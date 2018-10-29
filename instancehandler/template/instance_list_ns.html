@@ -7,7 +7,7 @@
 
             <button type="button" class="btn btn-default" data-container="body"
                     data-toggle="tooltip" data-placement="top" title="Instantiate NS"
-                    onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}','vim_list_url': '{% url "vims:list"  %}', 'nsd_list_url': '{% url "projects:list_descriptors" descriptor_type='nsd' %}'})">
+                    onclick="javascript:openModalCreateNS({ 'project_id':'{{ project_id }}','vim_list_url': '{% url "vims:list"  %}', 'nsd_list_url': '{% url "projects:descriptors:list_descriptors" descriptor_type='nsd' %}'})">
                 <i class="fa fa-paper-plane"></i> <span> New NS</span></button>
 
         </div>

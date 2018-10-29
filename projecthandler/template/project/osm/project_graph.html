@@ -36,9 +36,8 @@
  {% csrf_token %}
 
 
-{% include 'osm/descriptor/modal/create_link_chooser.html' %}
-{% include 'osm/descriptor/modal/choose_node_id.html' %}
-{% include 'osm/modal/modal_keyboard_info.html' %}
+{% include 'modal/create_link_chooser.html' %}
+{% include 'modal/choose_node_id.html' %}
 {% endblock %}
 
 {% block resource_block %}
