@@ -91,8 +91,8 @@
 #graph_editor_container {
     position: relative;
     min-height: 100vh;
-    border-right: 1px solid #AFAFAF;
-    border-left: 1px solid #AFAFAF;
+
+
     flex: 1 1 auto;
     display: flex;
     align-items: center;
@@ -127,15 +127,52 @@
 }
 
 #leftside {
+    border-right: 1px solid #AFAFAF;
     flex: 0 0 auto;
-    max-width: 500px;
-    min-width: 300px;
+    max-width: 300px;
+    min-width: 150px;
     padding: 20px 30px;
     display: flex;
     flex-direction: column;
 }
 
+#palette > .node {
+    margin-top: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    cursor: move;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#palette > .node:first-child {
+    margin-top: 0;
+}
+
+#palette > .node > .icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 1px;
+    margin-right: 10px;
+}
+
+[draggable=true] {
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+}
+#graph_svg {
+    max-width: 100%;
+    width: 100%;
+}
 #side {
+    border-left: 1px solid #AFAFAF;
     flex: 0 0 auto;
     max-width: 500px;
     min-width: 300px;

@@ -25,6 +25,7 @@ from django.shortcuts import render, redirect
 
 from lib.util import Util
 from lib.osm.osmclient.clientv2 import Client
+from lib.osm.osm_rdcl_parser import OsmParser
 import authosm.utils as osmutils
 
 logging.basicConfig(level=logging.DEBUG)
@@ -263,6 +264,30 @@ def download_pkg(request, descriptor_id, descriptor_type):
 def open_composer(request):
     user = osmutils.get_user(request)
     project_id = user.project_id
+    descriptor_id = request.GET.get('id')
+    descriptor_type = request.GET.get('type')
+    client = Client()
+    if descriptor_id:
+        try:
+            if descriptor_type == 'nsd':
+                descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
+            elif descriptor_type == 'vnfd':
+                descriptor_result = client.vnfd_get(user.get_token(), descriptor_id)
+
+        except Exception as e:
+            descriptor_result = {'error': True, 'data': str(e)}
+
+        if isinstance(descriptor_result, dict) and 'error' in descriptor_result and descriptor_result['error']:
+            return render(request, 'error.html')
+
+        test = OsmParser()
+        # print nsr_object
+        if descriptor_type == 'nsd':
+            result = test.nsd_to_graph(descriptor_result)
+        elif descriptor_type == 'vnfd':
+            result = test.vnfd_to_graph(descriptor_result)
+        return __response_handler(request, result,'composer.html')
+
     result = {'project_id': project_id,
               'vertices': [
                   {"info": {"type": "vnf", "property": {"custom_label": ""},

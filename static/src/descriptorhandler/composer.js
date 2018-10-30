@@ -17,41 +17,19 @@
 //GraphEditor instance
 var graph_editor = new TCD3.ModelGraphEditor();
 
-var layer_map = {
-    'nsr': {
-        'id':  'NS instance id',
-        'nsdId': 'NSD id',
-        'name-ref': 'NSD name',
-        'operational-status': 'Operational status',
-        'config-status': 'Config status',
-        'detailed-status': 'Detailed status',
-        'create-time': 'Creation date',
-        'instantiate_params' :'Instantiation parameters'
-    },
-    'vnfr': {
-        'id':  'VNF instance id',
-        'vnfd-id': 'NSD id',
-        'vnfd-ref': 'NSD name',
-        'member-vnf-index': 'Constituent VNF in the NS',
-        'ip-address': 'Mgmt IP address',
-        'vim-account-id': 'VIM id',
-        'create-time': 'Creation date'
-    }
-};
-
 var type_view = {
-    "nsr": ["vnfr", "ns_vl"],
-    "vnfr": ["vdur", "cp", "vnf_vl"]
+    "nsd": ["vnf", "ns_vl"],
+    "vnfd": ["vdu", "cp", "vnf_vl", "int_cp"]
 };
 
 var params = {
     node: {
-        type: type_view['nsr'],
+        type: type_view[getUrlParameter('type')],
         group: []
     },
     link: {
         group: [],
-        view: ['nsr']
+        view: [getUrlParameter('type')]
     }
 };
 
@@ -65,6 +43,7 @@ $(document).ready(function () {
     graph_editor.init({
         width: $('#graph_editor_container').width(),
         height: $('#graph_editor_container').height(),
+
         data_url: window.location.href,
         //desc_id: getUrlParameter('id'),
         gui_properties: osm_gui_properties,
@@ -79,6 +58,7 @@ $(document).ready(function () {
 });
 
 
+
 function handleForce(el) {
     graph_editor.handleForce((el.getAttribute('aria-pressed') === "true"));
 }
@@ -87,7 +67,7 @@ function changeFilter(e, c) {
     if (c && c.link && c.link.view[0]) {
         updateLegend(c.link.view[0]);
     }
-    layerDetails(graph_editor.getCurrentFilters())
+    //layerDetails(graph_editor.getCurrentFilters())
 }
 
 function resetFilters() {
@@ -135,11 +115,11 @@ function buildBehaviorsOnEvents() {
 function refreshElementInfo(event, element) {
     if (event.type === 'node:selected') {
         switch (element.info.type) {
-            case 'vnfr':
-                vnfrDetails(element.info.osm);
+            case 'vnfd':
+                vnfDetails(element.info.osm);
                 break;
-            case 'vdur':
-                vdurDetails(element.info.osm);
+            case 'vdu':
+                vduDetails(element.info.osm);
                 break;
             case 'int_cp':
             case 'cp':
@@ -156,43 +136,20 @@ function refreshElementInfo(event, element) {
     }
 }
 
-
 function layerDetails(filters) {
     var side = $('#side');
     var graph_parameters = graph_editor.getGraphParams();
     var layer_template = '';
+    console.log(graph_parameters)
     if(graph_parameters['view'] && filters.link.view.length >0 && filters.link.view[0]){
         if(filters.link.view[0] === 'nsr') {
             layer_template = getMainSection('NS View');
-            layer_template+= '<table class="children">';
-            for (var key in layer_map['nsr']) {
-                if ( graph_parameters['view']['nsr'][key] ) {
-                    var field_value = graph_parameters['view']['nsr'][key];
-                    if(key === 'create-time'){
-                        field_value = moment.unix(field_value).toISOString();
-                    }
-                    layer_template += '<tr><td>' + layer_map['nsr'][key] + '</td><td>' + field_value + '</td></tr>';
-                }
-            }
-            layer_template += '</table>';
-            //layer_template += getChildrenTable(graph_parameters['view']['nsr']);
+            layer_template += getChildrenTable(graph_parameters['view']['nsr']);
         }
         else if(filters.link.view[0] === 'vnfr') {
             layer_template = getMainSection('VNF View');
             var vnfr_id = filters.link.group[0];
-
-            layer_template+= '<table class="children">';
-            var vnfr_data = graph_parameters['view']['vnfr'][vnfr_id];
-            for (var key in layer_map['vnfr']) {
-                if ( vnfr_data[key] ) {
-                    var field_value = vnfr_data[key];
-                    if(key === 'create-time'){
-                        field_value = moment.unix(field_value).toISOString();
-                    }
-                    layer_template += '<tr><td>' + layer_map['vnfr'][key] + '</td><td>' + field_value + '</td></tr>';
-                }
-            }
-            layer_template += '</table>';
+            layer_template += getChildrenTable(graph_parameters['view']['vnfr'][vnfr_id]);
         }
     }
 
@@ -220,32 +177,32 @@ function updateLegend(view) {
 }
 
 var map = {
-    'ip-address': 'IP', 'vnfd-id': 'Vnfd Id', 'vnfd-ref': 'Vnfd Ref', 'vim-account-id': 'VIM Id',
+    'ip-address': 'IP', 'vnfd-id': 'Vnfd Id', 'vnfd-ref': 'Vnfd Ref', 'vim-account-id': 'Vim Id',
     'member-vnf-index-ref': 'Member index', 'created-time': 'Created', 'id': 'Id', 'mgmt-network': 'Mgmt network',
     'name': 'Name', 'type': 'Type', 'vim-network-name': 'Vim network name', 'connection-point-id': 'Cp Id',
-    'vdu-id-ref': 'Vdu Id', 'nsr-id-ref': 'Nsr Id', 'vim-id': 'VIM id'
+    'vdu-id-ref': 'Vdu Id', 'nsr-id-ref': 'Nsr Id'
 };
 
-function vnfrDetails(vnfr) {
+function vnfDetails(vnfr) {
     var side = $('#side');
-    var vnfr_template = getMainSection('VNFR');
+    var vnfr_template = getMainSection('VNF');
 
     vnfr_template += getChildrenTable(vnfr);
     side.empty();
     side.append(vnfr_template)
 }
 
-function vdurDetails(vdur) {
+function vduDetails(vdur) {
     var side = $('#side');
-    var vdur_template = getMainSectionWithStatus('VDUR', vdur['status'] === 'ACTIVE');
+    var vdur_template = getMainSectionWithStatus('VDU', vdur['status'] === 'ACTIVE');
     vdur_template += getChildrenTable(vdur);
 
-    if (vdur['interfaces'].length > 0) {
+    if (vdur['interface'] && vdur['interface'].length > 0) {
         vdur_template += getSubSection('Interfaces:');
         vdur_template += '<table class="children">';
 
-        for (var i = 0; i < vdur['interfaces'].length; ++i) {
-            var interface = vdur['interfaces'][i];
+        for (var i = 0; i < vdur['interface'].length; ++i) {
+            var interface = vdur['interface'][i];
             var interface_template = '<tr><td>' + interface['name'] + '</td>'
                 + '<td>IP:' + interface['ip-address'] + '</td>'
                 + '<td>MAC:' + interface['mac-address'] + '</td>';
@@ -301,7 +258,7 @@ function getChildrenTable(data) {
     for (var key in data) {
         if (typeof data[key] === 'string') {
             var key_map = (map[key]) ? map[key] : key;
-            template += '<tr><td>' + key_map + '</td><td>' + data[key] + '</td></tr>';
+            template += '<tr><td>' + key_map + '</td><td><input name="'+key+'" class="form-control input-sm" type="text"  value="' + data[key] + '"></td></tr>';
         }
     }
     template += '</table>';

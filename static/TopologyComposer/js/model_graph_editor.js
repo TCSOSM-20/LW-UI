@@ -118,10 +118,9 @@ TCD3.ModelGraphEditor = (function () {
      * @returns {boolean}
      */
     ModelGraphEditor.prototype.updateData = function (args) {
-        console.log("updateData")
         this.d3_graph.nodes = args.graph_data.vertices;
         this.d3_graph.links = args.graph_data.edges;
-        this.d3_graph.graph_parameters = args.graph_parameters;
+        this.d3_graph.graph_parameters = args.graph_data.graph_parameters;
         this.model = args.model;
         this.refreshGraphParameters(this.d3_graph.graph_parameters);
         this.refresh();

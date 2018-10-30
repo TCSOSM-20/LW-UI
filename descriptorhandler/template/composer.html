@@ -30,9 +30,32 @@
 {% block content_body %}
     {{ block.super }}
     {% csrf_token %}
+
     <div class="container-fluid">
         <div id="main" class="row">
             <div id="leftside">
+                <div class="section">
+                    <span style="font-weight: 500;">Select Element</span>
+                </div>
+                <div id="palette">
+                    <div class="node" draggable="true">
+                        <div class="icon" style="background-color: #cf1c24" ></div>
+                        <div class="name">VDU</div>
+                    </div>
+                    <div class="node" draggable="true">
+                        <div class="icon" style="background-color: #f8a800" ></div>
+                        <div class="name">VL</div>
+                    </div>
+                    <div class="node" draggable="true">
+                        <div class="icon" style="background-color: #e3bfad" ></div>
+                        <div class="name">intCP</div>
+                    </div>
+                    <div class="node" draggable="true">
+                        <div class="icon" style="background-color: #c6b63f" ></div>
+                        <div class="name">extCp</div>
+                    </div>
+
+                </div>
 
             </div>
             <div id="graph_editor_container" class="col">
@@ -61,6 +84,7 @@
     </script>
     <!-- d3.js -->
     <script src="/static/bower_components/d3/d3.js"></script>
+    <script src="/static/bower_components/moment/moment.js"></script>
 
     <!-- TopologyComposer D3 -->
     <script src="/static/TopologyComposer/js/event.js"></script>
@@ -71,6 +95,7 @@
 
 
     <script src="/static/src/osm_gui_properties.js"></script>
+    <script src="/static/src/descriptorhandler/composer.js"></script>
 {#    <script src="/static/src/instancehandler/instance_topology_view.js"></script>#}
 
 {% endblock %}

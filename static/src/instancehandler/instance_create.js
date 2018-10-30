@@ -14,7 +14,6 @@
    limitations under the License.
 */
 
-
 function openModalCreateNS(args) {
     // load vim account list
     select2_groups = $('#vimAccountId').select2({
@@ -63,7 +62,7 @@ function openModalCreateNS(args) {
         }
     });
 
-    if(args.descriptor_id){
+    if (args.descriptor_id) {
         // Set the value, creating a new option if necessary
         if ($('#nsdId').find("option[value='" + args.descriptor_id + "']").length) {
             $('#nsdId').val(args.descriptor_id).trigger('change');

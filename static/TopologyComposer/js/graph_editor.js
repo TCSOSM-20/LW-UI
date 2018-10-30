@@ -86,15 +86,17 @@ TCD3.GraphEditor = (function () {
 
         this.type_property_link = {
             "unrecognized": {
-                "color": "lightgray",
+                "color": "lightgray"
             },
         };
 
         this.force = d3.forceSimulation()
             .force("charge", d3.forceManyBody())
-            .force("collide", d3.forceCollide().radius(80))
+            .force("collide", d3.forceCollide().radius(40))
            // .force("link", d3.forceLink().distance(80).iterations(1).id(function (d) {
-            .force("link", d3.forceLink().distance(100).id(function (d) {
+            .force("link", d3.forceLink().distance(function(d){
+                return d.short ? 1 : 100;
+            }).id(function (d) {
                 return d.id;
             }))
             .force("center", d3.forceCenter(this.width / 2, this.height / 2));
@@ -108,8 +110,8 @@ TCD3.GraphEditor = (function () {
         this.svg = d3.select("#graph_editor_container").append("svg")
             .attr("id", "graph_svg")
             .attr("preserveAspectRatio", "xMinYMid")
-            .attr("width", this.width)
-            .attr("height", this.height);
+            .attr("width", '100%')
+            .attr("height", '100%');
 
         //End Arrow style
         this.defs = this.svg.append("svg:defs");
@@ -181,7 +183,7 @@ TCD3.GraphEditor = (function () {
             self.height = self.container.height();
             chart.attr("width", self.container.width());
             chart.attr("height", self.container.height());
-        }).trigger("resize");
+        });
 
     }
 

@@ -50,8 +50,9 @@ class RdclGraph(object):
         }
 
         edge_obj.update(optional)
-        if edge_obj not in graph_object['edges']:
-            graph_object['edges'].append(edge_obj)
+        #if edge_obj not in graph_object['edges']:
+        #    graph_object['edges'].append(edge_obj)
+        graph_object['edges'].append(edge_obj)
 
     def add_node(self, id, type, group, positions, graph_object, optional={}):
         if id is None:
@@ -258,6 +259,203 @@ class OsmParser(RdclGraph):
             for cp_ref in ns_vld['vnfd-connection-point-ref']:
                 self.add_link(map_vnf_index_to_id[str(cp_ref['member-vnf-index-ref'])], ns_vld['id'], 'nsr', None,
                               graph)
+
+        return graph
+
+    def vnfd_to_graph(self, vnfd_catalog):
+        graph = {'vertices': [], 'edges': [], 'model': {
+            "layer": {
+                "vnfd": {
+                    "nodes": {
+                        "vdu": {},
+                        "cp": {},
+                        "int_cp": {},
+                        "vnf_vl": {}
+
+                    },
+                    "allowed_edges": {
+                        "vdu": {
+                            "destination": {
+                                "cp": {
+                                    "direct_edge": False,
+                                },
+                                "int_cp": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "cp": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "int_cp": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "vnf_vl": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False
+                                }
+                            }
+                        }
+                    }
+                },
+                "name": "OSM",
+                "version": 1,
+                "description": "osm"
+            }
+        }, 'graph_parameters': {'view': {'vnfd': {}}}}
+        if 'vnfd-catalog' in vnfd_catalog:
+            vnfd = vnfd_catalog['vnfd-catalog']['vnfd'][0]
+        elif 'vnfd:vnfd-catalog' in vnfd_catalog:
+            vnfd = vnfd_catalog['vnfd:vnfd-catalog']['vnfd'][0]
+        else:
+            return graph
+        if 'connection-point' in vnfd:
+            for extCp in vnfd['connection-point']:
+                self.add_node(extCp['name'], 'cp', vnfd['id'], None, graph,
+                              {'property': {'custom_label': extCp['name']}, 'osm': extCp})
+        if 'vdu' in vnfd:
+            for vdu in vnfd['vdu']:
+                self.add_node(vdu['id'], 'vdu', vnfd['id'], None, graph,
+                              {'property': {'custom_label': vdu['id']}, 'osm': vdu})
+                if 'internal-connection-point' in vdu:
+                    for intCp in vdu['internal-connection-point']:
+                        self.add_node(intCp['id'], 'int_cp', vnfd['id'], None, graph,
+                                      {'property': {'custom_label': intCp['id']}, 'osm': intCp})
+                if 'interface' in vdu:
+                    for interface in vdu['interface']:
+                        if interface['type'] == "EXTERNAL":
+                            self.add_link(vdu['id'], interface['external-connection-point-ref'], 'vnfd', vnfd['id'], graph)
+                        elif interface['type'] == "INTERNAL":
+                            self.add_link(vdu['id'], interface['internal-connection-point-ref'], 'vnfd', vnfd['id'], graph, {'short': True})
+        if 'internal-vld' in vnfd:
+            for intVl in vnfd['internal-vld']:
+                self.add_node(intVl['id'], 'vnf_vl', intVl['id'], None, graph,
+                              {'property': {'custom_label': intVl['id']}, 'osm': intVl})
+                for intCp in intVl['internal-connection-point']:
+                    self.add_link(intVl['id'], intCp['id-ref'], 'vnfd', vnfd['id'], graph)
+
+        return graph
+
+    def nsd_to_graph(self, nsd_catalog):
+        graph = {'vertices': [], 'edges': [], 'model': {
+            "layer": {
+                "nsd": {
+                    "nodes": {
+                        "vnfd": {},
+                        "cp": {},
+                        "ns_vl": {}
+                    },
+                    "allowed_edges": {
+                        "cp": {
+                            "destination": {
+                                "vnfd": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "vnfd":{
+                            "destination": {
+                                "ns_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "ns_vl": {
+                            "destination": {
+                                "vnfd": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        }
+                    }
+                },
+                "vnfd": {
+                    "nodes": {
+                        "vdu": {},
+                        "cp": {},
+                        "int_cp": {},
+                        "vnf_vl": {}
+                    },
+                    "allowed_edges": {
+                        "vdu": {
+                            "destination": {
+                                "cp": {
+                                    "direct_edge": False,
+                                },
+                                "int_cp": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "cp": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "int_cp": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False,
+                                },
+                                "vnf_vl": {
+                                    "direct_edge": False,
+                                }
+                            }
+                        },
+                        "vnf_vl": {
+                            "destination": {
+                                "vdu": {
+                                    "direct_edge": False
+                                }
+                            }
+                        }
+                    }
+                },
+                "name": "OSM",
+                "version": 1,
+                "description": "osm"
+            }
+        }, 'graph_parameters': {'view': {'vnfd': {}}}}
+        if 'nsd-catalog' in nsd_catalog:
+            nsd = nsd_catalog['nsd-catalog']['nsd'][0]
+        elif 'nsd:nsd-catalog' in nsd_catalog:
+            nsd = nsd_catalog['nsd:nsd-catalog']['nsd'][0]
+        else:
+            return graph
+        if 'constituent-vnfd' in nsd:
+            for vnfd in nsd['constituent-vnfd']:
+                costinuent_id = vnfd['vnfd-id-ref']+":"+vnfd['member-vnf-index']
+                self.add_node(costinuent_id, 'vnf', None, None, graph,
+                              {'property': {'custom_label': costinuent_id}, 'osm': vnfd})
+
+        if 'vld' in nsd:
+            for vld in nsd['vld']:
+                self.add_node(vld['id'], 'ns_vl', None, None, graph,
+                              {'property': {'custom_label': vld['id']}, 'osm': vld})
+                if 'vnfd-connection-point-ref' in vld:
+                    for cp_ref in vld['vnfd-connection-point-ref']:
+                        vnfd_id = cp_ref['vnfd-id-ref'] + ':' + str(cp_ref['member-vnf-index-ref'])
+                        self.add_link(vld['id'], vnfd_id, 'nsd', None, graph)
 
         return graph
 

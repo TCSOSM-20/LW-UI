@@ -11,7 +11,7 @@ var osm_gui_properties = {
             "vnf": {
                 //"image": "vnf-100.png",
                 "shape": "square",
-                "color": "#54A698",
+                "color": "#605ca8",
                 "size": 35,
                 "width": 40,
                 "height": 20,
@@ -20,8 +20,8 @@ var osm_gui_properties = {
             "vdu": {
                 "shape": "square",
                 //"color": "#50A7CC",
-                "color": "#54A698",
-                "size": 30,
+                "color": "#cf1c24",
+                "size": 40,
                 "width": 40,
                 "height": 20,
                 "name": "VDU"
@@ -30,15 +30,15 @@ var osm_gui_properties = {
                 //"image": "cp-80.png",
                  "shape": "square",
                 "color": "#c6b63f",
-                "size": 40,
+                "size": 30,
                 "name": "CP"
             },
             "int_cp": {
                 //"image": "cp-80.png",
                  "shape": "square",
                 "color": "#e3bfad",
-                "size": 40,
-                "name": "CP"
+                "size": 15,
+                "name": "intCP"
             },
             "ns_vl": {
                 "shape": "triangle",
