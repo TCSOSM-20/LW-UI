@@ -65,7 +65,7 @@ def create(request):
             "vimAccountId": request.POST.get('vimAccountId', ''),
         }
         if 'ssh_key' in request.POST and request.POST.get('ssh_key') != '':
-            ns_data["ssh_keys"] = request.POST.get('ssh_key')
+            ns_data["ssh_keys"] = [request.POST.get('ssh_key')]
 
         if 'config' in request.POST:
             ns_config = yaml.load(request.POST.get('config'))
