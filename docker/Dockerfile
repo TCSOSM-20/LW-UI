@@ -1,4 +1,4 @@
-﻿FROM ubuntu:16.04
+FROM ubuntu:16.04
 
 WORKDIR /usr/share/osm-lightui
 COPY . /usr/share/osm-lightui
