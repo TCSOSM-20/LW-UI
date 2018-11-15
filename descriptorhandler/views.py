@@ -26,6 +26,7 @@ from django.shortcuts import render, redirect
 from lib.util import Util
 from lib.osm.osmclient.clientv2 import Client
 from lib.osm.osm_rdcl_parser import OsmParser
+from lib.osm.osm_util import OsmUtil
 import authosm.utils as osmutils
 
 logging.basicConfig(level=logging.DEBUG)
@@ -37,7 +38,6 @@ def show_descriptors(request, descriptor_type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
     client = Client()
-    print descriptor_type
     try:
         if descriptor_type == 'nsd':
             descriptors = client.nsd_list(user.get_token())
@@ -115,6 +115,74 @@ def clone_descriptor(request, descriptor_type=None, descriptor_id=None):
     else:
         return __response_handler(request, {}, url=None, status=200)
 
+@login_required
+def addElement(request, descriptor_type=None, descriptor_id=None, element_type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
+    client = Client()
+    if descriptor_type == 'nsd':
+        descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
+        element_id = request.POST.get('id', '')
+        util = OsmUtil()
+        descriptor_updated = util.add_base_node('nsd', descriptor_result, element_type, element_id, request.POST.dict())
+        result = client.nsd_update(user.get_token(), descriptor_id, descriptor_updated)
+        if result['error'] == True:
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            parser = OsmParser()
+            # print nsr_object
+            if descriptor_type == 'nsd':
+                result_graph = parser.nsd_to_graph(descriptor_updated)
+
+        return __response_handler(request, result_graph, url=None, status=200)
+
+@login_required
+def removeElement(request, descriptor_type=None, descriptor_id=None, element_type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
+    client = Client()
+    if descriptor_type == 'nsd':
+        descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
+        element_id = request.POST.get('id', '')
+        util = OsmUtil()
+        descriptor_updated = util.remove_node('nsd', descriptor_result, element_type, element_id, request.POST.dict())
+        result = client.nsd_update(user.get_token(), descriptor_id, descriptor_updated)
+        if result['error'] == True:
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            parser = OsmParser()
+            # print nsr_object
+            if descriptor_type == 'nsd':
+                result_graph = parser.nsd_to_graph(descriptor_updated)
+
+        return __response_handler(request, result_graph, url=None, status=200)
+
+@login_required
+def updateElement(request, descriptor_type=None, descriptor_id=None, element_type=None):
+    user = osmutils.get_user(request)
+    project_id = user.project_id
+    client = Client()
+    if descriptor_type == 'nsd':
+        descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
+        util = OsmUtil()
+        payload = request.POST.dict()
+        if element_type == 'graph_params':
+            descriptor_updated = util.update_graph_params('nsd', descriptor_result, json.loads(payload['update']))
+        else:
+            descriptor_updated = util.update_node('nsd', descriptor_result, element_type, json.loads(payload['old']), json.loads(payload['update']))
+        result = client.nsd_update(user.get_token(), descriptor_id, descriptor_updated)
+        if result['error'] == True:
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            parser = OsmParser()
+            # print nsr_object
+            if descriptor_type == 'nsd':
+                result_graph = parser.nsd_to_graph(descriptor_updated)
+
+        return __response_handler(request, result_graph, url=None, status=200)
 
 @login_required
 def new_descriptor(request, descriptor_type=None):
@@ -266,8 +334,12 @@ def open_composer(request):
     project_id = user.project_id
     descriptor_id = request.GET.get('id')
     descriptor_type = request.GET.get('type')
+    result = {}
     client = Client()
     if descriptor_id:
+        raw_content_types = request.META.get('HTTP_ACCEPT', '*/*').split(',')
+        if 'application/json' not in raw_content_types:
+            return __response_handler(request, {'type': descriptor_type}, 'composer.html')
         try:
             if descriptor_type == 'nsd':
                 descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
@@ -286,185 +358,28 @@ def open_composer(request):
             result = test.nsd_to_graph(descriptor_result)
         elif descriptor_type == 'vnfd':
             result = test.vnfd_to_graph(descriptor_result)
-        return __response_handler(request, result,'composer.html')
+        return __response_handler(request, result, 'composer.html')
 
-    result = {'project_id': project_id,
-              'vertices': [
-                  {"info": {"type": "vnf", "property": {"custom_label": ""},
-                            "group": []}, "id": "vm"},
-                  {"info": {"type": "vnf", "property": {"custom_label": ""},
-                            "group": []}, "id": "vlan"},
-                  {"info": {"type": "vnf", "property": {"custom_label": ""},
-                            "group": []}, "id": "firewall"},
-                  {"info": {"type": "vnf", "property": {"custom_label": ""},
-                            "group": []}, "id": "ping"},
-
-                  {"info": {"type": "ns_vl", "property": {"custom_label": ""},
-                            "group": []}, "id": "vl1"},
-                  {"info": {"type": "ns_vl", "property": {"custom_label": ""},
-                            "group": []}, "id": "vl2"},
-                  {"info": {"type": "ns_vl", "property": {"custom_label": ""},
-                            "group": []}, "id": "vl3"},
-              ],
-              'edges': [
-                  {"source": "vm", "group": [], "target": "vl3", "view": "ns"},
-                  {"source": "vlan", "group": [], "target": "vl3", "view": "ns"},
-                  {"source": "vlan", "group": [], "target": "vl1", "view": "ns"},
-                  {"source": "firewall", "group": [], "target": "vl1", "view": "ns"},
-                  {"source": "firewall", "group": [], "target": "vl2", "view": "ns"},
-                  {"source": "ping", "group": [], "target": "vl2", "view": "ns"},
-              ],
-              'model': {
-                "layer": {
-
-                    "ns": {
-                        "nodes": {
-                            "vnf": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                },
-                                "expands": "vnf"
-                            },
-                            "ns_vl": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
-
-                        },
-                        "allowed_edges": {
-                            "ns_vl": {
-                                "destination": {
-                                    "vnf": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            },
-                            "vnf": {
-                                "destination": {
-                                    "ns_vl": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    },
-
-                                }
-                            }
-
-                        }
-                    },
-                    "vnf": {
-                        "nodes": {
-                            "vdu": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
-                            "cp": {
-                                "addable": {
-                                    "callback": "addNode"
-                                },
-                                "removable": {
-                                    "callback": "removeNode"
-                                }
-                            },
-
-                        },
-                        "allowed_edges": {
-                            "vdu": {
-                                "destination": {
-                                    "cp": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            },
-                            "cp": {
-                                "destination": {
-                                    "vdu": {
-                                        "callback": "addLink",
-                                        "direct_edge": False,
-                                        "removable": {
-                                            "callback": "removeLink"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "name": "OSM",
-                    "version": 1,
-                    "nodes": {
-                        "vnf": {
-                            "label": "vnf"
-                        },
-                        "ns_vl": {
-                            "label": "vl"
-                        },
-                        "cp": {
-                            "label": "cp"
-                        },
-                        "vdu": {
-                            "label": "vdu"
-                        }
-                    },
-                    "description": "osm",
-                    "callback": {
-                        "addNode": {
-                            "file": "osm_controller.js",
-                            "class": "OsmController"
-                        },
-                        "removeNode": {
-                            "file": "osm_controller.js",
-                            "class": "OsmController"
-                        },
-                        "addLink": {
-                            "file": "osm_controller.js",
-                            "class": "OsmController"
-                        },
-                        "removeLink": {
-                            "file": "osm_controller.js",
-                            "class": "OsmController"
-                        }
-                    }
-
-                }
-            }}
     return __response_handler(request, result, 'composer.html')
 
 
 def get_available_nodes(request):
-
+    user = osmutils.get_user(request)
     params = request.GET.dict()
-    nodes = {
-        'ns': [{"types": [{"name": "Generic", "id": "vnf"},
-                          {"name": "ping", "id": "vnf"},
-                          {"name": "pong", "id": "vnf"},
-                          {"name": "hackfest1-vm", "id": "vnf"}], "category_name": "Vnf"},
-               {"types": [{"name": "VL", "id": "ns_vl"}], "category_name": "VirtualLink"}],
-        'vnf': [{"types": [{"name": "VDU", "id": "vdu"}], "category_name": "Vdu"},
-                {"types": [{"name": "CP", "id": "cp"}], "category_name": "CP"}]
-    }
+    client = Client()
+    result = []
+    try:
+        if params['layer'] == 'nsd':
+            descriptors = client.vnfd_list(user.get_token())
+    except Exception as e:
+        log.exception(e)
+        descriptors = []
+    if descriptors and descriptors['error'] is False:
+        for desc in descriptors['data']:
+            # print desc
+            result.append({'_id': desc['_id'],'id': desc['id'], 'name': desc['short-name']})
 
-    return __response_handler(request, nodes[params['layer']])
+    return __response_handler(request, {'descriptors': result})
 
 
 @login_required

@@ -396,12 +396,13 @@ TCD3.GraphEditor = (function () {
         //log(data)
         var self = this;
 
-        this.link = this.svg
+        var link = this.svg
             .selectAll()
             .data(self.d3_graph.links
                 .filter(this.link_filter_cb)
-            )
-            .enter().append("g")
+            );
+        link.exit().remove();
+         this.link = link.enter().append("g")
             .attr("class", "link cleanable")
             .append("path")
             .attr("class", "link")
@@ -418,24 +419,26 @@ TCD3.GraphEditor = (function () {
                 return (d.directed_edge ? "url(#" + marker_url + ")" : '');
             });
 
-        this.nodeContainer = this.svg
+        var nodeContainer = this.svg
             .selectAll()
             .data(self.d3_graph.nodes
-                .filter(this.node_filter_cb))
-            .enter()
+                .filter(this.node_filter_cb));
+        nodeContainer.exit().remove();
+        nodeContainer.enter()
             .append("g")
             // .attr("class", "nodosdads")
             .attr("class", "node cleanable");
 
-        this.svg.selectAll('.node')
+        var nodes_symbols = this.svg.selectAll('.node')
             .data(self.d3_graph.nodes
                 .filter(this.node_filter_cb))
 
             .filter(function (d) {
                 return (d.info.type === undefined) || (self._node_property_by_type(d.info.type, 'image', d) === undefined)
-            })
+            });
+            nodes_symbols.exit().remove();
 
-            .append("svg:path")
+            nodes_symbols.append("svg:path")
             .attr("d", d3.symbol()
                 .size(function (d) {
                     return Math.PI * Math.pow(self._node_property_by_type(d.info.type, 'size', d), 2) / 4;
@@ -471,7 +474,7 @@ TCD3.GraphEditor = (function () {
             .filter(function (d) {
                 return self._node_property_by_type(d.info.type, 'image', d) != undefined
             });
-
+            figure_node.exit().remove();
         figure_node.append("svg:image")
             .attr("xlink:href", function (d) {
                 return self._node_property_by_type(d.info.type, 'image', d)

@@ -22,6 +22,13 @@ var type_view = {
     "vnfd": ["vdu", "cp", "vnf_vl", "int_cp"]
 };
 
+var map = {
+    'ip-address': 'IP', 'vnfd-id': 'Vnfd Id', 'vnfd-ref': 'Vnfd Ref', 'vim-account-id': 'Vim Id',
+    'member-vnf-index-ref': 'Member index', 'created-time': 'Created', 'id': 'Id', 'mgmt-network': 'Mgmt network',
+    'name': 'Name', 'type': 'Type', 'vim-network-name': 'Vim network name', 'connection-point-id': 'Cp Id',
+    'vdu-id-ref': 'Vdu Id', 'nsr-id-ref': 'Nsr Id'
+};
+
 var params = {
     node: {
         type: type_view[getUrlParameter('type')],
@@ -47,16 +54,107 @@ $(document).ready(function () {
         data_url: window.location.href,
         //desc_id: getUrlParameter('id'),
         gui_properties: osm_gui_properties,
-        edit_mode: false,
+        edit_mode: true,
         behaviorsOnEvents: {
             viewBased: false,
             behaviors: buildBehaviorsOnEvents()
         }
     });
     graph_editor.handleFiltersParams(params);
+    initDropOnGraph();
 
+
+    $("#side_form").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        console.log("ON submit")
+        var form_data = new FormData(this); //Encode form elements for submission
+        var formDataJson = {};
+        form_data.forEach(function (value, key) {
+            formDataJson[key] = value;
+        });
+        if (graph_editor._selected_node) {
+            graph_editor.updateDataNode(graph_editor._selected_node, formDataJson, function () {
+
+            }, function (result) {
+                var data = result.responseJSON;
+                var title = "Error " + (data && data.code ? data.code : 'unknown');
+                var message = data && data.detail ? data.detail : 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+            })
+        } else {
+            graph_editor.updateGraphParams(formDataJson, function () {
+
+            }, function (result) {
+                var data = result.responseJSON;
+                var title = "Error " + (data && data.code ? data.code : 'unknown');
+                var message = data && data.detail ? data.detail : 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
+            })
+        }
+
+    });
 });
 
+
+function initDropOnGraph() {
+
+    var dropZone = document.getElementById('graph_editor_container');
+    dropZone.ondrop = function (e) {
+        var group = graph_editor.getCurrentGroup();
+        e.preventDefault();
+        var elemet_id = e.dataTransfer.getData("text/plain");
+
+        var nodetype = $('#' + elemet_id).attr('type-name');
+        var random_name = nodetype + "_" + generateUID();
+
+        var node_information = {
+            'id': random_name,
+            'info': {
+                'type': nodetype,
+                'property': {
+                    'custom_label': random_name
+                },
+                'group': null,
+                'desc_id': getUrlParameter('id'),
+                'desc_type': getUrlParameter('type'),
+                'osm': {}
+            },
+            'x': e.layerX,
+            'y': e.layerY
+        };
+        if (nodetype === 'ns_vl') {
+
+            graph_editor.addNode(node_information, function () {
+                console.log("OK")
+            }, function (error) {
+                showAlert(error)
+            })
+        } else if (nodetype === 'vnf') {
+            node_information['id'] = $('#' + elemet_id).attr('desc_id');
+            graph_editor.addNode(node_information, function () {
+                console.log("OK")
+            }, function (error) {
+                showAlert(error)
+            })
+        }
+    };
+
+    dropZone.ondragover = function (ev) {
+        console.log("ondragover");
+        return false;
+    };
+
+    dropZone.ondragleave = function () {
+        console.log("ondragleave");
+        return false;
+    };
+}
 
 
 function handleForce(el) {
@@ -66,8 +164,9 @@ function handleForce(el) {
 function changeFilter(e, c) {
     if (c && c.link && c.link.view[0]) {
         updateLegend(c.link.view[0]);
+        updatePalette(c.link.view[0]);
     }
-    //layerDetails(graph_editor.getCurrentFilters())
+    layerDetails(graph_editor.getCurrentFilters())
 }
 
 function resetFilters() {
@@ -75,37 +174,7 @@ function resetFilters() {
 }
 
 function buildBehaviorsOnEvents() {
-    var self = this;
-    var contextmenuNodesAction = [
-        {
-            title: 'Explore',
-            action: function (elm, c_node, i) {
-                if (c_node.info.type !== undefined) {
-                    var current_layer_nodes = Object.keys(graph_editor.model.layer[graph_editor.getCurrentView()].nodes);
-                    if (current_layer_nodes.indexOf(c_node.info.type) >= 0) {
-                        if (graph_editor.model.layer[graph_editor.getCurrentView()].nodes[c_node.info.type].expands) {
-                            var new_layer = graph_editor.model.layer[graph_editor.getCurrentView()].nodes[c_node.info.type].expands;
-                            graph_editor.handleFiltersParams({
-                                node: {
-                                    type: Object.keys(graph_editor.model.layer[new_layer].nodes),
-                                    group: [c_node.id]
-                                },
-                                link: {
-                                    group: [c_node.id],
-                                    view: [new_layer]
-                                }
-                            });
-
-                        }
-                        else {
-                            showAlert('This is not an explorable node.')
-                        }
-                    }
-                }
-            },
-            edit_mode: false
-        }];
-
+    var contextmenuNodesAction = [];
     return {
         'nodes': contextmenuNodesAction
     };
@@ -115,7 +184,7 @@ function buildBehaviorsOnEvents() {
 function refreshElementInfo(event, element) {
     if (event.type === 'node:selected') {
         switch (element.info.type) {
-            case 'vnfd':
+            case 'vnf':
                 vnfDetails(element.info.osm);
                 break;
             case 'vdu':
@@ -137,19 +206,18 @@ function refreshElementInfo(event, element) {
 }
 
 function layerDetails(filters) {
-    var side = $('#side');
+    var side = $('#side_form');
     var graph_parameters = graph_editor.getGraphParams();
     var layer_template = '';
-    console.log(graph_parameters)
-    if(graph_parameters['view'] && filters.link.view.length >0 && filters.link.view[0]){
-        if(filters.link.view[0] === 'nsr') {
-            layer_template = getMainSection('NS View');
-            layer_template += getChildrenTable(graph_parameters['view']['nsr']);
+    if (graph_parameters['view'] && filters.link.view.length > 0 && filters.link.view[0]) {
+        if (filters.link.view[0] === 'nsd') {
+            layer_template = getMainSectionWithSubmitButton('NSD');
+            layer_template += getChildrenTable(graph_parameters['view']['nsd']);
         }
-        else if(filters.link.view[0] === 'vnfr') {
-            layer_template = getMainSection('VNF View');
-            var vnfr_id = filters.link.group[0];
-            layer_template += getChildrenTable(graph_parameters['view']['vnfr'][vnfr_id]);
+        else if (filters.link.view[0] === 'vnfd') {
+            layer_template = getMainSectionWithSubmitButton('VNFD');
+
+            layer_template += getChildrenTable(graph_parameters['view']['vnfd']);
         }
     }
 
@@ -162,12 +230,12 @@ function updateLegend(view) {
     var nodes = type_view[view];
     var legend_template = '';
     var nodes_properties = osm_gui_properties['nodes'];
-    for (var n in nodes){
+    for (var n in nodes) {
         var node = nodes[n];
-        if(nodes_properties[node]){
+        if (nodes_properties[node]) {
             legend_template += '<div class="node">' +
-                '<div class="icon" style="background-color:' + nodes_properties[node].color +'"></div>' +
-                '<div class="name">' +nodes_properties[node].name + '</div></div>';
+                '<div class="icon" style="background-color:' + nodes_properties[node].color + '"></div>' +
+                '<div class="name">' + nodes_properties[node].name + '</div></div>';
         }
     }
 
@@ -176,48 +244,74 @@ function updateLegend(view) {
 
 }
 
-var map = {
-    'ip-address': 'IP', 'vnfd-id': 'Vnfd Id', 'vnfd-ref': 'Vnfd Ref', 'vim-account-id': 'Vim Id',
-    'member-vnf-index-ref': 'Member index', 'created-time': 'Created', 'id': 'Id', 'mgmt-network': 'Mgmt network',
-    'name': 'Name', 'type': 'Type', 'vim-network-name': 'Vim network name', 'connection-point-id': 'Cp Id',
-    'vdu-id-ref': 'Vdu Id', 'nsr-id-ref': 'Nsr Id'
-};
+function updatePalette(view) {
+    var palette = $('#palette');
+    var palette_template = '';
+    palette.empty();
+    if (view === 'vnfd') {
+        var nodes = type_view[view];
+        var nodes_properties = osm_gui_properties['nodes'];
+        for (var n in nodes) {
+            var node = nodes[n];
+            if (nodes_properties[node]) {
+                palette_template += '<div id="drag_' + n + '" class="node ui-draggable"' +
+                    'type-name="' + n + '" draggable="true" ondragstart="nodeDragStart(event)">' +
+                    '<div class="icon" style="background-color:' + nodes_properties[node].color + '"></div>' +
+                    '<div class="name">' + nodes_properties[node].name + '</div></div>';
+            }
+        }
+
+        palette.append(palette_template)
+    } else if (view === 'nsd') {
+        $.ajax({
+            url: '/projects/descriptors/composer/availablenodes?layer=nsd',
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+                palette_template += '<div id="drag_ns_vl" class="node ui-draggable"' +
+                    'type-name="ns_vl" draggable="true" ondragstart="nodeDragStart(event)">' +
+                    '<div class="icon" style="background-color:' + osm_gui_properties['nodes']['ns_vl'].color + '"></div>' +
+                    '<div class="name">' + osm_gui_properties['nodes']['ns_vl'].name + '</div></div>';
+                palette_template += getSubSection('VNFD');
+                for (var d in result['descriptors']) {
+                    var desc = result['descriptors'][d];
+                    palette_template += '<div id="drag_' + desc.id + '" class="node ui-draggable"' +
+                        'type-name="vnf" desc_id="' + desc.id + '" draggable="true" ondragstart="nodeDragStart(event)">' +
+                        '<div class="icon" style="background-color:#605ca8"></div>' +
+                        '<div class="name">' + desc.name + '</div></div>';
+                }
+                palette.append(palette_template)
+            },
+            error: function (result) {
+                showAlert(result);
+            }
+        });
+    }
+
+}
+
 
 function vnfDetails(vnfr) {
-    var side = $('#side');
+    var side = $('#side_form');
     var vnfr_template = getMainSection('VNF');
 
-    vnfr_template += getChildrenTable(vnfr);
+    vnfr_template += getChildrenTable(vnfr, true);
     side.empty();
     side.append(vnfr_template)
 }
 
 function vduDetails(vdur) {
-    var side = $('#side');
-    var vdur_template = getMainSectionWithStatus('VDU', vdur['status'] === 'ACTIVE');
+    var side = $('#side_form');
+    var vdur_template = getMainSectionWithSubmitButton('VDU');
     vdur_template += getChildrenTable(vdur);
-
-    if (vdur['interface'] && vdur['interface'].length > 0) {
-        vdur_template += getSubSection('Interfaces:');
-        vdur_template += '<table class="children">';
-
-        for (var i = 0; i < vdur['interface'].length; ++i) {
-            var interface = vdur['interface'][i];
-            var interface_template = '<tr><td>' + interface['name'] + '</td>'
-                + '<td>IP:' + interface['ip-address'] + '</td>'
-                + '<td>MAC:' + interface['mac-address'] + '</td>';
-            vdur_template += interface_template;
-        }
-        vdur_template += '</table>';
-    }
 
     side.empty();
     side.append(vdur_template)
 }
 
 function cpDetails(cp) {
-     var side = $('#side');
-    var cp_template = getMainSection('Connection Point');
+    var side = $('#side_form');
+    var cp_template = getMainSectionWithSubmitButton('Connection Point');
 
     cp_template += getChildrenTable(cp);
     side.empty();
@@ -225,8 +319,8 @@ function cpDetails(cp) {
 }
 
 function vlDetails(vl) {
-    var side = $('#side');
-    var vl_template = getMainSection('Virtual Link');
+    var side = $('#side_form');
+    var vl_template = getMainSectionWithSubmitButton('Virtual Link');
 
     vl_template += getChildrenTable(vl);
     side.empty();
@@ -236,6 +330,11 @@ function vlDetails(vl) {
 
 function getMainSection(title) {
     return '<div class="section"><span style="font-weight: 500;">' + title + '</span></div>';
+}
+
+function getMainSectionWithSubmitButton(title) {
+    return '<div class="section"><span style="font-weight: 500;">' + title + '</span>' +
+        '<div class="status"><button id="update_button" class="btn btn-xs btn-default" ><i class="fa fa-save"></i> SAVE</button></div></div>';
 }
 
 function getSubSection(title) {
@@ -252,15 +351,27 @@ function getMainSectionWithStatus(title, status) {
     return template;
 }
 
-function getChildrenTable(data) {
+function getChildrenTable(data, ro) {
     var template = '<table class="children">';
 
     for (var key in data) {
-        if (typeof data[key] === 'string') {
+        if (typeof data[key] !== 'object') {
             var key_map = (map[key]) ? map[key] : key;
-            template += '<tr><td>' + key_map + '</td><td><input name="'+key+'" class="form-control input-sm" type="text"  value="' + data[key] + '"></td></tr>';
+            if (ro)
+                template += '<tr><td>' + key_map + '</td><td>' + data[key] + '</td></tr>';
+            else
+                template += '<tr><td>' + key_map + '</td><td><input name="' + key + '" class="form-control input-sm" type="text"  value="' + data[key] + '"></td></tr>';
+
         }
     }
     template += '</table>';
     return template;
+}
+
+function openHelp() {
+    $('#modalTopologyInfoButton').modal('show');
+}
+
+function openTextedit() {
+    window.location.href = '/projects/descriptors/' + getUrlParameter('type') + '/' + getUrlParameter('id')
 }

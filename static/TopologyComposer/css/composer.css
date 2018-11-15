@@ -222,3 +222,7 @@
     font-weight: 500;
     text-align: right
 }
+
+.left-tool-bar-monitoring > .btn-default {
+    background-color: transparent!important;
+}

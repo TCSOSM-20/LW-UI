@@ -26,7 +26,7 @@ var layer_map = {
         'config-status': 'Config status',
         'detailed-status': 'Detailed status',
         'create-time': 'Creation date',
-        'instantiate_params' :'Instantiation parameters'
+       // 'instantiate_params' :'Instantiation parameters'
     },
     'vnfr': {
         'id':  'VNF instance id',
@@ -170,6 +170,8 @@ function layerDetails(filters) {
                     var field_value = graph_parameters['view']['nsr'][key];
                     if(key === 'create-time'){
                         field_value = moment.unix(field_value).toISOString();
+                    } else if (key === 'instantiate_params'){
+                        field_value = JSON.stringify(field_value);
                     }
                     layer_template += '<tr><td>' + layer_map['nsr'][key] + '</td><td>' + field_value + '</td></tr>';
                 }

@@ -270,8 +270,14 @@ class OsmParser(RdclGraph):
                         "vdu": {},
                         "cp": {},
                         "int_cp": {},
-                        "vnf_vl": {}
-
+                        "vnf_vl": {
+                            "addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }
+                        }
                     },
                     "allowed_edges": {
                         "vdu": {
@@ -316,7 +322,7 @@ class OsmParser(RdclGraph):
                 "name": "OSM",
                 "version": 1,
                 "description": "osm"
-            }
+            }, "callback": {"addNode": {"class": "OSMController"}, "removeNode": {"class": "OSMController"}}
         }, 'graph_parameters': {'view': {'vnfd': {}}}}
         if 'vnfd-catalog' in vnfd_catalog:
             vnfd = vnfd_catalog['vnfd-catalog']['vnfd'][0]
@@ -324,6 +330,13 @@ class OsmParser(RdclGraph):
             vnfd = vnfd_catalog['vnfd:vnfd-catalog']['vnfd'][0]
         else:
             return graph
+        vnfd_graph_param = graph['graph_parameters']['view']['vnfd']
+        vnfd_graph_param['id'] = vnfd['id'] if 'id' in vnfd else None
+        vnfd_graph_param['name'] = vnfd['name'] if 'name' in vnfd else None
+        vnfd_graph_param['short-name'] = vnfd['short-name'] if 'short-name' in vnfd else None
+        vnfd_graph_param['description'] = vnfd['description'] if 'description' in vnfd else None
+        vnfd_graph_param['version'] = vnfd['version'] if 'version' in vnfd else None
+        vnfd_graph_param['vendor'] = vnfd['vendor'] if 'vendor' in vnfd else None
         if 'connection-point' in vnfd:
             for extCp in vnfd['connection-point']:
                 self.add_node(extCp['name'], 'cp', vnfd['id'], None, graph,
@@ -356,9 +369,21 @@ class OsmParser(RdclGraph):
             "layer": {
                 "nsd": {
                     "nodes": {
-                        "vnfd": {},
+                        "vnf": {"addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }},
                         "cp": {},
-                        "ns_vl": {}
+                        "ns_vl": {
+                            "addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }
+                        }
                     },
                     "allowed_edges": {
                         "cp": {
@@ -368,17 +393,25 @@ class OsmParser(RdclGraph):
                                 }
                             }
                         },
-                        "vnfd":{
+                        "vnf":{
                             "destination": {
                                 "ns_vl": {
                                     "direct_edge": False,
+                                    "callback": "addLink",
+                                    "removable" : {
+                                        "callback": "removeLink",
+                                    }
                                 }
                             }
                         },
                         "ns_vl": {
                             "destination": {
-                                "vnfd": {
+                                "vnf": {
                                     "direct_edge": False,
+                                    "callback": "addLink",
+                                    "removable": {
+                                        "callback": "removeLink",
+                                    }
                                 }
                             }
                         }
@@ -434,17 +467,27 @@ class OsmParser(RdclGraph):
                 "name": "OSM",
                 "version": 1,
                 "description": "osm"
-            }
-        }, 'graph_parameters': {'view': {'vnfd': {}}}}
+            }, "callback": {"addNode": {"class": "OSMController"}, "removeNode": {"class": "OSMController"},
+                            "removeLink": {"class": "OSMController"}, "addLink": {"class": "OSMController"}}
+        }, 'graph_parameters': {'view': {'nsd': {}}}}
         if 'nsd-catalog' in nsd_catalog:
             nsd = nsd_catalog['nsd-catalog']['nsd'][0]
         elif 'nsd:nsd-catalog' in nsd_catalog:
             nsd = nsd_catalog['nsd:nsd-catalog']['nsd'][0]
         else:
             return graph
+
+        nsd_graph_param = graph['graph_parameters']['view']['nsd']
+        nsd_graph_param['id'] = nsd['id'] if 'id' in nsd else None
+        nsd_graph_param['name'] = nsd['name'] if 'name' in nsd else None
+        nsd_graph_param['short-name'] = nsd['short-name'] if 'short-name' in nsd else None
+        nsd_graph_param['description'] = nsd['description'] if 'description' in nsd else None
+        nsd_graph_param['version'] = nsd['version'] if 'version' in nsd else None
+        nsd_graph_param['vendor'] = nsd['vendor'] if 'vendor' in nsd else None
+
         if 'constituent-vnfd' in nsd:
             for vnfd in nsd['constituent-vnfd']:
-                costinuent_id = vnfd['vnfd-id-ref']+":"+vnfd['member-vnf-index']
+                costinuent_id = vnfd['vnfd-id-ref']+":"+str(vnfd['member-vnf-index'])
                 self.add_node(costinuent_id, 'vnf', None, None, graph,
                               {'property': {'custom_label': costinuent_id}, 'osm': vnfd})
 
@@ -456,7 +499,6 @@ class OsmParser(RdclGraph):
                     for cp_ref in vld['vnfd-connection-point-ref']:
                         vnfd_id = cp_ref['vnfd-id-ref'] + ':' + str(cp_ref['member-vnf-index-ref'])
                         self.add_link(vld['id'], vnfd_id, 'nsd', None, graph)
-
         return graph
 
 

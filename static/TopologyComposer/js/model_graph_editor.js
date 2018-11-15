@@ -118,23 +118,26 @@ TCD3.ModelGraphEditor = (function () {
      * @returns {boolean}
      */
     ModelGraphEditor.prototype.updateData = function (args) {
-        this.d3_graph.nodes = args.graph_data.vertices;
-        this.d3_graph.links = args.graph_data.edges;
-        this.d3_graph.graph_parameters = args.graph_data.graph_parameters;
+        this.d3_graph.nodes = args.vertices;
+        this.d3_graph.links = args.edges;
+        this.d3_graph.graph_parameters = args.graph_parameters;
         this.model = args.model;
         this.refreshGraphParameters(this.d3_graph.graph_parameters);
+        this.cleanAll();
         this.refresh();
         this.startForce();
+        this.handleForce(this.forceSimulationActive);
+        //this.force.restart();
         //if(args.filter_base != undefined)
 
-        //if(args.filter_base){
-        var self = this;
-        setTimeout(function () {
-            self.handleForce(true);
-            self.handleFiltersParams(args.filter_base);
-        }, 500);
-        //}
-    }
+        if(args.filter_base){
+            var self = this;
+            setTimeout(function () {
+                self.handleForce(true);
+                self.handleFiltersParams(args.filter_base);
+            }, 500);
+        }
+    };
 
     /**
      * Add a new node to the graph.
@@ -145,13 +148,16 @@ TCD3.ModelGraphEditor = (function () {
         var self = this;
         var current_layer = self.getCurrentView();
         var node_type = node.info.type;
-
         if (self.model.layer[current_layer] && self.model.layer[current_layer].nodes[node_type] && self.model.layer[current_layer].nodes[node_type].addable) {
             if (self.model.layer[current_layer].nodes[node_type].addable.callback) {
+                console.log(self.model.callback)
                 var c = self.model.callback[self.model.layer[current_layer].nodes[node_type].addable.callback].class;
-                var controller = new TCD3[c]();
-                controller[self.model.layer[current_layer].nodes[node_type].addable.callback](self, node, function () {
-                    self.parent.addNode.call(self, node);
+                var controller = new TCD3.OsmController();
+                controller[self.model.layer[current_layer].nodes[node_type].addable.callback](self, node, function (result) {
+                    console.log(result)
+                    console.log(node)
+                    self.updateData(result);
+                    // self.parent.addNode.call(self, node);
                     success && success();
                 }, error);
 
@@ -173,9 +179,24 @@ TCD3.ModelGraphEditor = (function () {
      * @param {Object} Required. An object that specifies tha data of the node.
      * @returns {boolean}
      */
-    ModelGraphEditor.prototype.updateDataNode = function (args) {
-        //FIXME updating a node properties need commit to server side!
-        this.parent.updateDataNode.call(this, args);
+    ModelGraphEditor.prototype.updateDataNode = function (node, args, success, error) {
+        console.log(node)
+        var controller = new  TCD3.OsmController();
+        controller.updateNode(this,node, args, function(){
+
+        }, error);
+    };
+
+    /**
+     * Update the data properties of the node
+     * @param {Object} Required. An object that specifies tha data of the node.
+     * @returns {boolean}
+     */
+    ModelGraphEditor.prototype.updateGraphParams = function (args, success, error) {
+        var controller = new  TCD3.OsmController();
+        controller.updateGraphParams(args, function(){
+
+        }, error);
     };
 
     /**
@@ -194,7 +215,7 @@ TCD3.ModelGraphEditor = (function () {
         if (self.model.layer[current_layer] && self.model.layer[current_layer].nodes[node_type] && self.model.layer[current_layer].nodes[node_type].removable) {
             if (self.model.layer[current_layer].nodes[node_type].removable.callback) {
                 var c = self.model.callback[self.model.layer[current_layer].nodes[node_type].removable.callback].class;
-                var controller = new TCD3[c]();
+                var controller = new  TCD3.OsmController();
                 controller[self.model.layer[current_layer].nodes[node_type].removable.callback](self, node, function () {
                     self.parent.removeNode.call(self, node);
                     success && success();
@@ -239,7 +260,7 @@ TCD3.ModelGraphEditor = (function () {
                 var direct_edge = 'direct_edge' in self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type] ? self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type]['direct_edge'] : false;
                 link.directed_edge = direct_edge;
                 var c = self.model.callback[callback].class;
-                var controller = new TCD3[c]();
+                var controller = new  TCD3.OsmController();
                 controller[callback](self, link, function () {
                     self._deselectAllNodes();
                     self.parent.addLink.call(self, link);
@@ -270,14 +291,14 @@ TCD3.ModelGraphEditor = (function () {
         var d = link.target;
         var source_type = s.info.type;
         var destination_type = d.info.type;
-        var current_layer = self.getCurrentView()
+        var current_layer = self.getCurrentView();
         if (self.model.layer[current_layer].allowed_edges && self.model.layer[current_layer].allowed_edges[source_type] && self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type] &&
             self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable
         ) {
             if (self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable.callback) {
                 var callback = self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable.callback;
                 var c = self.model.callback[callback].class;
-                var controller = new TCD3[c]();
+                var controller = new  TCD3.OsmController();
                 controller[callback](self, link, function () {
                     self._deselectAllNodes();
                     self._deselectAllLinks();
@@ -326,16 +347,7 @@ TCD3.ModelGraphEditor = (function () {
             },
             edit_mode: true
         }];
-        var contextMenuNodesAction = [{
-            title: 'Edit',
-            action: function (elm, d, i) {
-                if (d.info.type != undefined) {
-                    self.eventHandler.fire("edit_descriptor", self.project_id, d);
-                }
-            },
-            nodes: [],
-            edit_mode: true
-        },
+        var contextMenuNodesAction = [
             {
                 title: 'Delete',
                 action: function (elm, d, i) {
@@ -405,7 +417,6 @@ TCD3.ModelGraphEditor = (function () {
             'links': {
                 'click': function (d) {
                     self._selectLinkExclusive(this, d);
-
                 },
                 'dblclick': function (event) {
 
@@ -448,7 +459,6 @@ TCD3.ModelGraphEditor = (function () {
 
     ModelGraphEditor.prototype.getCurrentGroup = function () {
         return this.filter_parameters.node.group[0];
-
     };
 
     ModelGraphEditor.prototype.getCurrentView = function () {
