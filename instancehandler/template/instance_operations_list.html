@@ -28,7 +28,7 @@
 {% block breadcrumb_body %}
     {{ block.super }}
     <li><a href="{% url 'instances:list'  type=type %}">Instances</a></li>
-    <li><a href="#">Operations</a></li>
+    <li><a href="#">History of Operations</a></li>
 {% endblock %}
 
 {% block content_body %}
@@ -40,7 +40,7 @@
 
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Active operations</h3>
+                    <h3 class="box-title">History of operations</h3>
 
                 </div>
                 <div class="box-body">
@@ -139,13 +139,13 @@
                 },
                 {
                     "render": function (data, type, row) {
-                        return row["startTime"];
+                        return moment.unix(row['startTime']).format('YYYY-MM-DD hh:mm:ss a')
                     },
                     "targets": 3
                 },
                 {
                     "render": function (data, type, row) {
-                        return row["statusEnteredTime"];
+                        return moment.unix(row['statusEnteredTime']).format('YYYY-MM-DD hh:mm:ss a')
                     },
                     "targets": 4
                 },

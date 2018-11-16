@@ -72,13 +72,18 @@ $(document).ready(function () {
         form_data.forEach(function (value, key) {
             formDataJson[key] = value;
         });
+        var dialog = bootbox.dialog({
+            message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Updating...</div>',
+            closeButton: true
+        });
         if (graph_editor._selected_node) {
             graph_editor.updateDataNode(graph_editor._selected_node, formDataJson, function () {
-
+                dialog.modal('hide');
             }, function (result) {
                 var data = result.responseJSON;
                 var title = "Error " + (data && data.code ? data.code : 'unknown');
                 var message = data && data.detail ? data.detail : 'No detail available.';
+                dialog.modal('hide');
                 bootbox.alert({
                     title: title,
                     message: message
@@ -86,11 +91,12 @@ $(document).ready(function () {
             })
         } else {
             graph_editor.updateGraphParams(formDataJson, function () {
-
+                dialog.modal('hide');
             }, function (result) {
                 var data = result.responseJSON;
                 var title = "Error " + (data && data.code ? data.code : 'unknown');
                 var message = data && data.detail ? data.detail : 'No detail available.';
+                dialog.modal('hide');
                 bootbox.alert({
                     title: title,
                     message: message

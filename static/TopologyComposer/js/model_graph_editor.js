@@ -180,10 +180,12 @@ TCD3.ModelGraphEditor = (function () {
      * @returns {boolean}
      */
     ModelGraphEditor.prototype.updateDataNode = function (node, args, success, error) {
-        console.log(node)
+        console.log(node);
+        var self = this;
         var controller = new  TCD3.OsmController();
-        controller.updateNode(this,node, args, function(){
-
+        controller.updateNode(this,node, args, function(result){
+            self.updateData(result);
+            success && success();
         }, error);
     };
 
@@ -195,7 +197,7 @@ TCD3.ModelGraphEditor = (function () {
     ModelGraphEditor.prototype.updateGraphParams = function (args, success, error) {
         var controller = new  TCD3.OsmController();
         controller.updateGraphParams(args, function(){
-
+            success && success();
         }, error);
     };
 
