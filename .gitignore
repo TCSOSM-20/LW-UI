@@ -51,3 +51,9 @@ instancehandler/migrations
 sdnctrlhandler/migrations
 authosm/migrations
 userhandler/migrations
+
+#Deb package
+deb_dist/
+dists/
+debian/osm-lightui.install
+
