@@ -29,6 +29,16 @@ class OsmUtil():
                                                             str(item['member-vnf-index-ref']) != str(
                                                                 args['member-vnf-index-ref']) or str(
                                                                 item['vnfd-id-ref']) != str(args['vnfd-id-ref'])]
+        elif descriptor_type == 'vnfd':
+            if 'vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd-catalog']['vnfd'][0]
+            elif 'vnfd:vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd:vnfd-catalog']['vnfd'][0]
+
+            if node_type == 'vnf_vl':
+                vnfd['internal-vld'] = [item for item in vnfd['internal-vld'] if item['id'] != element_id]
+            if node_type == 'cp':
+                vnfd['connection-point'] = [item for item in vnfd['connection-point'] if item['name'] != element_id]
 
         return descriptor
 
@@ -92,6 +102,41 @@ class OsmUtil():
                                 "vnfd-id-ref": args['vnfd-id-ref']
                             },
                         )
+
+        elif descriptor_type == 'vnfd':
+            if 'vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd-catalog']['vnfd'][0]
+            elif 'vnfd:vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd:vnfd-catalog']['vnfd'][0]
+            if node_type == 'vdu':
+                vnfd['vdu'].append({
+                    "count": "1",
+                    "description": "",
+                    "monitoring-param": [],
+                    "internal-connection-point": [],
+                    "image": "ubuntu",
+                    "cloud-init-file": "",
+                    "vm-flavor": {},
+                    "interface": [],
+                    "id": element_id,
+                    "name": element_id
+                })
+            if node_type == 'cp':
+                vnfd['connection-point'].append({
+                    "type": "VPORT",
+                    "name": element_id
+                })
+
+            if node_type == 'vnf_vl':
+                vnfd['internal-vld'].append({
+                    "short-name": element_id,
+                    "name": element_id,
+                    "internal-connection-point": [],
+                    "type": "ELAN",
+                    "ip-profile-ref": "",
+                    "id": element_id
+                })
+
         return descriptor
 
     @staticmethod

@@ -267,9 +267,30 @@ class OsmParser(RdclGraph):
             "layer": {
                 "vnfd": {
                     "nodes": {
-                        "vdu": {},
-                        "cp": {},
-                        "int_cp": {},
+                        "vdu": {
+                            "addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }
+                        },
+                        "cp": {
+                            "addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }
+                        },
+                        "int_cp": {
+                            "addable": {
+                                "callback": "addNode"
+                            },
+                            "removable": {
+                                "callback": "removeNode"
+                            }
+                        },
                         "vnf_vl": {
                             "addable": {
                                 "callback": "addNode"
@@ -286,9 +307,6 @@ class OsmParser(RdclGraph):
                                     "direct_edge": False,
                                 },
                                 "int_cp": {
-                                    "direct_edge": False,
-                                },
-                                "vnf_vl": {
                                     "direct_edge": False,
                                 }
                             }
@@ -312,7 +330,7 @@ class OsmParser(RdclGraph):
                         },
                         "vnf_vl": {
                             "destination": {
-                                "vdu": {
+                                "int_cp": {
                                     "direct_edge": False
                                 }
                             }

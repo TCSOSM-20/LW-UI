@@ -118,7 +118,7 @@ function initDropOnGraph() {
 
         var nodetype = $('#' + elemet_id).attr('type-name');
         var random_name = nodetype + "_" + generateUID();
-
+        console.log(nodetype)
         var node_information = {
             'id': random_name,
             'info': {
@@ -134,21 +134,17 @@ function initDropOnGraph() {
             'x': e.layerX,
             'y': e.layerY
         };
-        if (nodetype === 'ns_vl') {
 
-            graph_editor.addNode(node_information, function () {
-                console.log("OK")
-            }, function (error) {
-                showAlert(error)
-            })
-        } else if (nodetype === 'vnf') {
+        if (nodetype === 'vnf') {
             node_information['id'] = $('#' + elemet_id).attr('desc_id');
-            graph_editor.addNode(node_information, function () {
-                console.log("OK")
-            }, function (error) {
-                showAlert(error)
-            })
         }
+
+        graph_editor.addNode(node_information, function () {
+            console.log("OK")
+        }, function (error) {
+            showAlert(error)
+        })
+
     };
 
     dropZone.ondragover = function (ev) {
@@ -261,7 +257,7 @@ function updatePalette(view) {
             var node = nodes[n];
             if (nodes_properties[node]) {
                 palette_template += '<div id="drag_' + n + '" class="node ui-draggable"' +
-                    'type-name="' + n + '" draggable="true" ondragstart="nodeDragStart(event)">' +
+                    'type-name="' + node + '" draggable="true" ondragstart="nodeDragStart(event)">' +
                     '<div class="icon" style="background-color:' + nodes_properties[node].color + '"></div>' +
                     '<div class="name">' + nodes_properties[node].name + '</div></div>';
             }
