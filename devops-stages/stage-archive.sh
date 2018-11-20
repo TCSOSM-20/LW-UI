@@ -18,7 +18,7 @@ MDG=LW-UI
 rm -rf pool
 rm -rf dists
 mkdir -p pool/$MDG
-mv *.deb pool/$MDG/
+mv deb_dist/*.deb pool/$MDG/
 
 mkdir -p dists/unstable/$MDG/binary-amd64/
 apt-ftparchive packages pool/$MDG > dists/unstable/$MDG/binary-amd64/Packages

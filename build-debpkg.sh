@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright 2018 Telefonica
 # All Rights Reserved.
 #
@@ -25,9 +25,9 @@ PKG_VERSION=$(git describe --match "v*" --tags --abbrev=0)
 PKG_VERSION_PREFIX=$(echo $PKG_VERSION | sed -e 's/v//g')
 PKG_VERSION_POST=$(git rev-list $PKG_VERSION..HEAD | wc -l)
 if [ "$PKG_VERSION_POST" -eq 0 ]; then
-    PKG_DIR="osm-${MDG_NAME}-${PKG_VERSION_PREFIX}"
+    PKG_DIR="deb_dist/osm-${MDG_NAME}-${PKG_VERSION_PREFIX}"
 else
-    PKG_DIR="osm-${MDG_NAME}-$PKG_VERSION_PREFIX.post${PKG_VERSION_POST}"
+    PKG_DIR="deb_dist/osm-${MDG_NAME}-$PKG_VERSION_PREFIX.post${PKG_VERSION_POST}"
 fi
 
 rm -rf $PKG_DIR
@@ -45,9 +45,11 @@ for f in $PKG_FILES; do
     echo "$f usr/share/osm-$MDG_NAME" >> $DEB_INSTALL
 done
 cp -R debian $PKG_DIR/.
+cp requirements.txt $PKG_DIR
 
-cd $PKG_DIR
+pushd $PKG_DIR
 dh_make -y --indep --createorig --a -c apache
 dpkg-buildpackage -uc -us -tc -rfakeroot
-cd -
+popd
+
 
