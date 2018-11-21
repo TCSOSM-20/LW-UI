@@ -284,9 +284,6 @@ class OsmParser(RdclGraph):
                             }
                         },
                         "int_cp": {
-                            "addable": {
-                                "callback": "addNode"
-                            },
                             "removable": {
                                 "callback": "removeNode"
                             }
@@ -304,34 +301,45 @@ class OsmParser(RdclGraph):
                         "vdu": {
                             "destination": {
                                 "cp": {
+                                    "callback": "addLink",
                                     "direct_edge": False,
+                                    "removable": {}
                                 },
-                                "int_cp": {
+                                "vnf_vl": {
+                                    "callback": "addLink",
                                     "direct_edge": False,
+                                    "removable": {}
                                 }
                             }
                         },
                         "cp": {
                             "destination": {
                                 "vdu": {
+                                    "callback": "addLink",
                                     "direct_edge": False,
+                                    "removable": {}
                                 }
                             }
                         },
-                        "int_cp": {
-                            "destination": {
-                                "vdu": {
-                                    "direct_edge": False,
-                                },
-                                "vnf_vl": {
-                                    "direct_edge": False,
-                                }
-                            }
-                        },
+                        # "int_cp": {
+                        #     "destination": {
+                        #         "vdu": {
+                        #             "direct_edge": False,
+                        #         },
+                        #         "vnf_vl": {
+                        #             "direct_edge": False,
+                        #         }
+                        #     }
+                        # },
                         "vnf_vl": {
                             "destination": {
                                 "int_cp": {
                                     "direct_edge": False
+                                },
+                                "vdu": {
+                                    "callback": "addLink",
+                                    "direct_edge": False,
+                                    "removable": {}
                                 }
                             }
                         }
@@ -340,7 +348,8 @@ class OsmParser(RdclGraph):
                 "name": "OSM",
                 "version": 1,
                 "description": "osm"
-            }, "callback": {"addNode": {"class": "OSMController"}, "removeNode": {"class": "OSMController"}}
+            }, "callback": {"addNode": {"class": "OSMController"}, "removeNode": {"class": "OSMController"},
+                            "removeLink": {"class": "OSMController"}, "addLink": {"class": "OSMController"}}
         }, 'graph_parameters': {'view': {'vnfd': {}}}}
         if 'vnfd-catalog' in vnfd_catalog:
             vnfd = vnfd_catalog['vnfd-catalog']['vnfd'][0]
@@ -387,12 +396,10 @@ class OsmParser(RdclGraph):
             "layer": {
                 "nsd": {
                     "nodes": {
-                        "vnf": {"addable": {
-                                "callback": "addNode"
-                            },
-                            "removable": {
-                                "callback": "removeNode"
-                            }},
+                        "vnf": {
+                            "addable": {"callback": "addNode"},
+                            "removable": {"callback": "removeNode"}
+                        },
                         "cp": {},
                         "ns_vl": {
                             "addable": {

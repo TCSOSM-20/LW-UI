@@ -93,7 +93,7 @@ class OsmUtil():
             if node_type == 'cp':
                 for vld in nsd['vld']:
                     if vld['id'] == args['vld_id']:
-                        if'vnfd-connection-point-ref' not in vld:
+                        if 'vnfd-connection-point-ref' not in vld:
                             vld['vnfd-connection-point-ref'] = []
                         vld['vnfd-connection-point-ref'].append(
                             {
@@ -136,7 +136,18 @@ class OsmUtil():
                     "ip-profile-ref": "",
                     "id": element_id
                 })
-
+            if node_type == 'interface':
+                for vdu in vnfd['vdu']:
+                    if vdu['id'] == args['vdu-id']:
+                        vdu['interface'].append({
+                            "virtual-interface": {
+                                "type": "VIRTIO"
+                            },
+                            "name": element_id,
+                            "mgmt-interface": True,
+                            "type": "EXTERNAL",
+                            "external-connection-point-ref": args["external-connection-point-ref"]
+                        })
         return descriptor
 
     @staticmethod

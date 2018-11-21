@@ -79,6 +79,55 @@ TCD3.OsmController = (function (global) {
                 error: error
             });
         }
+        else if (desc_type === 'vnfd') {
+            if (['vdu', 'cp'].indexOf(link.source.info.type) > -1 && ['vdu', 'cp'].indexOf(link.target.info.type) > -1) {
+                var vdu_node = (link.source.info.type === 'vdu') ? link.source : link.target;
+                var cp_node = (link.source.info.type === 'cp') ? link.source : link.target;
+
+                var data_form = new FormData();
+                data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+                data_form.append('vdu-id', vdu_node.info.osm.id);
+                data_form.append('external-connection-point-ref', cp_node.info.osm.name);
+                $.ajax({
+                    url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/addElement/interface',
+                    type: 'POST',
+                    data: data_form,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: success,
+                    error: error
+                });
+            }
+            else if (['vdu', 'vnf_vl'].indexOf(link.source.info.type) > -1 && ['vdu', 'vnf_vl'].indexOf(link.target.info.type) > -1) {
+
+                console.log("link tra vdu e vl");
+                /*var element_type = 'cp';
+                var data_form = new FormData();
+
+                var vdu_node = (link.source.info.type === 'vdu') ? link.source : link.target;
+                var vld_node = (link.source.info.type === 'vnf_vl') ? link.source : link.target;
+
+                data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+                data_form.append('vnfd-connection-point-ref', 'cp_temp');
+                data_form.append('member-vnf-index-ref', vnfd_node.info.osm['member-vnf-index']);
+                data_form.append('vnfd-id-ref', vnfd_node.info.osm['vnfd-id-ref']);
+                data_form.append('vld_id', vld_node.info.osm['id']);
+
+                $.ajax({
+                    url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/addElement/' + element_type,
+                    type: 'POST',
+                    data: data_form,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: success,
+                    error: error
+                });*/
+            }
+
+        }
+
 
     };
 
@@ -114,7 +163,7 @@ TCD3.OsmController = (function (global) {
         console.log(args)
         var data_form = new FormData();
         data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-        data_form.append('old', JSON.stringify( node.info.osm));
+        data_form.append('old', JSON.stringify(node.info.osm));
         data_form.append('update', JSON.stringify(args));
         /*for (var key in node.info.osm) {
             data_form.append(key, node.info.osm[key]);
@@ -134,7 +183,7 @@ TCD3.OsmController = (function (global) {
 
     };
 
-    OsmController.prototype.updateGraphParams = function(args, success, error){
+    OsmController.prototype.updateGraphParams = function (args, success, error) {
         var desc_id = getUrlParameter('id');
         var desc_type = getUrlParameter('type');
         var data_form = new FormData();
