@@ -193,6 +193,8 @@ function refreshElementInfo(event, element) {
                 vduDetails(element.info.osm);
                 break;
             case 'int_cp':
+                intcpDetails(element.info.osm);
+                break;
             case 'cp':
                 cpDetails(element.info.osm);
                 break;
@@ -309,6 +311,15 @@ function vduDetails(vdur) {
 
     side.empty();
     side.append(vdur_template)
+}
+
+function intcpDetails(cp) {
+    var side = $('#side_form');
+    var cp_template = getMainSection('Int. Connection Point');
+
+    cp_template += getChildrenTable(cp, true);
+    side.empty();
+    side.append(cp_template);
 }
 
 function cpDetails(cp) {

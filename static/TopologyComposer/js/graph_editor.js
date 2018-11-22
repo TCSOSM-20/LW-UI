@@ -347,7 +347,7 @@ TCD3.GraphEditor = (function () {
      * @returns {boolean}
      */
     GraphEditor.prototype.addLink = function (link) {
-        console.log("addLink" + JSON.stringify(link));
+
         if (link.source && link.target) {
             this.force.stop();
             this.cleanAll();

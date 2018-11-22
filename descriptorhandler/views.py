@@ -216,6 +216,22 @@ def updateElement(request, descriptor_type=None, descriptor_id=None, element_typ
             # print nsr_object
             if descriptor_type == 'nsd':
                 result_graph = parser.nsd_to_graph(descriptor_updated)
+    if descriptor_type == 'vnfd':
+        descriptor_result = client.vnfd_get(user.get_token(), descriptor_id)
+        util = OsmUtil()
+        payload = request.POST.dict()
+        if element_type == 'graph_params':
+            descriptor_updated = util.update_graph_params('vnfd', descriptor_result, json.loads(payload['update']))
+        else:
+            descriptor_updated = util.update_node('vnfd', descriptor_result, element_type, json.loads(payload['old']), json.loads(payload['update']))
+        result = client.vnfd_update(user.get_token(), descriptor_id, descriptor_updated)
+        if result['error'] == True:
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            parser = OsmParser()
+            if descriptor_type == 'vnfd':
+                result_graph = parser.vnfd_to_graph(descriptor_updated)
 
         return __response_handler(request, result_graph, url=None, status=200)
 

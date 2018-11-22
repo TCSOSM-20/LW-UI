@@ -72,6 +72,24 @@ class OsmUtil():
                     if str(v['member-vnf-index']) == str(old['member-vnf-index']) and str(v['vnfd-id-ref']) == str(
                             old['vnfd-id-ref']):
                         print 'update here'
+        elif descriptor_type == 'vnfd':
+            if 'vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd-catalog']['vnfd'][0]
+            elif 'vnfd:vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd:vnfd-catalog']['vnfd'][0]
+
+            if node_type == 'vnf_vl':
+                for k, v in enumerate(vnfd['internal-vld']):
+                    if v['id'] == old['id']:
+                        vnfd['internal-vld'][k].update(updated)
+            if node_type == 'cp':
+                for k, v in enumerate(vnfd['connection-point']):
+                    if v['name'] == old['name']:
+                        vnfd['connection-point'][k].update(updated)
+            if node_type == 'vdu':
+                for k, v in enumerate(vnfd['vdu']):
+                    if v['name'] == old['name']:
+                        vnfd['vdu'][k].update(updated)
 
         return descriptor
 
@@ -196,5 +214,11 @@ class OsmUtil():
             elif 'nsd:nsd-catalog' in descriptor:
                 nsd = descriptor['nsd:nsd-catalog']['nsd'][0]
             nsd.update(updated)
+        elif descriptor_type == 'vnfd':
+            if 'vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd-catalog']['vnfd'][0]
+            elif 'vnfd:vnfd-catalog' in descriptor:
+                vnfd = descriptor['vnfd:vnfd-catalog']['vnfd'][0]
+            vnfd.update(updated)
 
         return descriptor
