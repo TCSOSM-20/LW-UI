@@ -39,6 +39,19 @@ class OsmUtil():
                 vnfd['internal-vld'] = [item for item in vnfd['internal-vld'] if item['id'] != element_id]
             if node_type == 'cp':
                 vnfd['connection-point'] = [item for item in vnfd['connection-point'] if item['name'] != element_id]
+            if node_type == 'vdu':
+                # check
+                vnfd['vdu'] = [item for item in vnfd['vdu'] if item['name'] != element_id]
+            if node_type == 'int_cp':
+
+                for vdu in vnfd['vdu']:
+                    if 'interface' in vdu:
+                        vdu['interface'] = [item for item in vdu['interface'] if 'internal-connection-point-ref' not in item
+                        or ('internal-connection-point-ref'in item and item['internal-connection-point-ref'] != element_id)]
+                    if 'internal-connection-point' in vdu:
+                        vdu['internal-connection-point'] = [item for item in vdu['internal-connection-point'] if item['id'] != element_id]
+
+
 
         return descriptor
 
@@ -54,14 +67,11 @@ class OsmUtil():
                 for k, v in enumerate(nsd['vld']):
                     if v['id'] == old['id']:
                         nsd['vld'][k].update(updated)
-                        print 'update here'
-                        print old
             elif node_type == 'vnf':
                 for k, v in enumerate(nsd['constituent-vnfd']):
                     if str(v['member-vnf-index']) == str(old['member-vnf-index']) and str(v['vnfd-id-ref']) == str(
                             old['vnfd-id-ref']):
                         print 'update here'
-                        print old
 
         return descriptor
 
@@ -138,7 +148,7 @@ class OsmUtil():
                 })
             if node_type == 'interface':
                 for vdu in vnfd['vdu']:
-                    if vdu['id'] == args['vdu-id']:
+                    if vdu['id'] == args['vdu_id']:
                         vdu['interface'].append({
                             "virtual-interface": {
                                 "type": "VIRTIO"
@@ -147,6 +157,34 @@ class OsmUtil():
                             "mgmt-interface": True,
                             "type": "EXTERNAL",
                             "external-connection-point-ref": args["external-connection-point-ref"]
+                        })
+            if node_type == 'int_cp':
+                for vdu in vnfd['vdu']:
+                    if vdu['id'] == args['vdu_id']:
+                        if 'internal-connection-point' not in vdu:
+                            vdu['internal-connection-point'] = []
+                        vdu['internal-connection-point'].append({
+                            "short-name": element_id,
+                            "type": "VPORT",
+                            "id": element_id,
+                            "name": element_id
+                        })
+                        if 'interface' not in vdu:
+                            vdu['interface'] = []
+                        vdu['interface'].append({
+                            "virtual-interface": {
+                                "type": "VIRTIO"
+                            },
+                            "name": "int_"+element_id,
+                            "type": "INTERNAL",
+                            "internal-connection-point-ref": element_id
+                        })
+                for int_vld in vnfd['internal-vld']:
+                    if int_vld['id'] == args['vld_id']:
+                        if 'internal-connection-point' not in int_vld:
+                            int_vld['internal-connection-point'] = []
+                        int_vld['internal-connection-point'].append({
+                            'id-ref': element_id
                         })
         return descriptor
 

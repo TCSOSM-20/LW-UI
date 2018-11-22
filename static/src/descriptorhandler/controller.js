@@ -43,16 +43,6 @@ TCD3.OsmController = (function (global) {
     OsmController.prototype.addLink = function (graph_editor, link, success, error) {
         log('addLink');
 
-        var data_to_send = {
-            'desc_id': link.desc_id,
-            'source': link.source.id,
-            'source_type': link.source.info.type,
-            'target': link.target.id,
-            'target_type': link.target.info.type,
-            'view': link.view,
-            'group': link.group
-        };
-
         var desc_id = getUrlParameter('id');
         var desc_type = getUrlParameter('type');
         if (desc_type === 'nsd') {
@@ -86,7 +76,7 @@ TCD3.OsmController = (function (global) {
 
                 var data_form = new FormData();
                 data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-                data_form.append('vdu-id', vdu_node.info.osm.id);
+                data_form.append('vdu_id', vdu_node.info.osm.id);
                 data_form.append('external-connection-point-ref', cp_node.info.osm.name);
                 $.ajax({
                     url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/addElement/interface',
@@ -101,21 +91,17 @@ TCD3.OsmController = (function (global) {
             }
             else if (['vdu', 'vnf_vl'].indexOf(link.source.info.type) > -1 && ['vdu', 'vnf_vl'].indexOf(link.target.info.type) > -1) {
 
-                console.log("link tra vdu e vl");
-                /*var element_type = 'cp';
-                var data_form = new FormData();
-
                 var vdu_node = (link.source.info.type === 'vdu') ? link.source : link.target;
                 var vld_node = (link.source.info.type === 'vnf_vl') ? link.source : link.target;
 
+                var data_form = new FormData();
                 data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-                data_form.append('vnfd-connection-point-ref', 'cp_temp');
-                data_form.append('member-vnf-index-ref', vnfd_node.info.osm['member-vnf-index']);
-                data_form.append('vnfd-id-ref', vnfd_node.info.osm['vnfd-id-ref']);
-                data_form.append('vld_id', vld_node.info.osm['id']);
+                data_form.append('vdu_id', vdu_node.info.osm.id);
+                data_form.append('vld_id', vld_node.info.osm.id);
+                data_form.append('id',  "intcp_" + generateUID());
 
                 $.ajax({
-                    url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/addElement/' + element_type,
+                    url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/addElement/int_cp',
                     type: 'POST',
                     data: data_form,
                     cache: false,
@@ -123,7 +109,7 @@ TCD3.OsmController = (function (global) {
                     processData: false,
                     success: success,
                     error: error
-                });*/
+                });
             }
 
         }
