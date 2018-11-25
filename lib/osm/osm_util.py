@@ -38,21 +38,24 @@ class OsmUtil():
             if node_type == 'vnf_vl':
                 vnfd['internal-vld'] = [item for item in vnfd['internal-vld'] if item['id'] != element_id]
             if node_type == 'cp':
-                vnfd['connection-point'] = [item for item in vnfd['connection-point'] if item['name'] != element_id]
-            if node_type == 'vdu':
-                # check
-                vnfd['vdu'] = [item for item in vnfd['vdu'] if item['name'] != element_id]
-            if node_type == 'int_cp':
-
+                vnfd['connection-point'] = [item for item in vnfd['connection-point'] if item['name'] != args['name']]
                 for vdu in vnfd['vdu']:
                     if 'interface' in vdu:
-                        vdu['interface'] = [item for item in vdu['interface'] if 'internal-connection-point-ref' not in item
-                        or ('internal-connection-point-ref'in item and item['internal-connection-point-ref'] != element_id)]
-                    if 'internal-connection-point' in vdu:
-                        vdu['internal-connection-point'] = [item for item in vdu['internal-connection-point'] if item['id'] != element_id]
-
-
-
+                        vdu['interface'] = [item for item in vdu['interface'] if 'external-connection-point-ref' not in item
+                        or ('external-connection-point-ref'in item and item['external-connection-point-ref'] != args['name'])]
+            if node_type == 'vdu':
+                vdus = []
+                for vdu in vnfd['vdu']:
+                    if vdu['name'] != element_id:
+                        vdus.append(vdu)
+                    else:
+                        for intcp in vdu['internal-connection-point']:
+                            for intVld in vnfd['internal-vld']:
+                                intVld['internal-connection-point'] = [item for item in intVld['internal-connection-point']
+                                                                    if item['id-ref'] != intcp['id']]
+                vnfd['vdu'] = vdus
+            if node_type == 'int_cp':
+                OsmUtil.remove_int_cp(element_id, vnfd)
         return descriptor
 
     @staticmethod
@@ -137,6 +140,8 @@ class OsmUtil():
             elif 'vnfd:vnfd-catalog' in descriptor:
                 vnfd = descriptor['vnfd:vnfd-catalog']['vnfd'][0]
             if node_type == 'vdu':
+                if 'vdu' not in vnfd:
+                    vnfd['vdu'] = []
                 vnfd['vdu'].append({
                     "count": "1",
                     "description": "",
@@ -150,12 +155,16 @@ class OsmUtil():
                     "name": element_id
                 })
             if node_type == 'cp':
+                if 'connection-point' not in vnfd:
+                    vnfd['connection-point'] = []
                 vnfd['connection-point'].append({
                     "type": "VPORT",
                     "name": element_id
                 })
 
             if node_type == 'vnf_vl':
+                if 'internal-vld' not in vnfd:
+                    vnfd['internal-vld'] = []
                 vnfd['internal-vld'].append({
                     "short-name": element_id,
                     "name": element_id,
@@ -222,3 +231,19 @@ class OsmUtil():
             vnfd.update(updated)
 
         return descriptor
+
+    @staticmethod
+    def remove_int_cp(element_id, vnfd):
+        for vdu in vnfd['vdu']:
+            if 'interface' in vdu:
+                vdu['interface'] = [item for item in vdu['interface'] if 'internal-connection-point-ref' not in item
+                                    or ('internal-connection-point-ref' in item and item[
+                    'internal-connection-point-ref'] != element_id)]
+            if 'internal-connection-point' in vdu:
+                vdu['internal-connection-point'] = [item for item in vdu['internal-connection-point'] if
+                                                    item['id'] != element_id]
+        for intVld in vnfd['internal-vld']:
+            intVld['internal-connection-point'] = [item for item in intVld['internal-connection-point'] if
+                                                   item['id-ref'] != element_id]
+
+        return vnfd

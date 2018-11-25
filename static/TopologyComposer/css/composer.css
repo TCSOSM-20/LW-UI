@@ -1,3 +1,8 @@
+line {
+  stroke: rgb(212, 212, 212);
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
 
 .node_path {
     opacity: 1;
@@ -148,6 +153,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    background-color: whitesmoke;
 }
 
 #palette > .node:first-child {

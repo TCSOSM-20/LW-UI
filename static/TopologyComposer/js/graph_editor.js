@@ -137,11 +137,11 @@ TCD3.GraphEditor = (function () {
                 //d3.event.preventDefault();
                 if (self.lastKeyDown !== -1) return;
                 self.lastKeyDown = d3.event.keyCode;
-                if (self.lastKeyDown === CANC_BUTTON && self._selected_node !== undefined) {
-                    self.removeNode(self._selected_node, null, showAlert);
-                } else if (self.lastKeyDown === CANC_BUTTON && self._selected_link !== undefined) {
-                    self.removeLink(self._selected_link, null, showAlert);
-                }
+                // if (self.lastKeyDown === CANC_BUTTON && self._selected_node !== undefined) {
+                //     self.removeNode(self._selected_node, null, showAlert);
+                // } else if (self.lastKeyDown === CANC_BUTTON && self._selected_link !== undefined) {
+                //     self.removeLink(self._selected_link, null, showAlert);
+                // }
 
             })
             .on('keyup', function () {
