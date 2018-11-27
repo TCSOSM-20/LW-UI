@@ -45,7 +45,6 @@ for f in $PKG_FILES; do
     echo "$f usr/share/osm-$MDG_NAME" >> $DEB_INSTALL
 done
 cp -R debian $PKG_DIR/.
-cp requirements.txt $PKG_DIR
 
 pushd $PKG_DIR
 dh_make -y --indep --createorig --a -c apache
