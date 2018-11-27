@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-PKG_DIRECTORIES="authosm instancehandler lib projecthandler sdnctrlhandler sf_t3d static template userhandler vimhandler"
+PKG_DIRECTORIES="authosm descriptorhandler instancehandler lib projecthandler sdnctrlhandler sf_t3d static template userhandler vimhandler"
 PKG_FILES="bower.json django.ini LICENSE manage.py nginx-app.conf README.md requirements.txt supervisor-app.conf"
 MDG_NAME=lightui
 DEB_INSTALL=debian/osm-${MDG_NAME}.install
