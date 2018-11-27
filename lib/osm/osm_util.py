@@ -116,7 +116,7 @@ class OsmUtil():
                 indexes = []
                 for cvnfd in nsd['constituent-vnfd']:
                     indexes.append(int(cvnfd["member-vnf-index"]))
-                memberindex = max(indexes) + 1
+                memberindex = max(indexes) + 1 if len(indexes) > 0 else 1
                 nsd['constituent-vnfd'].append({
                     "member-vnf-index": memberindex,
                     "vnfd-id-ref": element_id

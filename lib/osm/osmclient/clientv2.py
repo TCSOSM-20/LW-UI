@@ -13,13 +13,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-
+import errno
 import requests
 import logging
-import json
 import tarfile
 import yaml
-import pyaml
 import StringIO
 from lib.util import Util
 import hashlib
@@ -31,6 +29,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('helper.py')
 logging.getLogger("urllib3").setLevel(logging.INFO)
+
 
 class Client(object):
     def __init__(self):
@@ -329,7 +328,7 @@ class Client(object):
 
         _url = "{0}/nsd/v1/ns_descriptors_content/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False,headers=headers)
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -361,13 +360,13 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/gzip", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        with open('/tmp/'+package.name, 'wb+') as destination:
+        with open('/tmp/' + package.name, 'wb+') as destination:
             for chunk in package.chunks():
                 destination.write(chunk)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/'+package.name, 'rb'))
+        headers['Content-File-MD5'] = self.md5(open('/tmp/' + package.name, 'rb'))
         _url = "{0}/nsd/v1/ns_descriptors_content/".format(self._base_path)
         try:
-            r = requests.post(_url, data=open('/tmp/'+package.name, 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open('/tmp/' + package.name, 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -381,13 +380,13 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/gzip", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        with open('/tmp/'+package.name, 'wb+') as destination:
+        with open('/tmp/' + package.name, 'wb+') as destination:
             for chunk in package.chunks():
                 destination.write(chunk)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/'+package.name, 'rb'))
+        headers['Content-File-MD5'] = self.md5(open('/tmp/' + package.name, 'rb'))
         _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
         try:
-            r = requests.post(_url, data=open('/tmp/'+package.name, 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open('/tmp/' + package.name, 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -395,6 +394,48 @@ class Client(object):
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def nsd_create_pkg_base(self, token, pkg_name):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/nsd/v1/ns_descriptors_content/".format(self._base_path)
+
+        try:
+            self._create_base_pkg('nsd', pkg_name)
+            r = requests.post(_url, data=open('/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['data'] = r.json()
+            result['error'] = False
+        if r.status_code == requests.codes.conflict:
+            result['data'] = "Invalid ID."
+        return result
+
+    def vnfd_create_pkg_base(self, token, pkg_name):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
+
+        try:
+            self._create_base_pkg('vnfd', pkg_name)
+            r = requests.post(_url, data=open('/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['data'] = r.json()
+            result['error'] = False
+        if r.status_code == requests.codes.conflict:
+            result['data'] = "Invalid ID."
         return result
 
     def nsd_clone(self, token, id):
@@ -412,7 +453,7 @@ class Client(object):
 
         try:
             r = requests.post(_url, data=open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'), verify=False,
-                             headers=headers)
+                              headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -440,7 +481,7 @@ class Client(object):
 
         try:
             r = requests.post(_url, data=open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'), verify=False,
-                             headers=headers)
+                              headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -506,7 +547,7 @@ class Client(object):
 
     def get_nsd_pkg(self, token, id):
         result = {'error': True, 'data': ''}
-        headers = { "accept": "application/zip",
+        headers = {"accept": "application/zip",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
         _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(self._base_path, id)
@@ -556,6 +597,59 @@ class Client(object):
         tarf_temp.close()
         return tarf
 
+    def _create_base_pkg(self, descriptor_type, pkg_name):
+        filename = '/tmp/'+pkg_name+'/' + pkg_name + '.yaml'
+        if descriptor_type == 'nsd':
+            descriptor = {
+                "nsd:nsd-catalog": {
+                    "nsd": [
+                        {
+                            "short-name": str(pkg_name),
+                            "vendor": "OSM Composer",
+                            "description": str(pkg_name) + " descriptor",
+                            "vld": [],
+                            "constituent-vnfd": [],
+                            "version": "1.0",
+                            "id": str(pkg_name),
+                            "name": str(pkg_name)
+                        }
+                    ]
+                }
+            }
+
+        elif descriptor_type == 'vnfd':
+            descriptor = {
+                "vnfd:vnfd-catalog": {
+                    "vnfd": [
+                        {
+                            "short-name": str(pkg_name),
+                            "vdu": [],
+                            "description": "",
+                            "mgmt-interface": {},
+                            "id": str(pkg_name),
+                            "version": "1.0",
+                            "internal-vld": [],
+                            "connection-point": [],
+                            "name": str(pkg_name)
+                        }
+                    ]
+                }
+            }
+
+        if not os.path.exists(os.path.dirname(filename)):
+            try:
+                os.makedirs(os.path.dirname(filename))
+            except OSError as exc:  # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        with open('/tmp/' + pkg_name + '/' + pkg_name + '.yaml', 'w') as yaml_file:
+            yaml_file.write(yaml.dump(descriptor, default_flow_style=False))
+
+        tarf_temp = tarfile.open('/tmp/' + pkg_name + '.tar.gz', "w:gz")
+        tarf_temp.add('/tmp/'+pkg_name+'/' + pkg_name + '.yaml', pkg_name + '/' + pkg_name + '.yaml', recursive=False)
+        tarf_temp.close()
+
     def _descriptor_clone(self, tarf, descriptor_type):
         # extract the package on a tmp directory
         tarf.extractall('/tmp')
@@ -569,15 +663,14 @@ class Client(object):
                         nsd_list = yaml_object['nsd:nsd-catalog']['nsd']
                         for nsd in nsd_list:
                             nsd['id'] = 'clone_' + nsd['id']
-                            nsd['name'] = 'clone_' +nsd['name']
-                            nsd['short-name'] = 'clone_' +nsd['short-name']
+                            nsd['name'] = 'clone_' + nsd['name']
+                            nsd['short-name'] = 'clone_' + nsd['short-name']
                     elif descriptor_type == 'vnfd':
                         vnfd_list = yaml_object['vnfd:vnfd-catalog']['vnfd']
                         for vnfd in vnfd_list:
                             vnfd['id'] = 'clone_' + vnfd['id']
                             vnfd['name'] = 'clone_' + vnfd['name']
                             vnfd['short-name'] = 'clone_' + vnfd['short-name']
-
 
                     with open('/tmp/' + name, 'w') as yaml_file:
                         yaml_file.write(yaml.dump(yaml_object, default_flow_style=False))
@@ -815,7 +908,7 @@ class Client(object):
             return result
         if r.status_code == requests.codes.ok:
             result['error'] = False
-        #result['data'] = Util.json_loads_byteified(r.text)
+        # result['data'] = Util.json_loads_byteified(r.text)
         result['data'] = r.text
         return result
 
@@ -832,7 +925,7 @@ class Client(object):
             return result
         if r.status_code == requests.codes.ok:
             result['error'] = False
-        #result['data'] = Util.json_loads_byteified(r.text)
+        # result['data'] = Util.json_loads_byteified(r.text)
         result['data'] = r.text
         return result
 
@@ -855,7 +948,7 @@ class Client(object):
 
     def vim_delete(self, token, id):
         result = {'error': True, 'data': ''}
-        headers = { "accept": "application/json",
+        headers = {"accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/vims/{1}".format(self._base_path, id)
         try:
@@ -957,7 +1050,6 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
         return result
 
-
     def sdn_create(self, token, sdn_data):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -975,7 +1067,6 @@ class Client(object):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
-
 
     @staticmethod
     def md5(f):

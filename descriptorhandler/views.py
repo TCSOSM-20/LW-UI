@@ -90,12 +90,35 @@ def delete_descriptor(request, descriptor_type=None, descriptor_id=None):
             'message': 'An error occurred while processing your request.' if result and result['error'] is True else "Record deleted successfully"}
     }, url)
 
+@login_required
+def create_package_empty(request, descriptor_type=None):
+    user = osmutils.get_user(request)
+    pkg_name = request.POST.get('name', '')
+    try:
+        client = Client()
+        if descriptor_type == 'nsd':
+            result = client.nsd_create_pkg_base(user.get_token(), pkg_name)
+        elif descriptor_type == 'vnfd':
+            result = client.vnfd_create_pkg_base(user.get_token(), pkg_name)
+        else:
+            log.debug('Update descriptor: Unknown data type')
+            result = {'error': True, 'data': 'Update descriptor: Unknown data type'}
+    except Exception as e:
+        log.exception(e)
+        result = {'error': True, 'data': str(e)}
+
+    if result['error'] == True:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        result['data']['type'] = descriptor_type
+        return __response_handler(request, result, url=None, status=200)
+
 
 @login_required
 def clone_descriptor(request, descriptor_type=None, descriptor_id=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
-
     try:
         client = Client()
         if descriptor_type == 'nsd':
@@ -111,7 +134,6 @@ def clone_descriptor(request, descriptor_type=None, descriptor_id=None):
     if result['error'] == True:
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
-
     else:
         return __response_handler(request, {}, url=None, status=200)
 
@@ -319,7 +341,6 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
                 result = client.nsd_get(user.get_token(), descriptor_id)
             elif descriptor_type == 'vnfd':
                 result = client.vnfd_get(user.get_token(), descriptor_id)
-
         except Exception as e:
             log.exception(e)
             result = {'error': True, 'data': str(e)}
