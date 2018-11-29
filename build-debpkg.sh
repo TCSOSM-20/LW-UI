@@ -15,7 +15,7 @@
 #    under the License.
 
 PKG_DIRECTORIES="authosm descriptorhandler instancehandler lib projecthandler sdnctrlhandler sf_t3d static template userhandler vimhandler"
-PKG_FILES="bower.json django.ini LICENSE manage.py nginx-app.conf README.md requirements.txt supervisor-app.conf"
+PKG_FILES="bower.json django.ini LICENSE manage.py nginx-app.conf README.md requirements.txt supervisor-app.conf .bowerrc"
 MDG_NAME=lightui
 DEB_INSTALL=debian/osm-${MDG_NAME}.install
 export DEBEMAIL="gerardo.garciadeblas@telefonica.com"
