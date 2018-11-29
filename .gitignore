@@ -56,4 +56,5 @@ userhandler/migrations
 deb_dist/
 dists/
 debian/osm-lightui.install
+pool/
 
