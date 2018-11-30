@@ -195,8 +195,10 @@ TCD3.ModelGraphEditor = (function () {
      * @returns {boolean}
      */
     ModelGraphEditor.prototype.updateGraphParams = function (args, success, error) {
+        var self = this;
         var controller = new  TCD3.OsmController();
-        controller.updateGraphParams(args, function(){
+        controller.updateGraphParams(args, function(result){
+            self.updateData(result);
             success && success();
         }, error);
     };
@@ -218,8 +220,9 @@ TCD3.ModelGraphEditor = (function () {
             if (self.model.layer[current_layer].nodes[node_type].removable.callback) {
                 var c = self.model.callback[self.model.layer[current_layer].nodes[node_type].removable.callback].class;
                 var controller = new  TCD3.OsmController();
-                controller[self.model.layer[current_layer].nodes[node_type].removable.callback](self, node, function () {
-                    self.parent.removeNode.call(self, node);
+                controller[self.model.layer[current_layer].nodes[node_type].removable.callback](self, node, function (result) {
+                    self._deselectAllNodes();
+                    self.updateData(result);
                     success && success();
                 }, error);
             } else {
@@ -263,11 +266,10 @@ TCD3.ModelGraphEditor = (function () {
                 link.directed_edge = direct_edge;
                 var c = self.model.callback[callback].class;
                 var controller = new  TCD3.OsmController();
-                controller[callback](self, link, function () {
+                controller[callback](self, link, function (result) {
                     self._deselectAllNodes();
-                    self.parent.addLink.call(self, link);
-                    if (success)
-                        success();
+                    self.updateData(result);
+                    success && success();
                 }, error);
             } else {
                 log('addLink: callback undefined in model spec.');

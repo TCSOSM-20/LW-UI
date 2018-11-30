@@ -29,8 +29,8 @@ Edit {{ descriptor_type|upper }} Descriptor
 {% block nav_buttons_list %}
     {{ block.super }}
     <li class="pull-right"><button id="save" type="button" class="btn btn-block btn-primary btn-sm"  onclick="update(this.id)" ><i class="fa fa-save"></i> Update</button></li>
-    <li class="pull-right"><button id="save_show_graph" type="button" class="btn btn-block btn-primary btn-sm"  onclick="update(this.id)" disabled><i class="fa fa-save"></i> Update and Show Graph</button></li>
-    <li class="pull-right"><button type="button" class="btn btn-block btn-primary btn-sm"  onclick="goToGraph()" disabled><i class="fa fa-sitemap"></i> Show Graph</button></li>
+    <li class="pull-right"><button id="save_show_graph" type="button" class="btn btn-block btn-primary btn-sm"  onclick="update(this.id, 'true')"><i class="fa fa-save"></i> Update and Show Graph</button></li>
+    <li class="pull-right"><button type="button" class="btn btn-block btn-primary btn-sm"  onclick="goToGraph()"><i class="fa fa-sitemap"></i> Show Graph</button></li>
 
 {% endblock %}
 
@@ -79,7 +79,7 @@ Edit {{ descriptor_type|upper }} Descriptor
     });
 
 
-    function update(e) {
+    function update(e, show_graph) {
         var dialog = bootbox.dialog({
             message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
             closeButton: false
@@ -107,6 +107,9 @@ Edit {{ descriptor_type|upper }} Descriptor
                 'text': text
             },
             success: function (result) {
+                if(show_graph){
+                    goToGraph();
+                }
                 dialog.modal('hide');
                 $("#success-alert").fadeTo(2000, 500).slideDown(500, function(){
                     setTimeout(function () {
@@ -116,9 +119,14 @@ Edit {{ descriptor_type|upper }} Descriptor
                 });
             },
             error: function (result) {
-                console.log(result);
                 dialog.modal('hide');
-                bootbox.alert(result);
+                var data = result.responseJSON;
+                var title = "Error " + (data && data.code ? data.code : 'unknown');
+                var message = data && data.detail ? data.detail : 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
             }
         });
     }

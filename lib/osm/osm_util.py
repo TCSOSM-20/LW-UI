@@ -39,6 +39,8 @@ class OsmUtil():
                 vnfd['internal-vld'] = [item for item in vnfd['internal-vld'] if item['id'] != element_id]
             if node_type == 'cp':
                 vnfd['connection-point'] = [item for item in vnfd['connection-point'] if item['name'] != args['name']]
+                if vnfd['mgmt-interface']['cp'] == args['name']:
+                    del vnfd['mgmt-interface']['cp']
                 for vdu in vnfd['vdu']:
                     if 'interface' in vdu:
                         vdu['interface'] = [item for item in vdu['interface'] if 'external-connection-point-ref' not in item
@@ -89,6 +91,11 @@ class OsmUtil():
                 for k, v in enumerate(vnfd['connection-point']):
                     if v['name'] == old['name']:
                         vnfd['connection-point'][k].update(updated)
+                for vdu in vnfd['vdu']:
+                    if 'interface' in vdu:
+                        for intf in vdu['interface']:
+                            if 'external-connection-point-ref' in intf and intf['external-connection-point-ref'] == old['name']:
+                                intf['external-connection-point-ref'] = updated['name']
             if node_type == 'vdu':
                 for k, v in enumerate(vnfd['vdu']):
                     if v['name'] == old['name']:
@@ -180,7 +187,7 @@ class OsmUtil():
                             "virtual-interface": {
                                 "type": "VIRTIO"
                             },
-                            "name": element_id,
+                            "name": args["name"],
                             "mgmt-interface": True,
                             "type": "EXTERNAL",
                             "external-connection-point-ref": args["external-connection-point-ref"]

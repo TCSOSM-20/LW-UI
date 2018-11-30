@@ -216,6 +216,7 @@ def removeElement(request, descriptor_type=None, descriptor_id=None, element_typ
 
             return __response_handler(request, result_graph, url=None, status=200)
 
+
 @login_required
 def updateElement(request, descriptor_type=None, descriptor_id=None, element_type=None):
     user = osmutils.get_user(request)

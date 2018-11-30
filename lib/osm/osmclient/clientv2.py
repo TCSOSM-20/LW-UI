@@ -405,6 +405,7 @@ class Client(object):
 
         try:
             self._create_base_pkg('nsd', pkg_name)
+            headers['Content-Filename'] = pkg_name + '.tar.gz'
             r = requests.post(_url, data=open('/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
@@ -516,6 +517,11 @@ class Client(object):
             return result
         if r.status_code == requests.codes.no_content:
             result['error'] = False
+        else:
+            try:
+                result['data'] = r.json()
+            except Exception as e:
+                result['data'] = {}
 
         return result
 
@@ -542,6 +548,11 @@ class Client(object):
             return result
         if r.status_code == requests.codes.no_content:
             result['error'] = False
+        else:
+            try:
+                result['data'] = r.json()
+            except Exception as e:
+                result['data'] = {}
 
         return result
 
@@ -625,7 +636,9 @@ class Client(object):
                             "short-name": str(pkg_name),
                             "vdu": [],
                             "description": "",
-                            "mgmt-interface": {},
+                            "mgmt-interface": {
+                                "cp": ""
+                            },
                             "id": str(pkg_name),
                             "version": "1.0",
                             "internal-vld": [],

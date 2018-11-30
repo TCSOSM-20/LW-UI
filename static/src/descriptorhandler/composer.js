@@ -141,8 +141,14 @@ function initDropOnGraph() {
 
         graph_editor.addNode(node_information, function () {
             console.log("OK")
-        }, function (error) {
-            showAlert(error)
+        }, function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data && data.code ? data.code : 'unknown');
+                var message = data && data.detail ? data.detail : 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
         })
 
     };
@@ -287,7 +293,13 @@ function updatePalette(view) {
                 palette.append(palette_template)
             },
             error: function (result) {
-                showAlert(result);
+                var data = result.responseJSON;
+                var title = "Error " + (data && data.code ? data.code : 'unknown');
+                var message = data && data.detail ? data.detail : 'No detail available.';
+                bootbox.alert({
+                    title: title,
+                    message: message
+                });
             }
         });
     }

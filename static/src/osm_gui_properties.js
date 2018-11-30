@@ -55,13 +55,13 @@ var osm_gui_properties = {
             "vdur": {
                 "shape": "square",
                 "color": "#cf1c24",
-                "size": 60,
+                "size": 40,
                 "name": "VDUR"
             },
             "vnfr": {
                 "shape": "square",
                 "color": "#605ca8",
-                "size": 60,
+                "size": 40,
                 "name": "VNFR"
             },
 
