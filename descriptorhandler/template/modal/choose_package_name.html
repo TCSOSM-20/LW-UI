@@ -6,7 +6,7 @@
                     <span aria-hidden="true">×</span></button>
                 <h4 class="modal-title">Create new Package</h4>
             </div>
-            <form id="formCreatePackage" action='{% url "projects:descriptors:create_package_empty" descriptor_type=descriptor_type %}'
+            <form id="formCreatePackage" action='{% url "packages:create_package_empty" package_type=package_type %}'
                   class="form-horizontal"
                   method="post" enctype="multipart/form-data">
                 {% csrf_token %}

@@ -9,7 +9,7 @@ __pycache__/
 env/
 .idea
 db.sqlite3
-.idea
+.vscode
 wheelhouse/
 
 .installed.cfg

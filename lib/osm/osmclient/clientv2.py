@@ -37,7 +37,7 @@ class Client(object):
         self._user_endpoint = 'admin/v1/users'
         self._host = os.getenv('OSM_SERVER', "localhost")
         self._so_port = 9999
-        self._base_path = "https://{0}:{1}/osm".format(self._host, self._so_port)
+        self._base_path = 'https://{0}:{1}/osm'.format(self._host, self._so_port)
 
     def auth(self, args):
         result = {'error': True, 'data': ''}
@@ -251,12 +251,14 @@ class Client(object):
             result['data'] = Util.json_loads_byteified(r.text)
         return result
 
-    def nsd_list(self, token):
+    def nsd_list(self, token, filter=None):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-
-        _url = "{0}/nsd/v1/ns_descriptors_content".format(self._base_path)
+        query_path = ''
+        if filter:
+            query_path = '?_admin.type='+filter
+        _url = "{0}/nsd/v1/ns_descriptors_content{1}".format(self._base_path, query_path)
         try:
             r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
@@ -269,12 +271,14 @@ class Client(object):
 
         return result
 
-    def vnfd_list(self, token):
+    def vnfd_list(self, token, filter=None):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-
-        _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
+        query_path = ''
+        if filter:
+            query_path = '?_admin.type='+filter
+        _url = "{0}/vnfpkgm/v1/vnf_packages_content{1}".format(self._base_path, query_path)
         try:
             r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
