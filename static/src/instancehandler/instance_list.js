@@ -66,6 +66,38 @@ function deleteNs(instance_name, instance_id, force) {
     })
 }
 
+function deletePDU(instance_name, instance_id) {
+    var url = '/instances/pdu/'+instance_id+'/delete';
+    bootbox.confirm("Are you sure want to delete " + instance_name + "?", function (result) {
+        if (result) {
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    if (result['error'] == true){
+                        dialog.modal('hide');
+                        bootbox.alert("An error occurred.");
+                    }
+                    else {
+                        dialog.modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function (error) {
+                    dialog.modal('hide');
+                    bootbox.alert("An error occurred.");
+                }
+            });
+        }
+    })
+}
+
 var addFormGroup = function (event) {
     event.preventDefault();
 
@@ -84,6 +116,27 @@ var addFormGroup = function (event) {
 var removeFormGroup = function (event) {
     event.preventDefault();
     var $formGroup = $(this).closest('.form-group');
+    $formGroup.remove();
+};
+
+var addInterfaceGroup = function (event) {
+    event.preventDefault();
+
+    var $formGroup = $(this).closest('.interface-group');
+    var $formGroupClone = $formGroup.clone();
+
+    $(this)
+        .toggleClass('btn-success btn-add btn-danger btn-remove')
+        .html('–');
+
+    $formGroupClone.find('input').val('');
+    $formGroupClone.insertAfter($formGroup);
+
+};
+
+var removeInterfaceGroup = function (event) {
+    event.preventDefault();
+    var $formGroup = $(this).closest('.interface-group');
     $formGroup.remove();
 };
 
@@ -156,8 +209,39 @@ $(document).ready(function () {
     }, json_editor_settings);
 
 
-    $(document).on('click', '.btn-add', addFormGroup);
-    $(document).on('click', '.btn-remove', removeFormGroup);
+    $(document).on('click', '.primitive-group .btn-add', addFormGroup);
+    $(document).on('click', '.primitive-group .btn-remove', removeFormGroup);
+
+    $(document).on('click', '.interface-group .btn-add', addInterfaceGroup);
+    $(document).on('click', '.interface-group .btn-remove', removeInterfaceGroup);
+
+    $("#formCreatePDU").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response, textStatus, jqXHR) {
+            table.ajax.reload();
+            $('#modal_new_pdu').modal('hide');
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
+        });
+    });
 
     $("#formActionNS").submit(function (event) {
         event.preventDefault(); //prevent default action

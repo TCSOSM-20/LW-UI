@@ -40,6 +40,7 @@
             </li>
             {% url "instances:list"  type='ns' as  instance_ns_list_url %}
             {% url "instances:list"  type='vnf' as  instance_vnf_list_url %}
+            {% url "instances:list"  type='pdu' as  instance_vnf_list_url %}
             <li {% if request.get_full_path == instance_ns_list_url or  request.get_full_path == instance_vnf_list_url %}
                 class="active treeview menu-open" {% else %} class="treeview  menu-open" {% endif %} >
                 <a href="#">
@@ -60,6 +61,12 @@
                     <li {% if request.get_full_path == instance_vnf_list_url %} class="active" {% endif %} >
                         <a href='{% url "instances:list"   type="vnf" %}'>
                             <i class="far fa-hdd fa-fw"></i> <span>VNF Instances</span>
+                        </a>
+                    </li>
+                    {% url "instances:list"  type='pdu' as  instance_vnf_list_url %}
+                    <li {% if request.get_full_path == instance_vnf_list_url %} class="active" {% endif %} >
+                        <a href='{% url "instances:list"   type="pdu" %}'>
+                            <i class="far fa-hdd fa-fw"></i> <span>PDU</span>
                         </a>
                     </li>
                 </ul>

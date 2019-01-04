@@ -40,12 +40,15 @@
                 {% include 'instance_list_ns.html' %}
             {% elif type == 'vnf' %}
                 {% include 'instance_list_vnf.html' %}
+            {% elif type == 'pdu' %}
+                {% include 'instance_list_pdu.html' %}
             {% endif %}
 
         </div>
 
     </div>
     {% include 'modal/instance_create.html' %}
+    {% include 'modal/instance_create_pdu.html' %}
     {% include 'modal/instance_show.html' %}
     {% include 'modal/instance_new_action.html' %}
     {% include 'modal/instance_new_alarm.html' %}
@@ -75,6 +78,7 @@
     <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 
     <script>
+        var table;
         var instance_type = '{{ type }}';
         var row_builder = {
             'ns': [
@@ -184,7 +188,8 @@
                 },
 
             ],
-            'vnf': [ {
+            'vnf': [ 
+                {
                     "render": function (data, type, row) {
                         return row["_id"];
                     },
@@ -226,10 +231,58 @@
                     },
                     "targets": 5
                 },
+            ],
+            'pdu': [
+            {
+                    "render": function (data, type, row) {
+                        return row["_id"];
+                    },
+                    "targets": 0
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["name"];
+                    },
+                    "targets": 1
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row["type"];
+                    },
+                    "targets": 2
+                },
+                {
+                    "render": function (data, type, row) {
+                        return row['_admin']['usageState'];
+                    },
+                    "targets": 3
+                },
+                {
+                    "render": function (data, type, row) {
+                        return moment.unix(row['_admin']['created']).format('YYYY-MM-DD hh:mm:ss a');
+                    },
+                    "targets": 4
+                }, 
+                {
+                    "render": function (data, type, row) {
+                        return '<div class="btn-group">' +
+                            '     <button type="button" class="btn btn-default"' +
+                            '             onclick="javascript:showInstanceDetails(\''+instance_type+'\', \''+row["_id"]+'\')"' +
+                            '             data-toggle="tooltip" data-placement="top" data-container="body" title="Show Info">' +
+                            '         <i class="fa fa-info"></i>' +
+                            '     </button>' +
+                            '<button type="button" class="btn btn-default"' +
+                            '         onclick="javascript:deletePDU(\''+ row["name"] +'\', \''+row["_id"]+'\')"' +
+                            '         data-toggle="tooltip" data-placement="top" data-container="body" title="Delete"><i' +
+                            '         class="far fa-trash-alt"></i></button>'+
+                            ' </div>';
+                    },
+                    "targets": 5
+                }
             ]
         };
         $(document).ready(function () {
-            var table = $('#instances_table').DataTable({
+            table = $('#instances_table').DataTable({
                 responsive: true,
                 "ajax": {
                     "url": "/instances/" + instance_type + "/list/",
@@ -254,6 +307,8 @@
             setInterval(function () {
                 table.ajax.reload();
             }, 10000);
+
+
         });
 
     </script>

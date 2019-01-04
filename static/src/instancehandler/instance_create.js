@@ -14,6 +14,31 @@
    limitations under the License.
 */
 
+function openModalCreatePDU(args) {
+    var select2_groups = $('#pdu_vim_accounts').select2({
+        placeholder: 'Select Vims',
+        width: '100%',
+        ajax: {
+            url: args.vim_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                vims = [];
+                if (data['datacenters']) {
+                    for (d in data['datacenters']) {
+                        var datacenter = data['datacenters'][d];
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
+                    }
+                }
+                return {
+                    results: vims
+                };
+            }
+        }
+    });
+
+    $('#modal_new_pdu').modal('show');
+}
+
 function openModalCreateNS(args) {
     // load vim account list
     select2_groups = $('#vimAccountId').select2({
@@ -27,7 +52,7 @@ function openModalCreateNS(args) {
                 if (data['datacenters']) {
                     for (d in data['datacenters']) {
                         var datacenter = data['datacenters'][d];
-                        vims.push({id: datacenter['_id'], text: datacenter['name']})
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
                     }
                 }
 
@@ -51,7 +76,7 @@ function openModalCreateNS(args) {
                 if (data['descriptors']) {
                     for (d in data['descriptors']) {
                         var nsd = data['descriptors'][d];
-                        nsd_list.push({id: nsd['_id'], text: nsd['name']})
+                        nsd_list.push({ id: nsd['_id'], text: nsd['name'] })
                     }
                 }
 

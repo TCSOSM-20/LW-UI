@@ -325,6 +325,23 @@ class Client(object):
 
         return result
 
+    def pdu_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/pdu/v1/pdu_descriptors".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
     def nsd_delete(self, token, id):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
@@ -804,6 +821,24 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def pdu_create(self, token, pdu_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/pdu/v1/pdu_descriptors".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=pdu_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def ns_op_list(self, token, id):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -878,6 +913,23 @@ class Client(object):
             result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def pdu_delete(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/pdu/v1/pdu_descriptors/{1}".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r:
+            result['error'] = False
+        if r.status_code != requests.codes.no_content:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def ns_get(self, token, id):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -900,6 +952,23 @@ class Client(object):
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/nslcm/v1/vnfrs/{1}".format(self._base_path, id)
+
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def pdu_get(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/pdu/v1/pdu_descriptors/{1}".format(self._base_path, id)
 
         try:
             r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
