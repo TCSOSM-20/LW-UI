@@ -131,7 +131,8 @@
 
                                return result
                     },
-                    "targets": 5
+                    "targets": 5,
+                    "orderable": false
                 }],
         'vnf': [
                 {
@@ -150,7 +151,8 @@
                     "render": function (data, type, row) {
                        return row['_admin']['type'] || '';
                     },
-                    "targets": 2
+                    "targets": 2,
+                    "orderable": false
                 },
                 {
                     "render": function (data, type, row) {
@@ -202,7 +204,8 @@
 
                                return result
                     },
-                    "targets": 6
+                    "targets": 6,
+                    "orderable": false
                 }]
     };
     function refreshTable() {
