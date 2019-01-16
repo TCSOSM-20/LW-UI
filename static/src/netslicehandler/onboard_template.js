@@ -15,6 +15,7 @@
 */
 
 function create(fs, dropzone) {
+    var url = '/netslices/templates/onboard';
     var id = $('.nav-tabs .active').attr('id');
     if (dropzone) id = 'file_li';
     var type, text;
@@ -37,10 +38,6 @@ function create(fs, dropzone) {
             console.log(files[0].name.match(patt1));
             var extension = files[0].name.substr(files[0].name.lastIndexOf('.') + 1);
             console.log(extension);
-            if (!(extension == 'gz' )) {
-                alert("The file must be .tar.gz");
-                return
-            }
 
             data.append('file', files[0]);
             break;
@@ -55,7 +52,7 @@ function create(fs, dropzone) {
                 closeButton: true
             });
     $.ajax({
-        url: new_desc_url,
+        url: url,
         type: 'POST',
         data: data,
         cache: false,

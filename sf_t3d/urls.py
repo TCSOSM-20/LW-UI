@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
     url(r'^packages/', include('packagehandler.urls', namespace='packages'), name='packages_base'),
     url(r'^instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),
+    url(r'^netslices/', include('netslicehandler.urls', namespace='netslices'), name='netslices_base'),
     url(r'^admin/users/', include('userhandler.urls', namespace='users'), name='users_base'),
     url(r'^forbidden', views.forbidden, name='forbidden'),
 

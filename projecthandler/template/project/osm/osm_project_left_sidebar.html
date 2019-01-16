@@ -38,6 +38,12 @@
 
                 </ul>
             </li>
+            {% url "netslices:list_templates"   as netslices_temaplates %}
+            <li {% if request.get_full_path == netslices_temaplates %} class="active" {% endif %}>
+                <a href='{% url "netslices:list_templates"   %}'>
+                    <i class="fas fa-layer-group fa-fw""></i> <span>NetSlice Templates</span>
+                </a>
+            </li>
             {% url "instances:list"  type='ns' as  instance_ns_list_url %}
             {% url "instances:list"  type='vnf' as  instance_vnf_list_url %}
             {% url "instances:list"  type='pdu' as  instance_vnf_list_url %}

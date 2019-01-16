@@ -251,6 +251,58 @@ class Client(object):
             result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def nst_details(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nst/v1/netslice_templates/{1}".format(self._base_path,id)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
+    def nst_content(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "text/plain",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nst/v1/netslice_templates/{1}/nst".format(self._base_path,id)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data']  = Util.json2yaml(yaml.load(str(r.text)))
+
+        return result
+
+    def nst_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        
+        _url = "{0}/nst/v1/netslice_templates".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
     def nsd_list(self, token, filter=None):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
@@ -342,6 +394,23 @@ class Client(object):
 
         return result
 
+    def nst_delete(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/nst/v1/netslice_templates/{1}?FORCE=True".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+        
+        return result
+
     def nsd_delete(self, token, id):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
@@ -375,6 +444,27 @@ class Client(object):
             result['error'] = False
         if r.status_code != requests.codes.no_content:
             result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def nst_onboard(self, token, template):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nst/v1/netslice_templates_content".format(self._base_path)
+        try:
+            fileName, fileExtension = os.path.splitext(template.name)
+            if fileExtension == '.gz':
+                headers["Content-Type"] = "application/gzip"
+            else:
+                headers["Content-Type"] = "application/yaml"
+            r = requests.post(_url, data=template, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def nsd_onboard(self, token, package):
@@ -513,6 +603,21 @@ class Client(object):
         if r.status_code == requests.codes.conflict:
             result['data'] = "Invalid ID."
 
+        return result
+
+    def nst_content_update(self, token, id, template):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nst/v1/netslice_templates/{1}/nst_content".format(self._base_path,id)
+        try:
+            r = requests.put(_url, data=template, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
         return result
 
     def nsd_update(self, token, id, data):

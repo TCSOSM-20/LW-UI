@@ -182,7 +182,6 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
             result = {'error': True, 'data': str(e)}
         if result['error'] == True:
             return __response_handler(request, result['data'], url=None, status=result['data']['status'] if 'status' in result['data'] else 500)
-
         else:
             return __response_handler(request, {}, url=None, status=200)
 
