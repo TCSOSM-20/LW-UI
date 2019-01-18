@@ -257,8 +257,12 @@ class OsmParser(RdclGraph):
             self.add_node(ns_vld['id'], 'ns_vl', None, None, graph,
                           {'property': {'custom_label': ns_vld['name']}, 'osm': ns_vld})
             for cp_ref in ns_vld['vnfd-connection-point-ref']:
-                self.add_link(map_vnf_index_to_id[str(cp_ref['member-vnf-index-ref'])], ns_vld['id'], 'nsr', None,
-                              graph)
+                ns_vld['id']+ ':' + str(cp_ref['member-vnf-index-ref']) + ':' + cp_ref['vnfd-connection-point-ref']
+                cp_id = ns_vld['id']+ ':' + str(cp_ref['member-vnf-index-ref']) + ':' + cp_ref['vnfd-connection-point-ref']             
+                cp_label = str(cp_ref['vnfd-connection-point-ref'])
+                self.add_node(cp_id,'ns_cp','nsd',None,graph, {'property': {'custom_label': cp_label}, 'osm': cp_ref})
+                self.add_link(cp_id, ns_vld['id'], 'nsr', None, graph)
+                self.add_link(cp_id, map_vnf_index_to_id[str(cp_ref['member-vnf-index-ref'])], 'nsr', None, graph)
 
         return graph
 
@@ -400,7 +404,9 @@ class OsmParser(RdclGraph):
                             "addable": {"callback": "addNode"},
                             "removable": {"callback": "removeNode"}
                         },
-                        "cp": {},
+                        "ns_cp": {
+                            "removable": {"callback": "removeNode"}
+                        },
                         "ns_vl": {
                             "addable": {
                                 "callback": "addNode"
@@ -411,29 +417,44 @@ class OsmParser(RdclGraph):
                         }
                     },
                     "allowed_edges": {
-                        "cp": {
-                            "destination": {
-                                "vnfd": {
-                                    "direct_edge": False,
-                                }
-                            }
-                        },
                         "vnf":{
                             "destination": {
-                                "ns_vl": {
+                                "ns_cp": {
                                     "direct_edge": False,
-                                    "callback": "addLink",
                                     "removable" : {
                                         "callback": "removeLink",
                                     }
+                                },
+                                "ns_vl": {
+                                    "direct_edge": False,
+                                    "callback": "addLink",
                                 }
                             }
                         },
                         "ns_vl": {
                             "destination": {
+                                "ns_cp": {
+                                    "direct_edge": False,
+                                    "removable": {
+                                        "callback": "removeLink",
+                                    }
+                                },
                                 "vnf": {
                                     "direct_edge": False,
                                     "callback": "addLink",
+                                }
+                            }
+                        },
+                        "ns_cp": {
+                            "destination": {
+                                "ns_vl": {
+                                    "direct_edge": False,
+                                    "removable": {
+                                        "callback": "removeLink",
+                                    }
+                                },
+                                "vnf": {
+                                    "direct_edge": False,
                                     "removable": {
                                         "callback": "removeLink",
                                     }
@@ -523,7 +544,15 @@ class OsmParser(RdclGraph):
                 if 'vnfd-connection-point-ref' in vld:
                     for cp_ref in vld['vnfd-connection-point-ref']:
                         vnfd_id = cp_ref['vnfd-id-ref'] + ':' + str(cp_ref['member-vnf-index-ref'])
-                        self.add_link(vld['id'], vnfd_id, 'nsd', None, graph)
+                        cp_id = vld['id']+ ':' + str(cp_ref['member-vnf-index-ref']) + ':' + cp_ref['vnfd-connection-point-ref']
+                        cp_label = vld['id']+ ':' + cp_ref['vnfd-connection-point-ref']
+                        node_payload = {'vld_id': vld['id']}
+                        node_payload.update(cp_ref)
+                        self.add_node(cp_id,'ns_cp',None,None,graph,
+                        {'property': {'custom_label': cp_label}, 'osm': node_payload})
+                        
+                        self.add_link(cp_id, vld['id'], 'nsd', None, graph)
+                        self.add_link(cp_id, vnfd_id, 'nsd', None, graph)
         return graph
 
 

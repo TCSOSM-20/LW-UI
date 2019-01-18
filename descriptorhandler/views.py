@@ -114,41 +114,34 @@ def removeElement(request, descriptor_type=None, descriptor_id=None, element_typ
 def updateElement(request, descriptor_type=None, descriptor_id=None, element_type=None):
     user = osmutils.get_user(request)
     client = Client()
+    payload = request.POST.dict()
+    util = OsmUtil()
+
     if descriptor_type == 'nsd':
         descriptor_result = client.nsd_get(user.get_token(), descriptor_id)
-        util = OsmUtil()
-        payload = request.POST.dict()
-        if element_type == 'graph_params':
-            descriptor_updated = util.update_graph_params('nsd', descriptor_result, json.loads(payload['update']))
-        else:
-            descriptor_updated = util.update_node('nsd', descriptor_result, element_type, json.loads(payload['old']), json.loads(payload['update']))
-        result = client.nsd_update(user.get_token(), descriptor_id, descriptor_updated)
-        if result['error'] == True:
-            return __response_handler(request, result['data'], url=None,
-                                      status=result['data']['status'] if 'status' in result['data'] else 500)
-        else:
-            parser = OsmParser()
-            # print nsr_object
-            if descriptor_type == 'nsd':
-                result_graph = parser.nsd_to_graph(descriptor_updated)
-    if descriptor_type == 'vnfd':
+    elif descriptor_type == 'vnfd':
         descriptor_result = client.vnfd_get(user.get_token(), descriptor_id)
-        util = OsmUtil()
-        payload = request.POST.dict()
-        if element_type == 'graph_params':
-            descriptor_updated = util.update_graph_params('vnfd', descriptor_result, json.loads(payload['update']))
-        else:
-            descriptor_updated = util.update_node('vnfd', descriptor_result, element_type, json.loads(payload['old']), json.loads(payload['update']))
+    
+    if element_type == 'graph_params':
+        descriptor_updated = util.update_graph_params(descriptor_type, descriptor_result, json.loads(payload['update']))
+    else:
+        descriptor_updated = util.update_node(descriptor_type, descriptor_result, element_type, json.loads(payload['old']), json.loads(payload['update']))
+
+    if descriptor_type == 'nsd':
+        result = client.nsd_update(user.get_token(), descriptor_id, descriptor_updated)
+    elif descriptor_type == 'vnfd':
         result = client.vnfd_update(user.get_token(), descriptor_id, descriptor_updated)
-        if result['error'] == True:
+    if result['error'] == True:
             return __response_handler(request, result['data'], url=None,
                                       status=result['data']['status'] if 'status' in result['data'] else 500)
-        else:
-            parser = OsmParser()
-            if descriptor_type == 'vnfd':
-                result_graph = parser.vnfd_to_graph(descriptor_updated)
-
+    else:
+        parser = OsmParser()
+        if descriptor_type == 'vnfd':
+            result_graph = parser.vnfd_to_graph(descriptor_updated)
+        elif descriptor_type == 'nsd':
+            result_graph = parser.nsd_to_graph(descriptor_updated)
         return __response_handler(request, result_graph, url=None, status=200)
+
 
 
 @login_required

@@ -210,17 +210,13 @@ TCD3.OsmController = (function (global) {
         var desc_type = getUrlParameter('type');
 
         if (desc_type === 'nsd') {
-            var element_type = 'cp';
+            var element_type = 'ns_cp';
             var data_form = new FormData();
-
-            var vnfd_node = (link.source.info.type === 'vnf') ? link.source : link.target;
-            var vld_node = (link.source.info.type === 'ns_vl') ? link.source : link.target;
-
+            var ns_cp = (link.source.info.type === 'ns_cp') ? link.source : link.target;
             data_form.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-            //data_form.append('vnfd-connection-point-ref', 'cp_temp');
-            data_form.append('member-vnf-index-ref', vnfd_node.info.osm['member-vnf-index']);
-            data_form.append('vnfd-id-ref', vnfd_node.info.osm['vnfd-id-ref']);
-            data_form.append('vld_id', vld_node.info.osm['id']);
+            data_form.append('member-vnf-index-ref', ns_cp.info.osm['member-vnf-index-ref']);
+            data_form.append('vnfd-id-ref', ns_cp.info.osm['vnfd-id-ref']);
+            data_form.append('vld_id', ns_cp.info.osm['vld_id']);
 
             $.ajax({
                 url: '/projects/descriptors/' + desc_type + '/' + desc_id + '/removeElement/' + element_type,

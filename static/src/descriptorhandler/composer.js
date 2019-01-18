@@ -18,7 +18,7 @@
 var graph_editor = new TCD3.ModelGraphEditor();
 
 var type_view = {
-    "nsd": ["vnf", "ns_vl"],
+    "nsd": ["vnf", "ns_vl", "ns_cp"],
     "vnfd": ["vdu", "cp", "vnf_vl", "int_cp"]
 };
 
@@ -201,6 +201,9 @@ function refreshElementInfo(event, element) {
             case 'int_cp':
                 intcpDetails(element.info.osm);
                 break;
+            case 'ns_cp':
+                nscpDetails(element.info.osm);
+                break;
             case 'cp':
                 cpDetails(element.info.osm);
                 break;
@@ -339,6 +342,15 @@ function cpDetails(cp) {
     var cp_template = getMainSectionWithSubmitButton('Connection Point');
 
     cp_template += getChildrenTable(cp);
+    side.empty();
+    side.append(cp_template);
+}
+
+function nscpDetails(cp) {
+    var side = $('#side_form');
+    var cp_template = getMainSection('Connection Point');
+
+    cp_template += getChildrenTable(cp, true);
     side.empty();
     side.append(cp_template);
 }

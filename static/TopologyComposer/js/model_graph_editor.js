@@ -296,6 +296,7 @@ TCD3.ModelGraphEditor = (function () {
         var source_type = s.info.type;
         var destination_type = d.info.type;
         var current_layer = self.getCurrentView();
+        console.log(self.model.layer[current_layer])
         if (self.model.layer[current_layer].allowed_edges && self.model.layer[current_layer].allowed_edges[source_type] && self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type] &&
             self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable
         ) {
@@ -303,10 +304,12 @@ TCD3.ModelGraphEditor = (function () {
                 var callback = self.model.layer[current_layer].allowed_edges[source_type].destination[destination_type].removable.callback;
                 var c = self.model.callback[callback].class;
                 var controller = new  TCD3.OsmController();
-                controller[callback](self, link, function () {
+                controller[callback](self, link, function (result) {
                     self._deselectAllNodes();
                     self._deselectAllLinks();
-                    self.parent.removeLink.call(self, link.index);
+                    
+                    self.updateData(result);
+                    // success && success();
                     success && success();
                 }, error);
             } else {

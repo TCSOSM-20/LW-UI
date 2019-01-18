@@ -26,6 +26,13 @@ var osm_gui_properties = {
                 "height": 20,
                 "name": "VDU"
             },
+            "ns_cp": {
+                //"image": "cp-80.png",
+                 "shape": "square",
+                "color": "#3c8dbc",
+                "size": 20,
+                "name": "CP"
+            },
             "cp": {
                 //"image": "cp-80.png",
                  "shape": "square",
