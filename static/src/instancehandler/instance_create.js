@@ -101,3 +101,65 @@ function openModalCreateNS(args) {
 
     $('#modal_new_instance').modal('show');
 }
+function openModalCreateNSI(args) {
+    // load vim account list
+    select2_groups = $('#vimAccountIdNSI').select2({
+        placeholder: 'Select VIM',
+        width: '100%',
+        ajax: {
+            url: args.vim_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                vims = [];
+                if (data['datacenters']) {
+                    for (d in data['datacenters']) {
+                        var datacenter = data['datacenters'][d];
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
+                    }
+                }
+
+                return {
+                    results: vims
+                };
+            }
+        }
+    });
+
+    // load nsd list
+    select2_groups = $('#nstId').select2({
+        placeholder: 'Select NST',
+        width: '100%',
+        ajax: {
+            url: args.nst_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                nst_list = [];
+
+                if (data['templates']) {
+                    for (d in data['templates']) {
+                        var nst = data['templates'][d];
+                        nst_list.push({ id: nst['_id'], text: nst['name'] })
+                    }
+                }
+
+                return {
+                    results: nst_list
+                };
+            }
+        }
+    });
+
+    if (args.descriptor_id) {
+        // Set the value, creating a new option if necessary
+        if ($('#nstId').find("option[value='" + args.descriptor_id + "']").length) {
+            $('#nstId').val(args.descriptor_id).trigger('change');
+        } else {
+            // Create a DOM Option and pre-select by default
+            var newOption = new Option(args.descriptor_name, args.descriptor_id, true, true);
+            // Append it to the select
+            $('#nstId').append(newOption).trigger('change');
+        }
+    }
+
+    $('#modal_new_nsi').modal('show');
+}

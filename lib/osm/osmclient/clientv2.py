@@ -343,6 +343,23 @@ class Client(object):
 
         return result
 
+    def nsi_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nsilcm/v1/netslice_instances".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+    
     def ns_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
@@ -908,6 +925,24 @@ class Client(object):
 
         return result
 
+    def nsi_create(self, token, nsi_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/nsilcm/v1/netslice_instances_content".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=nsi_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def ns_create(self, token, ns_data):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
@@ -962,6 +997,24 @@ class Client(object):
 
         return result
 
+    def nsi_op_list(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nsilcm/v1/nsi_lcm_op_occs/?nsInstanceId={1}".format(self._base_path, id)
+
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
     def ns_op(self, token, id):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -996,6 +1049,26 @@ class Client(object):
         if r.status_code == requests.codes.created:
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def nsi_delete(self, token, id, force=None):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        query_path = ''
+        if force:
+            query_path = '?FORCE=true'
+        _url = "{0}/nsilcm/v1/netslice_instances_content/{1}{2}".format(self._base_path, id, query_path)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r:
+            result['error'] = False
+        if r.status_code != requests.codes.no_content:
+            result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def ns_delete(self, token, id, force=None):
@@ -1033,6 +1106,23 @@ class Client(object):
             result['error'] = False
         if r.status_code != requests.codes.no_content:
             result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def nsi_get(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/nsilcm/v1/netslice_instances/{1}".format(self._base_path, id)
+
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def ns_get(self, token, id):

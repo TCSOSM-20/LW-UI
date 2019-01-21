@@ -57,9 +57,61 @@ function deleteNs(instance_name, instance_id, force) {
                         location.reload();
                     }
                 },
-                error: function (error) {
+                error: function (result) {
                     dialog.modal('hide');
-                    bootbox.alert("An error occurred.");
+                    var data = result.responseJSON;
+                        var title = "Error " + (data && data.code ? data.code : 'unknown');
+                        var message = data && data.detail ? data.detail : 'No detail available.';
+                        bootbox.alert({
+                            title: title,
+                            message: message
+                        });
+                }
+            });
+        }
+    })
+}
+function deleteNsi(instance_name, instance_id, force) {
+    var url = '/instances/nsi/'+instance_id+'/delete';
+    bootbox.confirm("Are you sure want to delete " + instance_name + "?", function (result) {
+        if (result) {
+            if (force)
+                url = url + '?force=true';
+            var dialog = bootbox.dialog({
+                message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+                closeButton: true
+            });
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    console.log(result)
+                    if (result['error'] == true){
+                        dialog.modal('hide');
+                        var data = result.responseJSON;
+                        var title = "Error " + (data && data.code ? data.code : 'unknown');
+                        var message = data && data.detail ? data.detail : 'No detail available.';
+                        bootbox.alert({
+                            title: title,
+                            message: message
+                        });
+                    }
+                    else {
+                        dialog.modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function (result) {
+                    dialog.modal('hide');
+                    var data = result.responseJSON;
+                        var title = "Error " + (data && data.code ? data.code : 'unknown');
+                        var message = data && data.detail ? data.detail : 'No detail available.';
+                        bootbox.alert({
+                            title: title,
+                            message: message
+                        });
                 }
             });
         }
