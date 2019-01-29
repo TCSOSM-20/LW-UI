@@ -148,14 +148,13 @@ function openModalCreateNSI(args) {
             }
         }
     });
-
-    if (args.descriptor_id) {
+    if (args.template_id) {
         // Set the value, creating a new option if necessary
-        if ($('#nstId').find("option[value='" + args.descriptor_id + "']").length) {
-            $('#nstId').val(args.descriptor_id).trigger('change');
+        if ($('#nstId').find("option[value='" + args.template_id + "']").length) {
+            $('#nstId').val(args.template_id).trigger('change');
         } else {
             // Create a DOM Option and pre-select by default
-            var newOption = new Option(args.descriptor_name, args.descriptor_id, true, true);
+            var newOption = new Option(args.template_name, args.template_id, true, true);
             // Append it to the select
             $('#nstId').append(newOption).trigger('change');
         }

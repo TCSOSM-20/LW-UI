@@ -32,6 +32,7 @@ Network Slices Templates
 {% block content_body %}
 {{ block.super }}
 {% include 'modal/nst_details.html' %}
+{% include 'modal/instance_create_nsi.html' %}
 {% csrf_token %}
 <div class="row">
     <div class="col-md-12">
@@ -96,6 +97,7 @@ Network Slices Templates
 <script src="/static/src/drop_zone.js"></script>
 <script src="/static/src/netslicehandler/onboard_template.js"></script>
 <script src="/static/src/netslicehandler/templates_list.js"></script>
+<script src="/static/src/instancehandler/instance_create.js"></script>
 <script>
     var csrf_token = '{{csrf_token}}';
     var table;
@@ -147,6 +149,10 @@ Network Slices Templates
                 {
                     "render": function (data, type, row) {
                         return '<div class="btn-group">' +
+                            '   <button type="button" class="btn btn-default" data-container="body"\n' +
+                               'data-toggle="tooltip" data-placement="top" title="Instantiate NS"\n' +
+                               'onclick="javascript:openModalCreateNSI({\'template_name\':\''+row["name"]+'\', \'template_id\':\''+row["_id"]+'\', \'project_id\':\'{{ project_id }}\',\'vim_list_url\': \'{% url "vims:list"  %}\', \'nst_list_url\': \'{% url "netslices:list_templates" %}\'})">\n' +
+                               '<i class="fa fa-paper-plane"></i></button>\n'+
                             '     <button type="button" class="btn btn-default"' +
                             '             onclick="javascript:showNstDetails(\'' + row["_id"] + '\')"' +
                             '             data-toggle="tooltip" data-placement="top" data-container="body" title="Open">' +
