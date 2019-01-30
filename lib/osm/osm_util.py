@@ -22,7 +22,7 @@ class OsmUtil():
                                                                 str(item['member-vnf-index-ref']) != str(
                                                                     args['member-vnf-index']) or str(
                                                                     item['vnfd-id-ref']) != str(args['vnfd-id-ref'])]
-            elif node_type == 'cp':
+            elif node_type == 'ns_cp':
                 for vld in nsd['vld']:
                     if vld['id'] == args['vld_id']:
                         vld['vnfd-connection-point-ref'] = [item for item in vld['vnfd-connection-point-ref'] if

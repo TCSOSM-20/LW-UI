@@ -14,24 +14,6 @@
    limitations under the License.
 */
 
-var dropZone = document.getElementById('drop-zone');
-dropZone.ondrop = function (e) {
-    e.preventDefault();
-    this.className = 'upload-drop-zone';
-    create(e.dataTransfer.files, true);
-};
-
-dropZone.ondragover = function () {
-    this.className = 'upload-drop-zone drop';
-    return false;
-};
-
-dropZone.ondragleave = function () {
-    this.className = 'upload-drop-zone';
-    return false;
-};
-
-
 function create(fs, dropzone) {
     var id = $('.nav-tabs .active').attr('id');
     if (dropzone) id = 'file_li';

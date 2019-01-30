@@ -18,15 +18,15 @@ from django.conf.urls import url
 from instancehandler import views
 
 urlpatterns = [
-    url(r'^(?P<type>[ns|vnf]+)/list/', views.list, name='list'),
-    url(r'^create/', views.create, name='create'),
-    url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/delete$', views.delete, name='delete'),
+    url(r'^(?P<type>[ns|vnf|pdu|nsi]+)/list/', views.list, name='list'),
+    url(r'^(?P<type>[ns|pdu|nsi]+)/create/', views.create, name='create'),
+    url(r'^(?P<type>[ns|pdu|nsi]+)/(?P<instance_id>[0-9a-z-]+)/delete$', views.delete, name='delete'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/topology', views.show_topology, name='show_topology'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/action$', views.action, name='action'),
-    url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/operation$', views.ns_operations, name='ns_operations'),
+    url(r'^(?P<type>[ns|vnf|nsi]+)/(?P<instance_id>[0-9a-z-]+)/operation$', views.ns_operations, name='ns_operations'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/operation/(?P<op_id>[0-9a-z-]+)', views.ns_operation, name='ns_operation'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/monitoring/alarm$', views.create_alarm, name='ns_create_alarm'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/monitoring/metric$', views.export_metric, name='ns_export_metric'),
-    url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)', views.show, name='show'),
+    url(r'^(?P<type>[ns|vnf|pdu|nsi]+)/(?P<instance_id>[0-9a-z-]+)', views.show, name='show'),
 
 ]

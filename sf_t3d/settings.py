@@ -53,11 +53,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'authosm',
     'projecthandler',
+    'packagehandler',
     'descriptorhandler',
     'vimhandler',
     'instancehandler',
     'sdnctrlhandler',
-    'userhandler'
+    'userhandler',
+    'netslicehandler'
 
 ]
 
@@ -90,11 +92,13 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'projecthandler', 'template'),
             os.path.join(BASE_DIR, 'projecthandler', 'template', 'download'),
             os.path.join(BASE_DIR, 'projecthandler', 'template', 'project'),
+            os.path.join(BASE_DIR, 'packagehandler', 'template'),
             os.path.join(BASE_DIR, 'descriptorhandler', 'template'),
             os.path.join(BASE_DIR, 'vimhandler', 'template'),
             os.path.join(BASE_DIR, 'instancehandler', 'template'),
             os.path.join(BASE_DIR, 'sdnctrlhandler', 'template'),
             os.path.join(BASE_DIR, 'userhandler', 'templates'),
+            os.path.join(BASE_DIR, 'netslicehandler', 'template'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

@@ -14,6 +14,31 @@
    limitations under the License.
 */
 
+function openModalCreatePDU(args) {
+    var select2_groups = $('#pdu_vim_accounts').select2({
+        placeholder: 'Select Vims',
+        width: '100%',
+        ajax: {
+            url: args.vim_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                vims = [];
+                if (data['datacenters']) {
+                    for (d in data['datacenters']) {
+                        var datacenter = data['datacenters'][d];
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
+                    }
+                }
+                return {
+                    results: vims
+                };
+            }
+        }
+    });
+
+    $('#modal_new_pdu').modal('show');
+}
+
 function openModalCreateNS(args) {
     // load vim account list
     select2_groups = $('#vimAccountId').select2({
@@ -27,7 +52,7 @@ function openModalCreateNS(args) {
                 if (data['datacenters']) {
                     for (d in data['datacenters']) {
                         var datacenter = data['datacenters'][d];
-                        vims.push({id: datacenter['_id'], text: datacenter['name']})
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
                     }
                 }
 
@@ -51,7 +76,7 @@ function openModalCreateNS(args) {
                 if (data['descriptors']) {
                     for (d in data['descriptors']) {
                         var nsd = data['descriptors'][d];
-                        nsd_list.push({id: nsd['_id'], text: nsd['name']})
+                        nsd_list.push({ id: nsd['_id'], text: nsd['name'] })
                     }
                 }
 
@@ -75,4 +100,65 @@ function openModalCreateNS(args) {
     }
 
     $('#modal_new_instance').modal('show');
+}
+function openModalCreateNSI(args) {
+    // load vim account list
+    select2_groups = $('#vimAccountIdNSI').select2({
+        placeholder: 'Select VIM',
+        width: '100%',
+        ajax: {
+            url: args.vim_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                vims = [];
+                if (data['datacenters']) {
+                    for (d in data['datacenters']) {
+                        var datacenter = data['datacenters'][d];
+                        vims.push({ id: datacenter['_id'], text: datacenter['name'] })
+                    }
+                }
+
+                return {
+                    results: vims
+                };
+            }
+        }
+    });
+
+    // load nsd list
+    select2_groups = $('#nstId').select2({
+        placeholder: 'Select NST',
+        width: '100%',
+        ajax: {
+            url: args.nst_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                nst_list = [];
+
+                if (data['templates']) {
+                    for (d in data['templates']) {
+                        var nst = data['templates'][d];
+                        nst_list.push({ id: nst['_id'], text: nst['name'] })
+                    }
+                }
+
+                return {
+                    results: nst_list
+                };
+            }
+        }
+    });
+    if (args.template_id) {
+        // Set the value, creating a new option if necessary
+        if ($('#nstId').find("option[value='" + args.template_id + "']").length) {
+            $('#nstId').val(args.template_id).trigger('change');
+        } else {
+            // Create a DOM Option and pre-select by default
+            var newOption = new Option(args.template_name, args.template_id, true, true);
+            // Append it to the select
+            $('#nstId').append(newOption).trigger('change');
+        }
+    }
+
+    $('#modal_new_nsi').modal('show');
 }

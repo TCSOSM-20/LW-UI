@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-function deletePackage(descriptor_type, package_id, package_name) {
+function deletePackage(package_type, package_id, package_name) {
 
     bootbox.confirm("Are you sure want to delete " + package_name + "?", function (result) {
         if (result) {
@@ -23,7 +23,7 @@ function deletePackage(descriptor_type, package_id, package_name) {
                 closeButton: true
             });
             $.ajax({
-                url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/delete',
+                url: '/packages/' + package_type + '/' + package_id + '/delete',
                 type: 'GET',
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
@@ -40,7 +40,7 @@ function deletePackage(descriptor_type, package_id, package_name) {
     })
 }
 
-function clonePackage(descriptor_type, package_id) {
+function clonePackage(package_type, package_id) {
 
     bootbox.confirm("Are you sure want to clone?", function (result) {
         if (result) {
@@ -49,7 +49,7 @@ function clonePackage(descriptor_type, package_id) {
                 closeButton: true
             });
             $.ajax({
-                url: '/projects/descriptors/' + descriptor_type + '/' + package_id + '/clone',
+                url: '/packages/' + package_type + '/' + package_id + '/clone',
                 type: 'GET',
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
@@ -73,7 +73,7 @@ function openPackageContentList(type, pkg_id) {
         closeButton: true
     });
     $.ajax({
-        url: '/projects/descriptors/' + type + '/' + pkg_id + '/action/get_package_files_list',
+        url: '/packages/' + type + '/' + pkg_id + '/action/get_package_files_list',
         type: 'GET',
         dataType: "json",
         contentType: "application/json;charset=utf-8",

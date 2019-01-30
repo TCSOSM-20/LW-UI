@@ -40,7 +40,7 @@ var layer_map = {
 };
 
 var type_view = {
-    "nsr": ["vnfr", "ns_vl"],
+    "nsr": ["vnfr", "ns_vl", "ns_cp"],
     "vnfr": ["vdur", "cp", "vnf_vl"]
 };
 

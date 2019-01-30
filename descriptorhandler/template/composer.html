@@ -24,7 +24,6 @@
 
 {% block breadcrumb_body %}
     {{ block.super }}
-    <li><a href="{% url 'projects:descriptors:list_descriptors'  descriptor_type=type %}">{{ type|upper }} Descriptors</a></li>
     <li><a href="#"><i class="fa fa-sitemap"></i> {{ type|upper }} Composer</a></li>
 {% endblock %}
 

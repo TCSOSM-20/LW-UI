@@ -23,7 +23,7 @@
     "codemirror": "^5.36.0",
     "d3": "^4",
     "bootbox.js": "bootbox#^4.4.0",
-    "components-font-awesome": "^5.0.6",
+    "components-font-awesome": "^5.2.0",
     "moment": "^2.22.2"
   }
 }

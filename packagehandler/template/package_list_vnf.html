@@ -9,7 +9,7 @@
             <div class="box-tools">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_new_package_name_chooser" >
-                <i class="fa fa-paint-brush"></i> <span> Compose a new {{ descriptor_type|upper }}</span></button>
+                <i class="fa fa-paint-brush"></i> <span> Compose a new {{ package_type|upper }}</span></button>
                 </div>
             </div>
         </div>
@@ -19,7 +19,15 @@
                 <thead>
                 <tr role="row">
                     <th>Short Name</th>
-                    <th>Identified</th>
+                    <th>Identifier</th>
+                    <th>
+                        <select name="type" id="type_vnf" class="form-control">
+                        <option value="">Type</option>
+                        <option value="vnfd">VNF</option>
+                        <option value="pnfd">PNF</option>
+                        <option value="hnfd">HNF</option>
+                        </select>
+                    </th>
                     <th>Description</th>
                     <th style="width:10%">Vendor</th>
                     <th style="width:5%">Version</th>
