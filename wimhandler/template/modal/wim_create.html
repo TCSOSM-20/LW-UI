@@ -1,0 +1,74 @@
+<div class="modal" id="modal_new_wim" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">New WIM</h4>
+            </div>
+            <form id="formCreateWIM" action='{% url "wims:create" %}'
+                  class="form-horizontal"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" id="modal_new_wim_body">
+                    <div class="form-group">
+                        <label for="wim_name" class="col-sm-2">Name *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="wim_name" name="name" placeholder="Name" required>
+                        </div>
+
+                        <label for="wim_type" class="col-sm-2">Type *</label>
+                        <div class="col-sm-3">
+                            <select id="wim_type" name="wim_type" class="form-control">
+                                <option value="onos">Onos</option>
+                                <option value="tapi">Tapi</option>
+                                <option value="odl">OpenDaylight</option>
+                                <option value="dynpac">DynPac</option>
+                            </select>
+                        </div>
+                    </div> 
+
+                    <div class="form-group">
+                        <label for="wim_url" class="col-sm-2">URL*</label>
+                        <div class="col-sm-3">
+                            <input type="url" class="form-control" id="wim_url" name="wim_url"
+                                           placeholder="WIM URL" required>
+                        </div>
+                        <label for="wim_user" class="col-sm-2">Username*</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="wim_user" name="user"
+                                            placeholder="WIM Username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wim_password" class="col-sm-2">Password*</label>
+                        <div class="col-sm-3">
+                            <input type="password" class="form-control" id="wim_password"
+                                       name="password" placeholder="WIMPassword" required>
+                        </div>
+                        <label for="wim_description" class="col-sm-2">Description</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="wim_description" name="description"
+                                        placeholder="Description" >
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary"
+                            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Creating..."
+                            id="create_new_wim">Create
+                    </button>
+
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+

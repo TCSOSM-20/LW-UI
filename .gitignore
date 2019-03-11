@@ -51,6 +51,10 @@ instancehandler/migrations
 sdnctrlhandler/migrations
 authosm/migrations
 userhandler/migrations
+packagehandler/migrations
+netslicehandler/migrations
+vimhandler/migrations
+wimhandler/migrations
 
 #Deb package
 deb_dist/

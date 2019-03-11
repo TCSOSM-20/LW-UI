@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^projects/', include('projecthandler.urls.project', namespace='projects'), name='projects_base'),
     url(r'^sdn/', include('sdnctrlhandler.urls', namespace='sdns'), name='sdns_base'),
     url(r'^vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
+    url(r'^wims/', include('wimhandler.urls', namespace='wims'), name='wims_base'),
     url(r'^packages/', include('packagehandler.urls', namespace='packages'), name='packages_base'),
     url(r'^instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),
     url(r'^netslices/', include('netslicehandler.urls', namespace='netslices'), name='netslices_base'),

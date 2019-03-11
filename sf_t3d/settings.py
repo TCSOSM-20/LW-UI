@@ -29,7 +29,7 @@ if os.getenv('DJANGO_ENV') == 'prod':
     DEBUG = False
 else:
     DEBUG = True
-    print DEBUG
+
 ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = "authosm.OsmUser"
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'packagehandler',
     'descriptorhandler',
     'vimhandler',
+    'wimhandler',
     'instancehandler',
     'sdnctrlhandler',
     'userhandler',
@@ -95,6 +96,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'packagehandler', 'template'),
             os.path.join(BASE_DIR, 'descriptorhandler', 'template'),
             os.path.join(BASE_DIR, 'vimhandler', 'template'),
+            os.path.join(BASE_DIR, 'wimhandler', 'template'),
             os.path.join(BASE_DIR, 'instancehandler', 'template'),
             os.path.join(BASE_DIR, 'sdnctrlhandler', 'template'),
             os.path.join(BASE_DIR, 'userhandler', 'templates'),

@@ -1,5 +1,4 @@
-#
-#   Copyright 2018 CNIT - Consorzio Nazionale Interuniversitario per le Telecomunicazioni
+#   Copyright 2018 EveryUP Srl
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,8 +11,14 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#
 
-from django.test import TestCase
+from django.conf.urls import url
+from wimhandler import views
 
-# Create your tests here.
+urlpatterns = [
+    url(r'^list/', views.list, name='list'),
+    url(r'^create/', views.create, name='create'),
+    url(r'^(?P<wim_id>[0-9a-z-]+)/delete$', views.delete, name='delete'),
+    url(r'^(?P<wim_id>[0-9a-z-]+)', views.show, name='show'),
+
+]

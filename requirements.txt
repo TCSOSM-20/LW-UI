@@ -1,12 +1,11 @@
 decorator==4.0.10
-Django==1.10.1
+Django==1.11.18
 django-model-utils==2.6
 functools32==3.2.3.post2
 jsonfield==1.0.3
 jsonschema==2.5.1
 pbr==1.10.0
 pyaml==15.8.2
-pymongo==3.4.0
 python-dateutil==2.6.0
 PyYAML==3.12
 requests==2.12.4

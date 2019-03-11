@@ -98,6 +98,13 @@
                     <i class="fa fa-server fa-fw"></i> <span>VIM Accounts</span>
                 </a>
             </li>
+
+            {% url "wims:list"   as  wim_list_url %}
+            <li {% if request.get_full_path == wim_list_url %} class="active" {% endif %}>
+                <a href='{% url "wims:list"   %}'>
+                    <i class="fa fa-sitemap fa-rotate-180 fa-fw"></i> <span>WIM Accounts</span>
+                </a>
+            </li>
             {% if user.is_admin %}
                 <li class="header">ADMIN</li>
                 {% url "users:list"   as  user_list_url %}
