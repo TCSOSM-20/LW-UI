@@ -93,25 +93,11 @@ def delete_package(request, package_type=None, package_id=None):
         log.exception(e)
         result = {'error': True, 'data': str(e)}
 
-    url = 'package_list.html'
-    descriptors = {}
-    try:
-        if package_type == 'ns':
-            descriptors = client.nsd_list(user.get_token())
-        elif package_type == 'vnf':
-            descriptors = client.vnfd_list(user.get_token())
-    except Exception as e:
-        log.exception(e)
+    if result['error']:
+        return __response_handler(request, result['data'], url=None, status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
-    return __response_handler(request, {
-        'descriptors': descriptors['data'] if descriptors and descriptors['error'] is False else [],
-        'project_id': project_id,
-        'project_type': 'osm',
-        'package_type': package_type,
-        'alert_message': {
-            'success': False if result['error'] is True else True,
-            'message': 'An error occurred while processing your request.' if result and result['error'] is True else "Record deleted successfully"}
-    }, url)
 
 @login_required
 def clone_package(request, package_type=None, package_id=None):

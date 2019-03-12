@@ -440,9 +440,10 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r:
             result['error'] = False
-        result['data'] = Util.json_loads_byteified(r.text)
+        if r.status_code != requests.codes.no_content:
+            result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def vnfd_delete(self, token, id):

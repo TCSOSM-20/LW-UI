@@ -33,7 +33,13 @@ function deletePackage(package_type, package_id, package_name) {
                 },
                 error: function (result) {
                     dialog.modal('hide');
-                    bootbox.alert("An error occurred.");
+                    var data = result.responseJSON;
+                    var title = "Error " + (data && data.code ? data.code : 'unknown');
+                    var message = data && data.detail ? data.detail : 'No detail available.';
+                    bootbox.alert({
+                        title: title,
+                        message: message
+                    });
                 }
             });
         }
@@ -59,7 +65,13 @@ function clonePackage(package_type, package_id) {
                 },
                 error: function (result) {
                     dialog.modal('hide');
-                    bootbox.alert("An error occurred.");
+                    var data = result.responseJSON;
+                    var title = "Error " + (data && data.code ? data.code : 'unknown');
+                    var message = data && data.detail ? data.detail : 'No detail available.';
+                    bootbox.alert({
+                        title: title,
+                        message: message
+                    });
                 }
             });
         }
