@@ -94,6 +94,13 @@ def create(request, type=None):
                                 vnf["vimAccountId"] = ns_data["vimAccountId"]
 
                         ns_data["vnf"] = ns_config["vnf"]
+                    if "additionalParamsForNs" in ns_config:
+                        ns_data["additionalParamsForNs"] = ns_config["additionalParamsForNs"]
+                    if "additionalParamsForVnf" in ns_config:
+                        ns_data["additionalParamsForVnf"] = ns_config["additionalParamsForVnf"]
+                    if "wimAccountId" in ns_config:
+                        ns_data["wimAccountId"] = ns_config["wimAccountId"]
+
         except Exception as e:
             request.session["OSM_ERROR"] = "Error creating the NS; Invalid parameters provided."
             return __response_handler(request, {}, 'instances:list', to_redirect=True, type='ns', )
