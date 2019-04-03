@@ -156,11 +156,9 @@ var addFormGroup = function (event) {
     var $formGroup = $(this).closest('.form-group');
     var $formGroupClone = $formGroup.clone();
 
-    $(this)
-        .toggleClass('btn-success btn-add btn-danger btn-remove')
-        .html('–');
-
     $formGroupClone.find('input').val('');
+    $formGroupClone.find('button').toggleClass('btn-success btn-add btn-danger btn-remove');
+    $formGroupClone.find('button').text('–');
     $formGroupClone.insertAfter($formGroup);
 
 };
