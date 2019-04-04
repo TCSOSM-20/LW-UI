@@ -61,3 +61,4 @@ class OsmBackend(object):
             return OsmUser.objects.get(pk=user_id)
         except OsmUser.DoesNotExist:
             return None
+

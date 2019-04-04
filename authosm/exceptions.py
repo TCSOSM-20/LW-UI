@@ -16,4 +16,5 @@
 
 
 class OSMAuthException(Exception):
+    
     pass
