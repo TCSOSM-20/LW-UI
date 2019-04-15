@@ -266,7 +266,7 @@ function updatePalette(view) {
         var nodes_properties = osm_gui_properties['nodes'];
         for (var n in nodes) {
             var node = nodes[n];
-            if (nodes_properties[node]) {
+        if (nodes_properties[node] && (nodes_properties[node].draggable != false)) {
                 palette_template += '<div id="drag_' + n + '" class="node ui-draggable"' +
                     'type-name="' + node + '" draggable="true" ondragstart="nodeDragStart(event)">' +
                     '<div class="icon" style="background-color:' + nodes_properties[node].color + '"></div>' +

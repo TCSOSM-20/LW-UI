@@ -45,7 +45,8 @@ var osm_gui_properties = {
                  "shape": "square",
                 "color": "#e3bfad",
                 "size": 15,
-                "name": "intCP"
+                "name": "intCP",
+                "draggable": false
             },
             "ns_vl": {
                 "shape": "triangle",
