@@ -40,20 +40,25 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="ssh_key_nsi" class="col-sm-3 control-label">SSH Key </label>
+                        <label for="ssh_keys" class="col-sm-3 control-label">SSH Key </label>
                         <div class="col-sm-6">
-                            <textarea class="form-control" id="ssh_key_nsi" name="ssh_key"
-                                      placeholder="Paste your key here..." rows="4"></textarea>
+                                <textarea class="form-control" id="ssh_key" name="ssh_key"
+                                placeholder="Paste your key here..." rows="3"></textarea> 
+                                <p class="help-block">Or load from file</p>
+                                <input type="file" id="ssh_key_files" name="ssh_key_files" multiple>
+                               
+                             
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="config_nsi" class="col-sm-3 control-label">Config </label>
+                        <label for="config" class="col-sm-3 control-label">Config </label>
                         <div class="col-sm-6">
-                            <textarea class="form-control" id="config_nsi" name="config" placeholder="Yaml config"
-                                      rows="4"></textarea>
+                            <textarea class="form-control" id="config" name="config" placeholder="Yaml config"
+                                      rows="3"></textarea>
+                            <p class="help-block">Or load from file</p>
+                            <input type="file" id="config_file" name="config_file">
                         </div>
-                    </div> 
-
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>

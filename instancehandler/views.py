@@ -58,8 +58,35 @@ def list(request, type=None):
 def create(request, type=None):
     result = {}
     config_vim_account_id = {}
+    config_wim_account_id = {}
     user = osmutils.get_user(request)
     client = Client()
+
+    def get_vim_account_id(vim_account):
+        if config_vim_account_id.get(vim_account):
+            return config_vim_account_id[vim_account]
+        result_client = client.vim_list(user.get_token())
+        vim_list = result_client['data'] if result_client and result_client['error'] is False else []
+        if vim_list is None or len(vim_list) == 0:
+            raise ValueError("cannot find vim account '{}'".format(vim_account))
+        for vim in vim_list:
+            if vim_account == vim['name']:
+                config_vim_account_id[vim_account] = vim['uuid']
+                return vim['uuid']
+    
+    def get_wim_account_id(wim_account):
+
+        if config_wim_account_id.get(wim_account):
+            return config_wim_account_id[wim_account]
+        result_client = client.wim_list(user.get_token())
+        wim_list = result_client['data'] if result_client and result_client['error'] is False else []
+        if wim_list is None or len(wim_list) == 0:
+            raise ValueError("cannot find wim account '{}'".format(wim_account))
+        for wim in wim_list:
+            if wim_account == wim['name']:
+                config_wim_account_id[wim_account] = wim['uuid']
+                return wim['uuid']
+
 
     if type == 'ns':
         try:
@@ -70,36 +97,72 @@ def create(request, type=None):
                 "nsdId": request.POST.get('nsdId', ''),
                 "vimAccountId": request.POST.get('vimAccountId', ''),
             }
+            ns_data["ssh_keys"] = []
             if 'ssh_key' in request.POST and request.POST.get('ssh_key') != '':
-                ns_data["ssh_keys"] = [request.POST.get('ssh_key')]
+                ns_data["ssh_keys"].append(request.POST.get('ssh_key'))
+            ssh_key_files = request.FILES.getlist('ssh_key_files')
+            for ssh_key_file in ssh_key_files:
+                ssh_key = ''
+                for line in ssh_key_file:
+                    ssh_key = ssh_key + line.decode()
+                ns_data["ssh_keys"].append(ssh_key)
+            
 
-            if 'config' in request.POST:
+            config_file = request.FILES.get('config_file')
+            
+            if config_file is not None:
+                config = ''
+                for line in config_file:
+                    config = config + line.decode()
+                ns_config = yaml.load(config)
+            elif 'config' in request.POST and request.POST.get('config') != '':
                 ns_config = yaml.load(request.POST.get('config'))
+            else:
+                ns_config = None
+            
+           
+            if ns_config is not None:
                 if isinstance(ns_config, dict):
                     if "vim-network-name" in ns_config:
                         ns_config["vld"] = ns_config.pop("vim-network-name")
                     if "vld" in ns_config:
-                        print ns_config
                         for vld in ns_config["vld"]:
                             if vld.get("vim-network-name"):
                                 if isinstance(vld["vim-network-name"], dict):
                                     vim_network_name_dict = {}
-                                    for vim_account, vim_net in vld["vim-network-name"].items():
-                                        vim_network_name_dict[ns_data["vimAccountId"]] = vim_net
+                                    for vim_account, vim_net in list(vld["vim-network-name"].items()):
+                                        vim_network_name_dict[get_vim_account_id(vim_account)] = vim_net
                                     vld["vim-network-name"] = vim_network_name_dict
+                            if "wim_account" in vld and vld["wim_account"] is not None:
+                                vld["wimAccountId"] = get_wim_account_id(vld.pop("wim_account"))
                         ns_data["vld"] = ns_config["vld"]
                     if "vnf" in ns_config:
                         for vnf in ns_config["vnf"]:
                             if vnf.get("vim_account"):
-                                vnf["vimAccountId"] = ns_data["vimAccountId"]
-
+                                vnf["vimAccountId"] = get_vim_account_id(vnf.pop("vim_account"))
                         ns_data["vnf"] = ns_config["vnf"]
+
                     if "additionalParamsForNs" in ns_config:
-                        ns_data["additionalParamsForNs"] = ns_config["additionalParamsForNs"]
+                        ns_data["additionalParamsForNs"] = ns_config.pop("additionalParamsForNs")
+                        if not isinstance(ns_data["additionalParamsForNs"], dict):
+                            raise ValueError("Error  'additionalParamsForNs' must be a dictionary")
                     if "additionalParamsForVnf" in ns_config:
-                        ns_data["additionalParamsForVnf"] = ns_config["additionalParamsForVnf"]
-                    if "wimAccountId" in ns_config:
-                        ns_data["wimAccountId"] = ns_config["wimAccountId"]
+                        ns_data["additionalParamsForVnf"] = ns_config.pop("additionalParamsForVnf")
+                        if not isinstance(ns_data["additionalParamsForVnf"], list):
+                            raise ValueError("Error  'additionalParamsForVnf' must be a list")
+                        for additional_param_vnf in ns_data["additionalParamsForVnf"]:
+                            if not isinstance(additional_param_vnf, dict):
+                                raise ValueError("Error  'additionalParamsForVnf' items must be dictionaries")
+                            if not additional_param_vnf.get("member-vnf-index"):
+                                raise ValueError("Error  'additionalParamsForVnf' items must contain "
+                                                "'member-vnf-index'")
+                            if not additional_param_vnf.get("additionalParams"):
+                                raise ValueError("Error  'additionalParamsForVnf' items must contain "
+                                                "'additionalParams'")
+                    if "wim_account" in ns_config:
+                        wim_account = ns_config.pop("wim_account")
+                        if wim_account is not None:
+                            ns_data['wimAccountId'] = get_wim_account_id(wim_account)
 
         except Exception as e:
             request.session["OSM_ERROR"] = "Error creating the NS; Invalid parameters provided."
@@ -116,11 +179,75 @@ def create(request, type=None):
                 "vimAccountId": request.POST.get('vimAccountId', ''),
             }
             
+            nsi_data["ssh_keys"] = []
             if 'ssh_key' in request.POST and request.POST.get('ssh_key') != '':
-                nsi_data["ssh_keys"] = [request.POST.get('ssh_key')]
+                nsi_data["ssh_keys"].append(request.POST.get('ssh_key'))
+            ssh_key_files = request.FILES.getlist('ssh_key_files')
+            for ssh_key_file in ssh_key_files:
+                ssh_key = ''
+                for line in ssh_key_file:
+                    ssh_key = ssh_key + line.decode()
+                nsi_data["ssh_keys"].append(ssh_key)
+            nsi_data["ssh_keys"] = ','.join(nsi_data["ssh_keys"])
+          
+            config_file = request.FILES.get('config_file')
+            
+            if config_file is not None:
+                config = ''
+                for line in config_file:
+                    config = config + line.decode()
+                nsi_config = yaml.load(config)
+            elif 'config' in request.POST and request.POST.get('config') != '':
+                nsi_config = yaml.load(request.POST.get('config'))
+            else:
+                nsi_config = None
+            
+            if nsi_config is not None:
+                if "netslice-vld" in nsi_config:
+                    for vld in nsi_config["netslice-vld"]:
+                        if vld.get("vim-network-name"):
+                            if isinstance(vld["vim-network-name"], dict):
+                                vim_network_name_dict = {}
+                                for vim_account, vim_net in list(vld["vim-network-name"].items()):
+                                    vim_network_name_dict[get_vim_account_id(vim_account)] = vim_net
+                                vld["vim-network-name"] = vim_network_name_dict
+                    nsi_data["netslice-vld"] = nsi_config["netslice-vld"]
+                if "netslice-subnet" in nsi_config:
+                    for nssubnet in nsi_config["netslice-subnet"]:
+                        if "vld" in nssubnet:
+                            for vld in nssubnet["vld"]:
+                                if vld.get("vim-network-name"):
+                                    if isinstance(vld["vim-network-name"], dict):
+                                        vim_network_name_dict = {}
+                                        for vim_account, vim_net in list(vld["vim-network-name"].items()):
+                                            vim_network_name_dict[get_vim_account_id(vim_account)] = vim_net
+                                        vld["vim-network-name"] = vim_network_name_dict
+                        if "vnf" in nssubnet:
+                            for vnf in nsi_config["vnf"]:
+                                if vnf.get("vim_account"):
+                                    vnf["vimAccountId"] = get_vim_account_id(vnf.pop("vim_account"))
+                    nsi_data["netslice-subnet"] = nsi_config["netslice-subnet"]
+                if "additionalParamsForNsi" in nsi_config:
+                    nsi_data["additionalParamsForNsi"] = nsi_config.pop("additionalParamsForNsi")
+                    if not isinstance(nsi_data["additionalParamsForNsi"], dict):
+                        raise ValueError("Error at 'additionalParamsForNsi' must be a dictionary")
+                if "additionalParamsForSubnet" in nsi_config:
+                    nsi_data["additionalParamsForSubnet"] = nsi_config.pop("additionalParamsForSubnet")
+                    if not isinstance(nsi_data["additionalParamsForSubnet"], list):
+                        raise ValueError("Error 'additionalParamsForSubnet' must be a list")
+                    for additional_param_subnet in nsi_data["additionalParamsForSubnet"]:
+                        if not isinstance(additional_param_subnet, dict):
+                            raise ValueError("Error 'additionalParamsForSubnet' items must be dictionaries")
+                        if not additional_param_subnet.get("id"):
+                            raise ValueError("Error 'additionalParamsForSubnet' items must contain subnet 'id'")
+                        if not additional_param_subnet.get("additionalParamsForNs") and\
+                                not additional_param_subnet.get("additionalParamsForVnf"):
+                            raise ValueError("Error 'additionalParamsForSubnet' items must contain "
+                                            "'additionalParamsForNs' and/or 'additionalParamsForVnf'")
         except Exception as e:
             request.session["OSM_ERROR"] = "Error creating the NSI; Invalid parameters provided."
             return __response_handler(request, {}, 'instances:list', to_redirect=True, type=type)
+
         result = client.nsi_create(user.get_token(), nsi_data)
         return __response_handler(request, result, 'instances:list', to_redirect=True, type=type)
 
@@ -191,7 +318,6 @@ def action(request, instance_id=None, type=None):
     }
 
     result = client.ns_action(user.get_token(), instance_id, action_payload)
-    print result
     if result['error']:
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
@@ -262,7 +388,7 @@ def show(request, instance_id=None, type=None):
         result = client.pdu_get(user.get_token(), instance_id)
     elif type == 'nsi':
         result = client.nsi_get(user.get_token(), instance_id)
-    print result
+
     return __response_handler(request, result)
 
 
@@ -283,7 +409,6 @@ def export_metric(request, instance_id=None, type=None):
     result = client.ns_metric_export(user.get_token(), instance_id, metric_data)
 
     if result['error']:
-        print result
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
     else:
@@ -293,7 +418,6 @@ def export_metric(request, instance_id=None, type=None):
 @login_required
 def create_alarm(request, instance_id=None, type=None):
     metric_data = request.POST.dict()
-    print metric_data
     user = osmutils.get_user(request)
     project_id = user.project_id
     client = Client()
@@ -311,7 +435,6 @@ def create_alarm(request, instance_id=None, type=None):
 
     result = client.ns_alarm_create(user.get_token(), instance_id, metric_data)
     if result['error']:
-        print result
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
     else:
