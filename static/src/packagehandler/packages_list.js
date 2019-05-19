@@ -13,6 +13,37 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+$(document).ready(function () {
+    $("#formCreateNS").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response, textStatus, jqXHR) {
+            window.location.href = '/instances/ns/list/';
+            
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
+        });
+    });
+
+    
+});
 
 function deletePackage(package_type, package_id, package_name) {
 
@@ -29,7 +60,7 @@ function deletePackage(package_type, package_id, package_name) {
                 contentType: "application/json;charset=utf-8",
                 success: function (result) {
                     dialog.modal('hide');
-                    location.reload();
+                    table.ajax.reload();
                 },
                 error: function (result) {
                     dialog.modal('hide');
@@ -61,7 +92,7 @@ function clonePackage(package_type, package_id) {
                 contentType: "application/json;charset=utf-8",
                 success: function (result) {
                     dialog.modal('hide');
-                    location.reload();
+                    table.ajax.reload();
                 },
                 error: function (result) {
                     dialog.modal('hide');

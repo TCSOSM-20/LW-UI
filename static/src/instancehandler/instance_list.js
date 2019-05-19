@@ -54,7 +54,7 @@ function deleteNs(instance_name, instance_id, force) {
                     }
                     else {
                         dialog.modal('hide');
-                        location.reload();
+                        table.ajax.reload();
                     }
                 },
                 error: function (result) {
@@ -100,7 +100,7 @@ function deleteNsi(instance_name, instance_id, force) {
                     }
                     else {
                         dialog.modal('hide');
-                        location.reload();
+                        table.ajax.reload();
                     }
                 },
                 error: function (result) {
@@ -138,7 +138,7 @@ function deletePDU(instance_name, instance_id) {
                     }
                     else {
                         dialog.modal('hide');
-                        location.reload();
+                        table.ajax.reload();
                     }
                 },
                 error: function (error) {
@@ -264,6 +264,35 @@ $(document).ready(function () {
 
     $(document).on('click', '.interface-group .btn-add', addInterfaceGroup);
     $(document).on('click', '.interface-group .btn-remove', removeInterfaceGroup);
+
+    
+    $("#formCreateNS").submit(function (event) {
+        event.preventDefault(); //prevent default action
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData(this); //Encode form elements for submission
+        $.ajax({
+            url: post_url,
+            type: request_method,
+            data: form_data,
+            headers: {
+                "Accept": 'application/json'
+            },
+            contentType: false,
+            processData: false
+        }).done(function (response, textStatus, jqXHR) {
+            table.ajax.reload();
+            $('#modal_new_instance').modal('hide');
+        }).fail(function (result) {
+            var data = result.responseJSON;
+            var title = "Error " + (data.code ? data.code : 'unknown');
+            var message = data.detail ? data.detail : 'No detail available.';
+            bootbox.alert({
+                title: title,
+                message: message
+            });
+        });
+    });
 
     $("#formCreatePDU").submit(function (event) {
         event.preventDefault(); //prevent default action

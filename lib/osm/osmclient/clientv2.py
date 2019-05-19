@@ -49,7 +49,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
 
         result['data'] = Util.json_loads_byteified(r.text)
@@ -66,7 +66,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
 
         result['data'] = Util.json_loads_byteified(r.text)
@@ -85,7 +85,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -104,7 +104,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -121,7 +121,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = Util.json_loads_byteified(r.text)
@@ -139,7 +139,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = Util.json_loads_byteified(r.text)
@@ -156,7 +156,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -173,7 +173,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -190,7 +190,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -209,7 +209,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -228,7 +228,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -245,7 +245,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = Util.json_loads_byteified(r.text)
@@ -262,7 +262,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -279,7 +279,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data']  = Util.json2yaml(yaml.load(str(r.text)))
 
@@ -297,7 +297,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -317,7 +317,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -337,7 +337,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -354,7 +354,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -371,7 +371,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -388,7 +388,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -405,7 +405,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -423,7 +423,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         
         return result
@@ -480,7 +480,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -500,7 +500,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -520,7 +520,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -540,7 +540,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['data'] = r.json()
             result['error'] = False
         if r.status_code == requests.codes.conflict:
@@ -561,7 +561,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['data'] = r.json()
             result['error'] = False
         if r.status_code == requests.codes.conflict:
@@ -588,7 +588,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         if r.status_code == requests.codes.conflict:
             result['data'] = "Invalid ID."
@@ -616,7 +616,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         if r.status_code == requests.codes.conflict:
             result['data'] = "Invalid ID."
@@ -634,7 +634,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         return result
 
@@ -659,7 +659,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             try:
@@ -690,7 +690,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             try:
@@ -712,7 +712,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             tarf = StringIO.StringIO(r.content)
             return tarf
@@ -729,7 +729,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             tarf = StringIO.StringIO(r.content)
             return tarf
@@ -851,7 +851,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             return yaml.load(r.text)
         else:
@@ -872,7 +872,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             return yaml.load(r.text)
         else:
@@ -893,7 +893,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             result['data'] = r.text
         else:
@@ -915,7 +915,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
             result['data'] = r.text
         else:
@@ -939,7 +939,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -957,7 +957,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -975,7 +975,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -992,7 +992,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -1010,7 +1010,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -1028,7 +1028,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -1047,7 +1047,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1121,7 +1121,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1138,7 +1138,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1155,7 +1155,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1172,7 +1172,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1188,7 +1188,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         # result['data'] = Util.json_loads_byteified(r.text)
         result['data'] = r.text
@@ -1205,7 +1205,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         # result['data'] = Util.json_loads_byteified(r.text)
         result['data'] = r.text
@@ -1222,7 +1222,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -1239,7 +1239,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
 
@@ -1256,7 +1256,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.accepted:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = r.text
@@ -1273,7 +1273,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.accepted:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = r.text
@@ -1292,7 +1292,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1310,7 +1310,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1328,7 +1328,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1347,7 +1347,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1363,7 +1363,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1379,7 +1379,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.accepted:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         else:
             result['data'] = r.text
@@ -1397,7 +1397,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
@@ -1415,7 +1415,7 @@ class Client(object):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.created:
+        if r.status_code in (200, 201, 202, 204):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result

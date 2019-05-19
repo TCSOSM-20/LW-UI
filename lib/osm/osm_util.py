@@ -155,7 +155,7 @@ class OsmUtil():
                     "monitoring-param": [],
                     "internal-connection-point": [],
                     "image": "ubuntu",
-                    "cloud-init-file": "",
+                    #"cloud-init-file": "",
                     "vm-flavor": {},
                     "interface": [],
                     "id": element_id,

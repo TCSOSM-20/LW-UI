@@ -165,10 +165,14 @@ def create(request, type=None):
                             ns_data['wimAccountId'] = get_wim_account_id(wim_account)
 
         except Exception as e:
-            request.session["OSM_ERROR"] = "Error creating the NS; Invalid parameters provided."
-            return __response_handler(request, {}, 'instances:list', to_redirect=True, type='ns', )
+            return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
         result = client.ns_create(user.get_token(), ns_data)
-        return __response_handler(request, result, 'instances:list', to_redirect=True, type='ns')
+        print result
+        if result['error']:
+            return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            return __response_handler(request, {}, url=None, status=200)
 
     elif type == 'nsi':
         try:
@@ -245,11 +249,14 @@ def create(request, type=None):
                             raise ValueError("Error 'additionalParamsForSubnet' items must contain "
                                             "'additionalParamsForNs' and/or 'additionalParamsForVnf'")
         except Exception as e:
-            request.session["OSM_ERROR"] = "Error creating the NSI; Invalid parameters provided."
-            return __response_handler(request, {}, 'instances:list', to_redirect=True, type=type)
+            return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
 
         result = client.nsi_create(user.get_token(), nsi_data)
-        return __response_handler(request, result, 'instances:list', to_redirect=True, type=type)
+        if result['error']:
+            return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            return __response_handler(request, {}, url=None, status=200)
 
     elif type == 'pdu':
         interface_param_name = request.POST.getlist('interfaces_name')

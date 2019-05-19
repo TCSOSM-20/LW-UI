@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+
 function openModalCreatePDU(args) {
     var select2_groups = $('#pdu_vim_accounts').select2({
         placeholder: 'Select Vims',
