@@ -74,8 +74,9 @@
     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
     <script src="/static/src/userhandler/user_list.js"></script>
     <script>
+        var table;
         $(document).ready(function () {
-            var table = $('#users_table').DataTable({
+            table = $('#users_table').DataTable({
                 responsive: true,
                 "ajax": {
                     "url": "/admin/users/list",
@@ -199,6 +200,40 @@
                 table.ajax.reload();
             }, 10000);
 
+            $("#formCreateUser").submit(function (event) {
+                event.preventDefault(); //prevent default action
+                var post_url = $(this).attr("action"); //get form action url
+                var request_method = $(this).attr("method");
+                var form_data = new FormData(this); //Encode form elements for submission
+                
+                $.ajax({
+                    url: post_url,
+                    type: request_method,
+                    data: form_data,
+                    headers: {
+                        "Accept": 'application/json'
+                    },
+                    contentType: false,
+                    processData: false
+                }).done(function (response, textStatus, jqXHR) {
+                    $('#modal_new_user').modal('hide');
+                    table.ajax.reload();
+                    bootbox.alert({
+                        title: "Result",
+                        message: "User successfully created."
+                    });
+
+                }).fail(function (result) {
+                    var data = result.responseJSON;
+                    var title = "Error " + (data.code ? data.code : 'unknown');
+                    var message = data.detail ? data.detail : 'No detail available.';
+                    bootbox.alert({
+                        title: title,
+                        message: message
+                    });
+                });
+            });
+
             $("#formEditUser").submit(function (event) {
                 event.preventDefault(); //prevent default action
                 var post_url = $(this).attr("action"); //get form action url
@@ -219,7 +254,7 @@
                     table.ajax.reload();
                     bootbox.alert({
                         title: "Result",
-                        message: "User modified successfully."
+                        message: "User successfully modified."
                     });
 
                 }).fail(function (result) {
@@ -232,6 +267,7 @@
                     });
                 });
             });
+        
         });
     </script>
 

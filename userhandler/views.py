@@ -46,10 +46,12 @@ def create(request):
         "password": request.POST['password'],
         "projects": request.POST.getlist('projects')
     }
-
     result = client.user_create(user.get_token(), user_data)
-
-    return __response_handler(request, result, 'users:list', to_redirect=True)
+    if result['error']:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
@@ -57,10 +59,15 @@ def delete(request, user_id=None):
     user = osmutils.get_user(request)
     try:
         client = Client()
-        del_res = client.user_delete(user.get_token(), user_id)
+        result = client.user_delete(user.get_token(), user_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, {}, 'users:list', to_redirect=True, )
+        result = {'error': True, 'data': str(e)}
+    if result['error']:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
+    else:
+        return __response_handler(request, {}, url=None, status=200)
 
 @login_required
 def update(request, user_id=None):

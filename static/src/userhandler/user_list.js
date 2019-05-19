@@ -84,7 +84,7 @@ function deleteUser(user_id, name) {
                 success: function (result) {
                     //$('#modal_show_vim_body').empty();
                     dialog.modal('hide');
-                    location.reload();
+                    table.ajax.reload();
                 },
                 error: function (result) {
                     dialog.modal('hide');
