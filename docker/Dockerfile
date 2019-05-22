@@ -4,7 +4,7 @@ WORKDIR /usr/share/osm-lightui
 COPY . /usr/share/osm-lightui
 
 RUN apt-get update
-RUN apt-get install -y npm git python-pip nginx supervisor
+RUN apt-get install -y npm git python-pip nginx supervisor libmysqlclient-dev mysql-client
 RUN npm install -g bower
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 RUN bower install --allow-root
@@ -19,11 +19,8 @@ COPY supervisor-app.conf /etc/supervisor/conf.d/
 RUN rm -f db.sqlite3
 
 ENV DJANGO_ENV=prod
-RUN python manage.py makemigrations authosm
-RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
-
 
 EXPOSE 80
 
-CMD ["supervisord", "-n"]
+CMD ["/usr/share/osm-lightui/entrypoint.sh"]

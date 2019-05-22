@@ -16,7 +16,7 @@
 
 
 PKG_DIRECTORIES="authosm descriptorhandler instancehandler lib projecthandler sdnctrlhandler sf_t3d static template userhandler vimhandler packagehandler netslicehandler wimhandler"
-PKG_FILES="bower.json django.ini LICENSE manage.py nginx-app.conf README.md requirements.txt supervisor-app.conf .bowerrc"
+PKG_FILES="bower.json django.ini LICENSE manage.py nginx-app.conf README.md requirements.txt supervisor-app.conf .bowerrc entrypoint.sh"
 MDG_NAME=lightui
 DEB_INSTALL=debian/osm-${MDG_NAME}.install
 export DEBEMAIL="gerardo.garciadeblas@telefonica.com"
@@ -25,10 +25,11 @@ export DEBFULLNAME="Gerardo Garcia"
 PKG_VERSION=$(git describe --match "v*" --tags --abbrev=0)
 PKG_VERSION_PREFIX=$(echo $PKG_VERSION | sed -e 's/v//g')
 PKG_VERSION_POST=$(git rev-list $PKG_VERSION..HEAD | wc -l)
+PKG_VERSION_HASH=$(git describe --match "v*" --tags | awk '{print $3}' FS=-)
 if [ "$PKG_VERSION_POST" -eq 0 ]; then
     PKG_DIR="deb_dist/osm-${MDG_NAME}-${PKG_VERSION_PREFIX}"
 else
-    PKG_DIR="deb_dist/osm-${MDG_NAME}-$PKG_VERSION_PREFIX.post${PKG_VERSION_POST}"
+    PKG_DIR="deb_dist/osm-${MDG_NAME}-$PKG_VERSION_PREFIX.post${PKG_VERSION_POST}+${PKG_VERSION_HASH}"
 fi
 
 rm -rf $PKG_DIR
