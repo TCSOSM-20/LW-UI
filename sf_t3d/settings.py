@@ -15,6 +15,7 @@
 #
 
 import os
+from sqlalchemy.engine.url import make_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -125,12 +126,26 @@ WSGI_APPLICATION = 'sf_t3d.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+sql_uri = make_url(os.getenv('OSMUI_SQL_DATABASE_URI', 'sqlite:///db.sqlite3'))
+if 'sqlite' in sql_uri.drivername:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, sql_uri.database if sql_uri.database else 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': sql_uri.database if sql_uri.database else 'lwui',
+            'USER': sql_uri.username,
+            'PASSWORD': sql_uri.password,
+            'HOST': sql_uri.host,
+            'PORT': sql_uri.port,
+        }
+    }
+
 
 AUTHENTICATION_BACKENDS = ['authosm.backend.OsmBackend']
 
