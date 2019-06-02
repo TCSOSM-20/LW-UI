@@ -107,18 +107,27 @@
             </li>
             {% if user.is_admin %}
                 <li class="header">ADMIN</li>
-                {% url "users:list"   as  user_list_url %}
-                <li {% if request.get_full_path == user_list_url %} class="active" {% endif %}>
-                <a href='{% url "users:list"   %}'>
-                    <i class="fas fa-users"></i> <span>Users</span>
-                </a>
-                </li>
                 {% url "projects:projects_list"   as  proj_list_url %}
                 <li {% if request.get_full_path == proj_list_url %} class="active" {% endif %}>
                 <a href='{% url "projects:projects_list"   %}'>
                     <i class="fas fa-folder"></i> <span>Projects</span>
                 </a>
                 </li>
+                {% url "users:list"   as  user_list_url %}
+                <li {% if request.get_full_path == user_list_url %} class="active" {% endif %}>
+                <a href='{% url "users:list"   %}'>
+                    <i class="fas fa-users"></i> <span>Users</span>
+                </a>
+                </li>
+                {%comment%}
+                {% url "roles:list"   as  role_list_url %}
+                <li {% if request.get_full_path == role_list_url %} class="active" {% endif %}>
+                <a href='{% url "roles:list"   %}'>
+                    <i class="fas fa-user-tag"></i> <span>Roles</span>
+                </a>
+                </li>
+                {%endcomment%}
+                
             {% endif %}
         </ul>
     </section>

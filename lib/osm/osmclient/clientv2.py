@@ -73,6 +73,97 @@ class Client(object):
 
         return result
 
+    def role_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/roles".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+
+        return result
+
+    def role_create(self, token, role_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/roles".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=role_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def role_update(self, token, role_id, role_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/roles/{1}".format(self._base_path, role_id)
+        
+        try:
+            r = requests.patch(_url, json=role_data, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+    
+    def role_delete(self, token, id, force=None):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        query_path = ''
+        if force:
+            query_path = '?FORCE=true'
+        _url = "{0}/admin/v1/roles/{1}{2}".format(self._base_path, id, query_path)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def role_get(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        
+        _url = "{0}/admin/v1/roles/{1}".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None, verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def user_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -230,7 +321,6 @@ class Client(object):
             return result
         if r.status_code in (200, 201, 202, 204):
             result['error'] = False
-        result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def project_delete(self, token, id):

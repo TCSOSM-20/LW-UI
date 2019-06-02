@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'instancehandler',
     'sdnctrlhandler',
     'userhandler',
+    'rolehandler',
     'netslicehandler'
 
 ]

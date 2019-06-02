@@ -67,8 +67,9 @@
     <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 
     <script>
-   $(document).ready( function () {
-        var table = $('#projects_table').DataTable({
+        var table;
+    $(document).ready( function () {
+        table = $('#projects_table').DataTable({
             responsive: true,
             "ajax": {
                 "url": "/projects/list",
@@ -163,7 +164,7 @@
                         title: "Result",
                         message: "Project deleted.",
                         callback: function () {
-                            location.reload();
+                            table.ajax.reload();
                         }
                     });
                 }).fail(function(result){
@@ -200,7 +201,43 @@
                         title: "Result",
                         message: "Project created.",
                     callback: function () {
-                        location.reload();
+                        table.ajax.reload();
+                        $('#modal_new_project').modal('hide');
+                    }
+                    });
+            }).fail(function(result){
+                var data  = result.responseJSON;
+                var title = "Error " + (data.code ? data.code: 'unknown');
+                    var message = data.detail ? data.detail: 'No detail available.';
+                    bootbox.alert({
+                        title: title,
+                        message: message
+                    });
+            });
+        });
+    
+        $("#formEditProject").submit(function(event){
+            event.preventDefault(); //prevent default action
+            var post_url = $(this).attr("action"); //get form action url
+            var request_method = $(this).attr("method"); //get form GET/POST method
+            var form_data = new FormData(this); //Encode form elements for submission
+            console.log(post_url);
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data,
+                headers: {
+                    "Accept": 'application/json'
+                },
+                contentType: false,
+                processData: false
+            }).done(function (response,textStatus, jqXHR) {
+                bootbox.alert({
+                        title: "Result",
+                        message: "Project updated.",
+                    callback: function () {
+                        table.ajax.reload();
+                        $('#modal_edit_project').modal('hide');
                     }
                     });
             }).fail(function(result){
