@@ -149,13 +149,10 @@ Network Slices Templates
                 {
                     "render": function (data, type, row) {
                         return '<div class="btn-group">' +
-<<<<<<< Updated upstream
                             '   <button type="button" class="btn btn-default" data-container="body"\n' +
-                               'data-toggle="tooltip" data-placement="top" title="Instantiate NS"\n' +
-                               'onclick="javascript:openModalCreateNSI({\'template_name\':\''+row["name"]+'\', \'template_id\':\''+row["_id"]+'\', \'project_id\':\'{{ project_id }}\',\'vim_list_url\': \'{% url "vims:list"  %}\', \'nst_list_url\': \'{% url "netslices:list_templates" %}\'})">\n' +
-                               '<i class="fa fa-paper-plane"></i></button>\n'+
-=======
->>>>>>> Stashed changes
+                            '   data-toggle="tooltip" data-placement="top" title="Instantiate NS"\n' +
+                            '   onclick="javascript:openModalCreateNSI({\'template_name\':\''+row["name"]+'\', \'template_id\':\''+row["_id"]+'\', \'project_id\':\'{{ project_id }}\',\'vim_list_url\': \'{% url "vims:list"  %}\', \'nst_list_url\': \'{% url "netslices:list_templates" %}\'})">\n' +
+                            '   <i class="fa fa-paper-plane"></i></button>\n'+
                             '     <button type="button" class="btn btn-default"' +
                             '             onclick="javascript:showNstDetails(\'' + row["_id"] + '\')"' +
                             '             data-toggle="tooltip" data-placement="top" data-container="body" title="Open">' +
