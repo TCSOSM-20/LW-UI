@@ -15,8 +15,8 @@
 */
 
 
-function showOperationDetails(instance_id, operation_id) {
-    var url_info = '/instances/ns/'+instance_id+'/operation/' + operation_id;
+function showOperationDetails(type, instance_id, operation_id) {
+    var url_info = '/instances/'+type+'/'+instance_id+'/operation/' + operation_id;
     var dialog = bootbox.dialog({
         message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
         closeButton: true

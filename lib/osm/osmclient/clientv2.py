@@ -1092,7 +1092,7 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nsilcm/v1/nsi_lcm_op_occs/?nsInstanceId={1}".format(self._base_path, id)
+        _url = "{0}/nsilcm/v1/nsi_lcm_op_occs/?netsliceInstanceId={1}".format(self._base_path, id)
 
         try:
             r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
