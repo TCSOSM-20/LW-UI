@@ -67,7 +67,7 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
     current_project = models.CharField(_('project_id'), max_length=255)
 
     psw = models.CharField(_('psw'), max_length=36)
-    token = models.CharField(_('token'), max_length=36)
+    token = models.CharField(_('token'), max_length=255)
     project_id = models.CharField(_('project_id'), max_length=36)
     token_expires = models.FloatField(_('token_expires'), max_length=36)
 
