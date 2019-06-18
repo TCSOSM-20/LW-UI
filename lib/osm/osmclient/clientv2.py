@@ -22,6 +22,7 @@ import StringIO
 from lib.util import Util
 import hashlib
 import os
+import re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -115,7 +116,7 @@ class Client(object):
         _url = "{0}/admin/v1/roles/{1}".format(self._base_path, role_id)
         
         try:
-            r = requests.patch(_url, json=role_data, verify=False, headers=headers)
+            r = requests.put(_url, json=role_data, verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -153,15 +154,14 @@ class Client(object):
         
         _url = "{0}/admin/v1/roles/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.get(_url, params=None, verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
             return result
         if r.status_code in (200, 201, 202, 204):
             result['error'] = False
-        else:
-            result['data'] = Util.json_loads_byteified(r.text)
+        result['data'] = Util.json_loads_byteified(r.text)
         return result
 
     def user_list(self, token):
@@ -827,10 +827,10 @@ class Client(object):
 
     def _descriptor_update(self, tarf, data):
         # extract the package on a tmp directory
-        tarf.extractall('/tmp')
-
+        tarf.extractall('/tmp') 
+        regex = re.compile(r"^[^/]+(/[^/]+\.(yaml|yml))$", re.U)
         for name in tarf.getnames():
-            if name.endswith(".yaml") or name.endswith(".yml"):
+            if regex.match(name):
                 with open('/tmp/' + name, 'w') as outfile:
                     yaml.safe_dump(data, outfile, default_flow_style=False)
                 break
