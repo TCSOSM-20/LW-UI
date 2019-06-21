@@ -17,6 +17,7 @@
 from django.shortcuts import render, redirect
 from sf_t3d.decorators import login_required
 from django.http import HttpResponse
+import yaml
 import json
 import logging
 import authosm.utils as osmutils
@@ -42,8 +43,21 @@ def create(request):
     user = osmutils.get_user(request)
     client = Client()
     role_data ={
-       'name'
+       'name': request.POST['name'],
+       'root': True if request.POST.get('root') else False
     }
+    try:
+        if 'definition' in request.POST and request.POST.get('definition') != '':
+            role_definition = yaml.load(request.POST.get('definition'))
+
+            if not isinstance(role_definition, dict):
+                    raise ValueError('Role definition should be provided in a key-value fashion')
+            for key, value in role_definition.items():
+                if not isinstance(value, bool):
+                    raise ValueError('Value in a role definition should be boolean')
+                role_data[key] = value
+    except Exception as e:
+        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
     result = client.role_create(user.get_token(), role_data)
     if result['error']:
         return __response_handler(request, result['data'], url=None,
@@ -70,20 +84,52 @@ def delete(request, role_id=None):
 @login_required
 def update(request, role_id=None):
     user = osmutils.get_user(request)
+    client = Client()
+    payload = {
+        '_id': role_id,
+        'name': request.POST['name'],
+        'root': True if request.POST.get('root') else False
+    }
     try:
-        client = Client()
-        payload = {}
-        if request.POST.get('name') and request.POST.get('name') is not '':
-            payload["name"] = request.POST.get('name')
-        update_res = client.role_update(user.get_token(), role_id, payload)
+        if 'definition' in request.POST and request.POST.get('definition') != '':
+            role_definition = yaml.load(request.POST.get('definition'))
+
+            if not isinstance(role_definition, dict):
+                    raise ValueError('Role definition should be provided in a key-value fashion')
+            for key, value in role_definition.items():
+                if not isinstance(value, bool):
+                    raise ValueError('Value in a role definition should be boolean')
+                payload[key] = value
     except Exception as e:
-        log.exception(e)
-        update_res = {'error': True, 'data': str(e)}
-    if update_res['error']:
-        return __response_handler(request, update_res['data'], url=None,
-                                  status=update_res['data']['status'] if 'status' in update_res['data'] else 500)
+        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
+    result = client.role_update(user.get_token(), role_id, payload)
+    if result['error']:
+        return __response_handler(request, result['data'], url=None,
+                                  status=result['data']['status'] if 'status' in result['data'] else 500)
     else:
         return __response_handler(request, {}, url=None, status=200)
+
+@login_required
+def get(request, role_id=None):
+    user = osmutils.get_user(request)
+    try:
+        client = Client()
+        get_res = client.role_get(user.get_token(), role_id)
+    except Exception as e:
+        log.exception(e)
+        get_res = {'error': True, 'data': str(e)}
+    if get_res['error']:
+        return __response_handler(request, get_res['data'], url=None,
+                                  status=get_res['data']['status'] if 'status' in get_res['data'] else 500)
+    else:
+        role = get_res['data']
+        result = {
+            '_id': role['_id'],
+            'name': role['name'],
+            'root': role['root'],
+            'definition': { key:value for key, value in role.items() if key not in ['_id', 'name', 'root', '_admin'] }
+        }
+        return __response_handler(request, result, url=None, status=200)
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):

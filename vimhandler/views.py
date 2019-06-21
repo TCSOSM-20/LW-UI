@@ -94,7 +94,6 @@ def show(request, vim_id=None):
     project_id = user.project_id
     client = Client()
     result = client.vim_get(user.get_token(), vim_id)
-    print result
     if isinstance(result, dict) and 'error' in result and result['error']:
         return render(request, 'error.html')
 
