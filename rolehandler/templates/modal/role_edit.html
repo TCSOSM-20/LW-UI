@@ -14,10 +14,26 @@
                 <div class="modal-body" id="modal_edit_role_body">
                     
                     <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">Name</label>
+                        <label for="rolename" class="col-sm-3 control-label">Name *</label>
                         <div class="col-sm-6">
-                           <input class="form-control" id="edit_role_name" name="role" 
-                                   placeholder="Name">
+                            <input class="form-control" type="text" id="edit_rolename" name="name"
+                                       placeholder="Name" required>
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                            <div class="col-sm-6">
+                                    <div class="checkbox">
+                                            <label><input type="checkbox" id="edit_root" name="root"> Root</label>
+                                        </div>
+                            </div>
+                        </div>
+                        
+                    <div class="form-group">
+                        <label for="definition" class="col-sm-3 control-label">Definition </label>
+                        <div class="col-sm-6">
+                            <textarea class="form-control" id="edit_definition" name="definition" placeholder="Yaml definition"
+                                      rows="3"></textarea>
                         </div>
                     </div>
                    

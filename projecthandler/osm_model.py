@@ -56,11 +56,10 @@ class OsmProject(object):
             client = Client()
             if type_descriptor == 'nsd':
                 result = client.nsd_get(descriptor_id)
-                print result
+                
             elif type_descriptor == 'vnfd':
                 result = client.vnfd_get(descriptor_id)
 
-                print result
         except Exception as e:
             log.exception(e)
             result = {}
@@ -175,11 +174,11 @@ class OsmProject(object):
             else:
                 return False
             result = yaml.load(result)
-            print result
+            
         except Exception as e:
             log.exception(e)
             result = False
-        print result
+        
         return result
 
     def get_add_element(self, request):
@@ -215,7 +214,6 @@ class OsmProject(object):
         except Exception as e:
             log.exception(e)
             result = False
-        print result
         return result
 
     @staticmethod
@@ -232,5 +230,4 @@ class OsmProject(object):
         except Exception as e:
             log.exception(e)
             result = False
-        print result
         return result

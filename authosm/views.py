@@ -26,8 +26,7 @@ def user_login(request):
 
     error_message = ''
     if request.POST:
-        print request.POST.get('username')
-        print request.POST.get('password')
+        
         next_page = request.POST.get('next')
         next_page = urllib.unquote(next_page).decode('iso-8859-2')
         try:

@@ -167,7 +167,7 @@ def create(request, type=None):
         except Exception as e:
             return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
         result = client.ns_create(user.get_token(), ns_data)
-        print result
+        
         if result['error']:
             return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
