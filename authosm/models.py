@@ -69,6 +69,7 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
     psw = models.CharField(_('psw'), max_length=36)
     token = models.CharField(_('token'), max_length=255)
     project_id = models.CharField(_('project_id'), max_length=36)
+    project_name = models.CharField(_('project_name'), max_length=36, default='')
     token_expires = models.FloatField(_('token_expires'), max_length=36)
 
     objects = OsmUserManager()
@@ -91,11 +92,12 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
 
     def get_projects(self):
         client = Client()
-        result = client.get_user_info(self.get_token(), self.username)
-        if 'error' in result and result['error'] is True:
+        user_info = client.get_user_info(self.get_token(), self.username)
+        projects = client.get_projects(self.get_token(), user_info['data']['projects'])
+        if 'error' in projects and projects['error'] is True:
             return []
         else:
-            return result['data']['projects']
+            return projects['data']
 
     def switch_project(self, project_id):
         client = Client()
@@ -105,6 +107,7 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
         else:
             self.token = result['data']['id']
             self.project_id = result['data']['project_id']
+            self.project_name = result['data']['project_name']
             self.token_expires = result['data']['expires']
             self.save()
             return True

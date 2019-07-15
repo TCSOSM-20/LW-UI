@@ -77,7 +77,7 @@ def open_project(request):
         vnf = client.vnf_list(user.get_token())
         project_overview = {
             'owner': user.username,
-            'name': project_id,
+            'name': user.project_name,
             'updated_date': prj['data']['_admin']['modified'] if prj and prj['error'] is False else '-',
             'created_date': prj['data']['_admin']['created'] if prj and prj['error'] is False else '-',
 

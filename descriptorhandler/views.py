@@ -148,6 +148,7 @@ def updateElement(request, descriptor_type=None, descriptor_id=None, element_typ
 def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
+    project_name = user.project_name
     if request.method == 'POST':
         new_data = request.POST.get('text'),
         data_type = request.POST.get('type')
@@ -199,6 +200,7 @@ def edit_descriptor(request, descriptor_id=None, descriptor_type=None):
         # print descriptor
         return render(request, page, {
             'project_id': project_id,
+            'project_name': project_name,
             'descriptor_id': descriptor_id,
             'descriptor_type': descriptor_type,
             'descriptor_strings': {'descriptor_string_yaml': descriptor_string_yaml,

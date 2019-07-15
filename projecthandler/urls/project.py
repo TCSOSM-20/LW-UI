@@ -22,9 +22,9 @@ urlpatterns = [
     url(r'^list/', views.user_projects, name='projects_list'),
     url(r'^new/', views.create_new_project, name='new_project'),
     url(r'^descriptors/', include('descriptorhandler.urls', namespace='descriptors'), name='descriptor_base'),
-    url(r'^(?P<project_id>[\w ]+)/delete$', views.delete_project, name='delete_project'),
-    url(r'^(?P<project_id>[\w ]+)/switch', views.switch_project, name='switch_project'),
-    url(r'^(?P<project_id>[\w ]+)/edit', views.edit_project, name='edit_project'),
+    url(r'^(?P<project_id>[-\w]+)/delete$', views.delete_project, name='delete_project'),
+    url(r'^(?P<project_id>[-\w]+)/switch', views.switch_project, name='switch_project'),
+    url(r'^(?P<project_id>[-\w]+)/edit', views.edit_project, name='edit_project'),
 
 
 

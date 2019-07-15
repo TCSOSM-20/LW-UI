@@ -252,6 +252,27 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def get_projects(self, token, uuids):
+        result = {'error': False, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        
+        projects = []
+        try:
+            for uuid in uuids:
+                _url = "{0}/admin/v1/projects/{1}".format(self._base_path, uuid)
+                r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+                if r.status_code not in (200, 201, 202, 204):
+                    raise Exception()
+                projects.append(Util.json_loads_byteified(r.text))
+        except Exception as e:
+            log.exception(e)
+            result['error'] = True
+            result['data'] = str(e)
+            return result
+        result['data'] = projects
+        return result
+
     def project_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",

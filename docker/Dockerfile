@@ -7,7 +7,9 @@ RUN apt-get update
 RUN apt-get install -y npm git python-pip nginx supervisor libmysqlclient-dev mysql-client
 RUN npm install -g bower
 RUN ln -s /usr/bin/nodejs /usr/bin/node
-RUN bower install --allow-root
+#RUN bower install --allow-root
+RUN npm install
+RUN mv node_modules /static
 RUN pip install -r requirements.txt
 RUN pip install uwsgi
 

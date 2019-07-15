@@ -44,6 +44,9 @@ target/
 #Bower
 static/bower_components
 
+#npm
+static/node_modules
+
 #migrations
 projecthandler/migrations/
 descriptorhandler/migrations/

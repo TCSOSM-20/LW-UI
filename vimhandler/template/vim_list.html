@@ -5,7 +5,7 @@
 
 {% block head_block %}
     {{ block.super }}
-    <link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs/css/dataTables.bootstrap.min.css">
 {% endblock %}
 {% block title_header_big %}
     {{ block.super }}
@@ -62,8 +62,8 @@
 
 {% block resource_block %}
     {{ block.super }}
-    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/node_modules/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     <script>
     $(document).ready( function () {
         var table = $('#vims_table').DataTable({

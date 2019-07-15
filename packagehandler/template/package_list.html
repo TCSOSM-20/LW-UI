@@ -4,7 +4,7 @@
 
 {% block head_block %}
   	{{ block.super }}
-<link rel="stylesheet" href="/static/bower_components/select2/dist/css/select2.min.css">
+<link rel="stylesheet" href="/static/node_modules/select2/dist/css/select2.min.css">
 {% endblock %}
 
 {% block title_header_big %}
@@ -22,7 +22,7 @@
 
 {% block breadcrumb_body %}
   	{{ block.super }}
-    <li><a href="{% url 'projects:open_project' %}">{{project_id}}</a></li>
+    <li><a href="{% url 'projects:open_project' %}">{{project_name}}</a></li>
     <li><a> {% if package_type  %}
      {{ package_type }}
   {% else%}
@@ -49,7 +49,7 @@
 
 {% block resource_block %}
   	{{ block.super }}
-     <script src="/static/bower_components/select2/dist/js/select2.js"></script>
+     <script src="/static/node_modules/select2/dist/js/select2.js"></script>
     <script src="/static/src/instancehandler/instance_create.js"></script>
     <script src="/static/src/packagehandler/packages_list.js"></script>
     <script src="/static/src/drop_zone.js"></script>
