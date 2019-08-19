@@ -44,17 +44,16 @@ def create(request):
     client = Client()
     role_data ={
        'name': request.POST['name'],
-       'root': True if request.POST.get('root') else False
     }
     try:
-        if 'definition' in request.POST and request.POST.get('definition') != '':
-            role_definition = yaml.load(request.POST.get('definition'))
+        if 'permissions' in request.POST and request.POST.get('permissions') != '':
+            role_permissions = yaml.load(request.POST.get('permissions'))
 
-            if not isinstance(role_definition, dict):
-                    raise ValueError('Role definition should be provided in a key-value fashion')
-            for key, value in role_definition.items():
+            if not isinstance(role_permissions, dict):
+                    raise ValueError('Role permissions should be provided in a key-value fashion')
+            for key, value in role_permissions.items():
                 if not isinstance(value, bool):
-                    raise ValueError('Value in a role definition should be boolean')
+                    raise ValueError("Value of '{}' in a role permissionss should be boolean".format(key))
                 role_data[key] = value
     except Exception as e:
         return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
@@ -86,19 +85,17 @@ def update(request, role_id=None):
     user = osmutils.get_user(request)
     client = Client()
     payload = {
-        '_id': role_id,
         'name': request.POST['name'],
-        'root': True if request.POST.get('root') else False
     }
     try:
-        if 'definition' in request.POST and request.POST.get('definition') != '':
-            role_definition = yaml.load(request.POST.get('definition'))
+        if 'permissions' in request.POST and request.POST.get('permissions') != '':
+            role_permissions = yaml.load(request.POST.get('permissions'))
 
-            if not isinstance(role_definition, dict):
-                    raise ValueError('Role definition should be provided in a key-value fashion')
-            for key, value in role_definition.items():
+            if not isinstance(role_permissions, dict):
+                    raise ValueError('Role permissions should be provided in a key-value fashion')
+            for key, value in role_permissions.items():
                 if not isinstance(value, bool):
-                    raise ValueError('Value in a role definition should be boolean')
+                    raise ValueError('Value in a role permissions should be boolean')
                 payload[key] = value
     except Exception as e:
         return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
@@ -126,8 +123,7 @@ def get(request, role_id=None):
         result = {
             '_id': role['_id'],
             'name': role['name'],
-            'root': role['root'],
-            'definition': { key:value for key, value in role.items() if key not in ['_id', 'name', 'root', '_admin'] }
+            'permissions': { key:value for key, value in role['permissions'].items() if key not in ['_id', 'name', 'root', '_admin'] }
         }
         return __response_handler(request, result, url=None, status=200)
 

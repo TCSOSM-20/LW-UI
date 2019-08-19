@@ -93,11 +93,10 @@ class AbstractOsmUser(AbstractBaseUser, PermissionsMixin):
     def get_projects(self):
         client = Client()
         user_info = client.get_user_info(self.get_token(), self.username)
-        projects = client.get_projects(self.get_token(), user_info['data']['projects'])
-        if 'error' in projects and projects['error'] is True:
+        if 'error' in user_info and user_info['error'] is True:
             return []
         else:
-            return projects['data']
+            return user_info['data']['project_role_mappings']
 
     def switch_project(self, project_id):
         client = Client()

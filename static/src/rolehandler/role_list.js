@@ -40,7 +40,7 @@ function openModalEditRole(args) {
         $("#formEditRole").attr("action", url_update);
         $('#modal_edit_role').modal('show');
         $('#edit_rolename').val(response['name'])
-        $('#edit_definition').val(JSON.stringify(response['definition']))
+        $('#edit_permissions').val(JSON.stringify(response['permissions']))
         if(response['root'] === true){
             $("#edit_root").attr("checked", true);
         }

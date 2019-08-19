@@ -1,3 +1,18 @@
+<!--
+Copyright 2019 EveryUP srl
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an  BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 {% extends "base.html" %}
 {% load get %}
 {% load date_tag %}
@@ -26,7 +41,9 @@
     {{ block.super }}
     {% include 'modal/user_details.html' %}
     {% include 'modal/user_create.html' %}
-    {% include 'modal/user_edit.html' %}
+    {% include 'modal/user_credentials_edit.html' %}
+    {% include 'modal/user_proj_role_edit.html' %}
+
 
     {% csrf_token %}
     <div class="row">
@@ -50,7 +67,6 @@
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Projects</th>
                             <th>Identifier</th>
                             <th>Modified</th>
                             <th>Created</th>
@@ -105,27 +121,22 @@
                     },
                     {
                         "render": function (data, type, row) {
-                            return row['projects'];
+                            
+                            return row['_id'];
                         },
                         "targets": 1
                     },
                     {
                         "render": function (data, type, row) {
-                            return row['_id'];
+                            return moment.unix(row["_admin"]['modified']).format('YYYY-MM-DD hh:mm:ss a');
                         },
                         "targets": 2
                     },
                     {
                         "render": function (data, type, row) {
-                            return moment.unix(row["_admin"]['modified']).format('YYYY-MM-DD hh:mm:ss a');
-                        },
-                        "targets": 3
-                    },
-                    {
-                        "render": function (data, type, row) {
                             return moment.unix(row["_admin"]['created']).format('YYYY-MM-DD hh:mm:ss a');
                         },
-                        "targets": 4
+                        "targets": 3
                     },
                     {
                         "render": function (data, type, row) {
@@ -134,17 +145,19 @@
                                 'data-toggle="dropdown" aria-expanded="false">Actions ' +
                                 '<span class="fa fa-caret-down"></span></button> ' +
                                 '<ul class="dropdown-menu">' +
-                                '<li> <a href="#" onclick="javascript:openModalEditUser({user_id:\'' + row['_id'] + '\', usernarme:\'' + row['username'] + '\', projects: \'' + row['projects'] + '\'})">' +
-                                '<i class="fa fa-edit"></i> Edit</a></li>' +
+                                '<li> <a href="#" onclick="javascript:openModalEditUserCredentials({user_id:\'' + row['_id'] + '\', usernarme:\'' + row['username'] + '\'})">' +
+                                '<i class="fa fa-lock"></i>Edit Credentials</a></li>' +
+                                '<li> <a href="#" onclick="javascript:openModalEditUserRoleMap(\''+row['_id']+'\')">' +
+                                '<i class="fa fa-user-tag"></i>Projects-Roles</a></li>' +
                                 '<li> <a href="#" onclick="javascript:deleteUser(\'' + row['_id'] + '\', \'' + row['username'] + '\')"' +
                                 'style="color:red"><i class="fa fa-trash"></i> Delete</a></li> </ul></div>';
                         },
-                        "targets": 5,
+                        "targets": 4,
                         "orderable": false
                     }
                 ]
             });
-
+            /*
             var select2_groups = $('#projects_edit').select2({
                 placeholder: 'Select Projects',
                 width: '100%',
@@ -169,8 +182,8 @@
                         };
                     }
                 }
-            });
-
+            });*/
+            /*
             var select2_single = $('#default_project_edit').select2({
                 placeholder: 'Select Default Project',
                 width: '100%',
@@ -194,7 +207,7 @@
                         };
                     }
                 }
-            });
+            });*/
 
             setInterval(function () {
                 table.ajax.reload();
@@ -250,7 +263,7 @@
                     contentType: false,
                     processData: false
                 }).done(function (response, textStatus, jqXHR) {
-                    $('#modal_edit_user').modal('hide');
+                    $('#modal_edit_user_credentials').modal('hide');
                     table.ajax.reload();
                     bootbox.alert({
                         title: "Result",
@@ -268,6 +281,11 @@
                 });
             });
         
+            $("#password2").keyup(validatePswOnCreate);
+            $("#edit_password2").keyup(validatePswOnEdit);
+
+            $(document).on('click', '.proj-role-map-group-head .btn-add', addMapGroup);
+            $(document).on('click', '.proj-role-map-group .btn-remove', removeMapGroup);
         });
     </script>
 
