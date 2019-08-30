@@ -32,9 +32,10 @@ log = logging.getLogger('packagehandler/view.py')
 
 
 @login_required
-def show_packages(request, package_type=None):
+def list_packages(request, package_type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
+    project_name = user.project_name
     client = Client()
     filter = request.GET.get('type')
     try:
@@ -50,6 +51,7 @@ def show_packages(request, package_type=None):
     return __response_handler(request, {
         'descriptors': descriptors['data'] if descriptors and descriptors['error'] is False else [],
         'project_id': project_id,
+        'project_name': project_name,
         'project_type': 'osm',
         'package_type': package_type
     }, url)

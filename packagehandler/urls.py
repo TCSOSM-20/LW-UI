@@ -16,7 +16,7 @@ from django.conf.urls import url
 from packagehandler import views
 
 urlpatterns = [
-    url(r'(?P<package_type>\w+)/list$', views.show_packages, name='list_packages'),
+    url(r'(?P<package_type>\w+)/list$', views.list_packages, name='list_packages'),
     url(r'(?P<package_type>\w+)/create', views.create_package_empty, name='create_package_empty'),
     url(r'(?P<package_type>\w+)/(?P<package_id>[-\w]+)/delete$', views.delete_package, name='delete_package'),
     url(r'(?P<package_type>\w+)/(?P<package_id>[-\w]+)/clone', views.clone_package, name='clone_package'),

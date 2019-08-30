@@ -15,6 +15,8 @@
 #
 
 import os
+import sys
+
 from sqlalchemy.engine.url import make_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -206,3 +208,28 @@ else:
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[django] %(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

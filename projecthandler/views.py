@@ -75,11 +75,13 @@ def open_project(request):
         vnfd = client.vnfd_list(user.get_token())
         ns = client.ns_list(user.get_token())
         vnf = client.vnf_list(user.get_token())
+
+        proj_data_admin =  prj['data']['_admin'] if prj and prj['data'] and  prj['data']['_admin'] and prj['error'] is False else None
         project_overview = {
             'owner': user.username,
-            'name': project_id,
-            'updated_date': prj['data']['_admin']['modified'] if prj and prj['error'] is False else '-',
-            'created_date': prj['data']['_admin']['created'] if prj and prj['error'] is False else '-',
+            'name': user.project_name,
+            'updated_date': proj_data_admin['modified'] if proj_data_admin else '-',
+            'created_date': proj_data_admin['created'] if proj_data_admin else '-',
 
             'type': 'osm',
             'nsd': len(nsd['data']) if nsd and nsd['error'] is False else 0,

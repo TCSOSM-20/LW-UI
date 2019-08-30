@@ -43,6 +43,7 @@ class OsmBackend(object):
                     user.psw = password
                     user.token = result['data']['id']
                     user.project_id = result['data']['project_id']
+                    user.project_name = result['data']['project_name']
                     user.token_expires = result['data']['expires']
                     user.is_admin = bool(result['data']['admin'])
                     user.save()
