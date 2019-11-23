@@ -58,7 +58,7 @@ def user_projects(request):
     user = osmutils.get_user(request)
     client = Client()
     result = client.project_list(user.get_token())
-    return __response_handler(request,{
+    return __response_handler(request, {
         'projects': result['data'] if result and result['error'] is False else [],
     },'projectlist.html')
 
@@ -75,8 +75,7 @@ def open_project(request):
         vnfd = client.vnfd_list(user.get_token())
         ns = client.ns_list(user.get_token())
         vnf = client.vnf_list(user.get_token())
-
-        proj_data_admin =  prj['data']['_admin'] if prj and prj['data'] and  prj['data']['_admin'] and prj['error'] is False else None
+        proj_data_admin =  prj['data']['_admin'] if prj and prj['error'] is False and prj['data'] and  prj['data']['_admin'] else None
         project_overview = {
             'owner': user.username,
             'name': user.project_name,
@@ -130,9 +129,6 @@ def edit_project(request, project_id):
                                       status=result['data']['status'] if 'status' in result['data'] else 500)
         else:
             return __response_handler(request, {}, url=None, status=200)
-
-
-
 
 
 def __response_handler(request, data_res, url=None, to_redirect=None, *args, **kwargs):
