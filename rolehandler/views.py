@@ -42,7 +42,7 @@ def role_list(request):
 def create(request):
     user = osmutils.get_user(request)
     client = Client()
-    role_data ={
+    role_data = {
        'name': request.POST['name'],
     }
     try:
@@ -50,13 +50,13 @@ def create(request):
             role_permissions = yaml.load(request.POST.get('permissions'))
 
             if not isinstance(role_permissions, dict):
-                    raise ValueError('Role permissions should be provided in a key-value fashion')
+                raise ValueError('Role permissions should be provided in a key-value fashion')
             for key, value in role_permissions.items():
                 if not isinstance(value, bool):
                     raise ValueError("Value of '{}' in a role permissionss should be boolean".format(key))
                 role_data[key] = value
     except Exception as e:
-        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
+        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message}, url=None, status=400)
     result = client.role_create(user.get_token(), role_data)
     if result['error']:
         return __response_handler(request, result['data'], url=None,
@@ -80,12 +80,14 @@ def delete(request, role_id=None):
     else:
         return __response_handler(request, {}, url=None, status=200)
 
+
 @login_required
 def update(request, role_id=None):
     user = osmutils.get_user(request)
     client = Client()
     payload = {
         'name': request.POST['name'],
+        'permissions': {}
     }
     try:
         if 'permissions' in request.POST and request.POST.get('permissions') != '':
@@ -96,15 +98,16 @@ def update(request, role_id=None):
             for key, value in role_permissions.items():
                 if not isinstance(value, bool):
                     raise ValueError('Value in a role permissions should be boolean')
-                payload[key] = value
+                payload['permissions'][key] = value
     except Exception as e:
-        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message} , url=None, status=400)
+        return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message}, url=None, status=400)
     result = client.role_update(user.get_token(), role_id, payload)
     if result['error']:
         return __response_handler(request, result['data'], url=None,
                                   status=result['data']['status'] if 'status' in result['data'] else 500)
     else:
         return __response_handler(request, {}, url=None, status=200)
+
 
 @login_required
 def get(request, role_id=None):
@@ -123,7 +126,7 @@ def get(request, role_id=None):
         result = {
             '_id': role['_id'],
             'name': role['name'],
-            'permissions': { key:value for key, value in role['permissions'].items() if key not in ['_id', 'name', 'root', '_admin'] }
+            'permissions': {key: value for key, value in role['permissions'].items() if key not in ['_id', 'name', 'root', '_admin'] }
         }
         return __response_handler(request, result, url=None, status=200)
 
