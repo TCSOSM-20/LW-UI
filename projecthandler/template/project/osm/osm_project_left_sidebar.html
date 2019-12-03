@@ -114,6 +114,30 @@ limitations under the License.
                 </a>
             </li>
 
+            {% url "k8sc:list"   as  k8sc_list_url %}
+            <li {% if request.get_full_path == k8sc_list_url %} class="active treeview menu-open" {% else %} class="treeview  menu-open" {% endif %} >
+                <a href="#">
+                    <i class="fa fa-paper-plane fa-fw"></i> <span>K8s</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu" style="display: block;">
+                        {% url "k8sc:list"   as  k8sc_list_url %}
+                        <li {% if request.get_full_path == k8sc_list_url %} class="active" {% endif %} >
+                            <a href='{% url "k8sc:list"   %}'>
+                                <b>K8s</b> <span>Clusters</span>
+                            </a>
+                        </li>
+                        {% url "k8sr:list"   as  k8srepo_list_url %}
+                        <li {% if request.get_full_path == k8srepo_list_url %} class="active" {% endif %} >
+                            <a href='{% url "k8sr:list"   %}'>
+                                <b>K8s</b> <span>Repos</span>
+                            </a>
+                        </li>
+                </ul>
+            </li>
+
             {% url "wims:list"   as  wim_list_url %}
             <li {% if request.get_full_path == wim_list_url %} class="active" {% endif %}>
                 <a href='{% url "wims:list"   %}'>

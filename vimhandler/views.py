@@ -78,6 +78,7 @@ def create(request):
         # TODO  'vim:show', to_redirect=True, vim_id=vim_id
         return __response_handler(request, result, 'vims:list', to_redirect=True, )
 
+
 @login_required
 def delete(request, vim_id=None):
     user = osmutils.get_user(request)
@@ -88,6 +89,7 @@ def delete(request, vim_id=None):
         log.exception(e)
     return __response_handler(request, del_res, 'vims:list', to_redirect=True, )
 
+   
 @login_required
 def show(request, vim_id=None):
     user = osmutils.get_user(request)

@@ -1,0 +1,85 @@
+<!--
+Copyright 2019 EveryUP srl
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an  BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="modal" id="modal_new_k8sc" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">New K8s Cluster</h4>
+            </div>
+            <form id="formCreatek8sc" action='{% url "k8sc:create" %}'
+                  class="form-horizontal"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" id="modal_new_k8sc_body">
+                    <div class="form-group">
+                        <label for="k8sc_name" class="col-sm-2">Name *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sc_name" name="name" placeholder="Name" required>
+                        </div>
+                        <label for="k8sc_vim_account" class="col-sm-2">Vim Account *</label>
+                        <div class="col-sm-3">
+                            <select required id="k8sc_vim_account" class="js-example-basic form-control" name="vim_account">
+                            </select>
+                        </div>
+                        
+                    </div> 
+                    
+
+                    <div class="form-group">
+                        <label for="k8sc_version" class="col-sm-2">K8s Version *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sc_version" name="k8s_version"
+                                        placeholder="K8s Version" required>
+                        </div>
+                        <label for="k8sc_nets" class="col-sm-2">Nets*</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sc_nets" name="nets"
+                                        placeholder="Nets" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="credentials" class="col-sm-3 control-label">Credentials *</label>
+                        <div class="col-sm-6">
+                            <textarea class="form-control" id="credentials" name="credentials" placeholder="Yaml"
+                                      rows="3"></textarea>
+                            <!--<p class="help-block">Or load from file</p>
+                            <input type="file" id="credentials_file" name=credentials_file">-->
+                        </div>
+                    </div>
+
+                    
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary"
+                            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Creating..."
+                            id="create_new_k8sc">Create
+                    </button>
+
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+

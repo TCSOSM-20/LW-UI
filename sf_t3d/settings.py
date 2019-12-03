@@ -64,7 +64,9 @@ INSTALLED_APPS = [
     'sdnctrlhandler',
     'userhandler',
     'rolehandler',
-    'netslicehandler'
+    'netslicehandler',
+    'k8sclusterhandler',
+    'k8srepohandler'
 
 ]
 
@@ -105,6 +107,8 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'sdnctrlhandler', 'template'),
             os.path.join(BASE_DIR, 'userhandler', 'templates'),
             os.path.join(BASE_DIR, 'netslicehandler', 'template'),
+            os.path.join(BASE_DIR, 'k8sclusterhandler', 'template'),
+            os.path.join(BASE_DIR, 'k8srepohandler', 'template'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

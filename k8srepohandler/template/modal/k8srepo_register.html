@@ -1,0 +1,76 @@
+<!--
+Copyright 2019 EveryUP srl
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an  BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="modal" id="modal_new_k8sr" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">New K8s Repository</h4>
+            </div>
+            <form id="formCreatek8sr" action='{% url "k8sr:create" %}'
+                  class="form-horizontal"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" id="modal_new_k8sr_body">
+                    <div class="form-group">
+                        <label for="k8sr_name" class="col-sm-2">Name *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sr_name" name="name" placeholder="Name" required>
+                        </div>
+                        <label for="k8sr_type" class="col-sm-2">Type *</label>
+                        <div class="col-sm-3">
+                            <select required id="k8sr_type" name="type" class="form-control">
+                                <option value="chart">Chart</option>
+                                <option value="bundle">Bundle</option>
+                            </select>
+                        </div>
+                        
+                    </div> 
+                    
+
+                    <div class="form-group">
+                        <label for="k8sr_url" class="col-sm-2">Url *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sr_url" name="url"
+                                        placeholder="Url" required>
+                        </div>
+                        <label for="k8sr_description" class="col-sm-2">Description</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sr_description" name="description"
+                                        placeholder="Description" >
+                        </div>
+                    </div>               
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary"
+                            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Creating..."
+                            id="create_new_k8sr">Register
+                    </button>
+
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+
