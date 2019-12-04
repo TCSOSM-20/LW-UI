@@ -334,7 +334,7 @@ class Client(object):
         _url = "{0}/admin/v1/projects/{1}".format(self._base_path, id)
 
         try:
-            r = requests.put(_url, json=project_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=project_data, verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
