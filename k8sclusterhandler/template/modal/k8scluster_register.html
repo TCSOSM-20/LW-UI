@@ -32,34 +32,41 @@ limitations under the License.
                         <div class="col-sm-3">
                             <input class="form-control" id="k8sc_name" name="name" placeholder="Name" required>
                         </div>
-                        <label for="k8sc_vim_account" class="col-sm-2">Vim Account *</label>
-                        <div class="col-sm-3">
-                            <select required id="k8sc_vim_account" class="js-example-basic form-control" name="vim_account">
-                            </select>
-                        </div>
-                        
-                    </div> 
-                    
-
-                    <div class="form-group">
                         <label for="k8sc_version" class="col-sm-2">K8s Version *</label>
                         <div class="col-sm-3">
                             <input class="form-control" id="k8sc_version" name="k8s_version"
                                         placeholder="K8s Version" required>
                         </div>
-                        <label for="k8sc_nets" class="col-sm-2">Nets*</label>
+                       
+                        
+                    </div> 
+                    
+                    <div class="form-group">
+                        
+                        <label for="k8sc_vim_account" class="col-sm-2">Vim Account *</label>
                         <div class="col-sm-3">
-                            <input class="form-control" id="k8sc_nets" name="nets"
-                                        placeholder="Nets" >
+                            <select required id="k8sc_vim_account" class="js-example-basic form-control" name="vim_account">
+                            </select>
+                        </div>
+
+                        <label for="k8sc_description" class="col-sm-2">Description *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="k8sc_description" name="description"
+                                        placeholder="Description" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="credentials" class="col-sm-3 control-label">Credentials *</label>
+                        <label for="k8sc_nets" class="col-sm-2">Nets*</label>
+                        <div class="col-sm-6">
+                            <textarea class="form-control" id="k8sc_nets" name="nets" placeholder="example: {'net1': 'osm-ext'}"
+                                        rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="k8sc_nets" class="col-sm-2">Credentials*</label>
                         <div class="col-sm-6">
                             <textarea class="form-control" id="credentials" name="credentials" placeholder="Yaml"
-                                      rows="3"></textarea>
-                            <!--<p class="help-block">Or load from file</p>
-                            <input type="file" id="credentials_file" name=credentials_file">-->
+                                        rows="2"></textarea>
                         </div>
                     </div>
 

@@ -55,6 +55,7 @@ def create(request):
             "name": request.POST.get('name'),
             "credentials": yaml.load(request.POST.get('credentials')),
             "vim_account": request.POST.get('vim_account'),
+            "description": request.POST.get('description'),
             "k8s_version": request.POST.get('k8s_version'),
             "nets": yaml.load(request.POST.get('nets')),
         }
