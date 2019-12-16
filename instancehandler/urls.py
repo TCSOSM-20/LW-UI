@@ -18,7 +18,7 @@ from django.conf.urls import url
 from instancehandler import views
 
 urlpatterns = [
-    url(r'^(?P<type>[ns|vnf|pdu|nsi]+)/list/', views.list, name='list'),
+    url(r'^(?P<type>[ns|vnf|pdu|nsi]+)/list/', views.get_list, name='list'),
     url(r'^(?P<type>[ns|pdu|nsi]+)/create/', views.create, name='create'),
     url(r'^(?P<type>[ns|pdu|nsi]+)/(?P<instance_id>[0-9a-z-]+)/delete$', views.delete, name='delete'),
     url(r'^(?P<type>[ns|vnf]+)/(?P<instance_id>[0-9a-z-]+)/topology', views.show_topology, name='show_topology'),

@@ -29,7 +29,7 @@ log = logging.getLogger('instancehandler/view.py')
 
 
 @login_required
-def list(request, type=None):
+def get_list(request, type=None):
     user = osmutils.get_user(request)
     project_id = user.project_id
     client = Client()
