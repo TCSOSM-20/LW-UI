@@ -157,57 +157,7 @@ limitations under the License.
                     }
                 ]
             });
-            /*
-            var select2_groups = $('#projects_edit').select2({
-                placeholder: 'Select Projects',
-                width: '100%',
-                ajax: {
-                    url: '/projects/list',
-                    dataType: 'json',
-                    processResults: function (data) {
-                        projects = [];
-                        if (data['projects']) {
-                            for (d in data['projects']) {
-                                var project = data['projects'][d];
-                                projects.push({
-                                    "id": project['_id'],
-                                    "text": project['name']
-                                });
 
-                            }
-                        }
-
-                        return {
-                            results: projects
-                        };
-                    }
-                }
-            });*/
-            /*
-            var select2_single = $('#default_project_edit').select2({
-                placeholder: 'Select Default Project',
-                width: '100%',
-                ajax: {
-                    url: '/projects/list',
-                    dataType: 'json',
-                    processResults: function (data) {
-                        projects = [];
-                        if (data['projects']) {
-                            for (d in data['projects']) {
-                                var project = data['projects'][d];
-                                projects.push({
-                                    id: project['_id'],
-                                    text: project['name']
-                                });
-                            }
-                        }
-
-                        return {
-                            results: projects
-                        };
-                    }
-                }
-            });*/
 
             setInterval(function () {
                 table.ajax.reload();

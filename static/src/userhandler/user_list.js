@@ -27,7 +27,7 @@ function openModalCreateUser(args) {
                 if (data['projects']) {
                     for (d in data['projects']) {
                         var project = data['projects'][d];
-                        projects.push({id: project['_id'], text: project['name']})
+                        projects.push({ id: project['_id'], text: project['name'] })
                     }
                 }
 
@@ -50,10 +50,10 @@ function openModalEditUserCredentials(args) {
     $('#default_project_edit').val(null).trigger('change');
     $('#edit_password').val('');
     if (user_projects.length > 0) {
-            // Create a DOM Option and pre-select by default
-            var newOption = new Option(user_projects[0], user_projects[0], true, true);
-            // Append it to the select
-            $('#default_project_edit').append(newOption).trigger('change');
+        // Create a DOM Option and pre-select by default
+        var newOption = new Option(user_projects[0], user_projects[0], true, true);
+        // Append it to the select
+        $('#default_project_edit').append(newOption).trigger('change');
 
         for (var d in user_projects) {
             var project = user_projects[d];
@@ -89,49 +89,49 @@ function openModalEditUserRoleMap(user_id) {
             bootbox.alert("An error occurred.");
         }
     });
-    
+
 }
 
-function resetMapGroup(args){
+function resetMapGroup(args) {
     var $formGroup = $('#modal_edit_proj_role_map_body');
     $formGroup.empty();
-    $formGroup.append('<div class="proj-role-map-group-head">' + 
-       
-        '<button type="button" class="btn btn-success btn-add btn-sm">+</button>'+
+    $formGroup.append('<div class="proj-role-map-group-head">' +
+
+        '<button type="button" class="btn btn-success btn-add btn-sm">+</button>' +
         '</div></br>');
-    if(args['project_role_mappings'] && args['project_role_mappings'].length > 0) {
-        
-        for(i = 0; i < args['project_role_mappings'].length; ++i){
+    if (args['project_role_mappings'] && args['project_role_mappings'].length > 0) {
+
+        for (i = 0; i < args['project_role_mappings'].length; ++i) {
             var mapping = args['project_role_mappings'][i];
-            
-            $formGroup.append('<div class="proj-role-map-group"> <div class="form-group">' + 
-            '<label  class="col-sm-2">Project* </label><div class="col-sm-3">'+
-            '<input name="map_project_name" value="'+mapping.project_name+'" class="form-control input-sm" required></div>'+
-            '<label class="col-sm-2">Role* </label>'+
-            '<div class="col-sm-3">'+
-            '<input name="map_role_name" value="'+mapping.role_name+'" class="form-control input-sm" required>'+
-            '</div>'+
-            '<button type="button" class="btn btn-danger btn-remove btn-sm">-</button></div></div>');
+
+            $formGroup.append('<div class="proj-role-map-group"> <div class="form-group">' +
+                '<label  class="col-sm-2">Project* </label><div class="col-sm-3">' +
+                '<input name="map_project_name" value="' + mapping.project_name + '" class="form-control input-sm" required></div>' +
+                '<label class="col-sm-2">Role* </label>' +
+                '<div class="col-sm-3">' +
+                '<input name="map_role_name" value="' + mapping.role_name + '" class="form-control input-sm" required>' +
+                '</div>' +
+                '<button type="button" class="btn btn-danger btn-remove btn-sm">-</button></div></div>');
         }
-    } 
-    
-        
-    
-    
+    }
+
+
+
+
 }
 
 var addMapGroup = function (event) {
     event.preventDefault();
 
     var $formGroup = $('#modal_edit_proj_role_map_body');
-    $formGroup.append('<div class="proj-role-map-group"> <div class="form-group">' + 
-            '<label  class="col-sm-2">Project* </label><div class="col-sm-3">'+
-            '<input name="map_project_name" class="form-control input-sm" required></div>'+
-            '<label class="col-sm-2">Role* </label>'+
-            '<div class="col-sm-3">'+
-            '<input name="map_role_name" class="form-control input-sm" required>'+
-            '</div>'+
-            '<button type="button" class="btn btn-danger btn-remove btn-sm">-</button></div></div>');
+    $formGroup.append('<div class="proj-role-map-group"> <div class="form-group">' +
+        '<label  class="col-sm-2">Project* </label><div class="col-sm-3">' +
+        '<input name="map_project_name" class="form-control input-sm" required></div>' +
+        '<label class="col-sm-2">Role* </label>' +
+        '<div class="col-sm-3">' +
+        '<input name="map_role_name" class="form-control input-sm" required>' +
+        '</div>' +
+        '<button type="button" class="btn btn-danger btn-remove btn-sm">-</button></div></div>');
 
 };
 
@@ -160,7 +160,13 @@ function deleteUser(user_id, name) {
                 },
                 error: function (result) {
                     dialog.modal('hide');
-                    bootbox.alert("An error occurred.");
+                    var data = result.responseJSON;
+                    var title = "Error " + (data && data.code ? data.code : 'unknown');
+                    var message = data && data.detail ? data.detail : 'No detail available.';
+                    bootbox.alert({
+                        title: title,
+                        message: message
+                    });
                 }
             });
         }
@@ -169,33 +175,33 @@ function deleteUser(user_id, name) {
 }
 
 function validatePswOnCreate() {
-    
+
     var confirm_password = document.getElementById("password2");
-    if($("#password").val() == $("#password2").val()){
+    if ($("#password").val() == $("#password2").val()) {
         $("#pwmatch").removeClass("glyphicon-remove");
         $("#pwmatch").addClass("glyphicon-ok");
-        $("#pwmatch").css("color","#00A41E");
+        $("#pwmatch").css("color", "#00A41E");
         confirm_password.setCustomValidity("");
-    }else{
+    } else {
         $("#pwmatch").removeClass("glyphicon-ok");
         $("#pwmatch").addClass("glyphicon-remove");
-        $("#pwmatch").css("color","#FF0004");
+        $("#pwmatch").css("color", "#FF0004");
         confirm_password.setCustomValidity("Passwords Don't Match");
     }
 }
 
 function validatePswOnEdit() {
-    
+
     var confirm_password = document.getElementById("edit_password2");
-    if($("#edit_password").val() == $("#edit_password2").val()){
+    if ($("#edit_password").val() == $("#edit_password2").val()) {
         $("#pwmatch_edit").removeClass("glyphicon-remove");
         $("#pwmatch_edit").addClass("glyphicon-ok");
-        $("#pwmatch_edit").css("color","#00A41E");
+        $("#pwmatch_edit").css("color", "#00A41E");
         confirm_password.setCustomValidity("");
-    }else{
+    } else {
         $("#pwmatch_edit").removeClass("glyphicon-ok");
         $("#pwmatch_edit").addClass("glyphicon-remove");
-        $("#pwmatch_edit").css("color","#FF0004");
+        $("#pwmatch_edit").css("color", "#FF0004");
         confirm_password.setCustomValidity("Passwords Don't Match");
     }
 }
