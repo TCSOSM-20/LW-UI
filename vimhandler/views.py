@@ -49,34 +49,42 @@ def create(request):
     if request.method == 'GET':
         return __response_handler(request, result, 'vim_create.html')
     else:
-        new_vim_dict = request.POST.dict()
-        client = Client()
-        keys = ["schema_version",
-                "schema_type",
-                "name",
-                "vim_url",
-                "vim_type",
-                "vim_user",
-                "vim_password",
-                "vim_tenant_name",
-                "description"]
-        vim_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_vim_dict.items()))
-        vim_data['config'] = {}
-        for k, v in new_vim_dict.items():
-            if str(k).startswith('config_') and len(v) > 0:
-                config_key = k[7:]
-                vim_data['config'][config_key] = v
-        if 'additional_conf' in new_vim_dict:
-            try:
-                additional_conf_dict = yaml.safe_load(new_vim_dict['additional_conf'])
-                for k,v in additional_conf_dict.items():
-                    vim_data['config'][k] = v
-            except Exception as e:
-                # TODO return error on json.loads exception
-                print e
+        try:
+            new_vim_dict = request.POST.dict()
+            client = Client()
+            keys = ["schema_version",
+                    "schema_type",
+                    "name",
+                    "vim_url",
+                    "vim_type",
+                    "vim_user",
+                    "vim_password",
+                    "vim_tenant_name",
+                    "description"]
+            vim_data = dict(filter(lambda i: i[0] in keys and len(
+                i[1]) > 0, new_vim_dict.items()))
+            vim_data['config'] = {}
+
+            config_file = request.FILES.get('config_file')
+
+            if config_file is not None:
+                config = ''
+                for line in config_file:
+                    config = config + line.decode()
+                vim_data['config'] = yaml.load(config)
+            elif 'config' in request.POST and request.POST.get('config') != '':
+                vim_data['config'] = yaml.load(request.POST.get('config'))
+
+
+        except Exception as e:
+            return __response_handler(request, {'status': 400, 'code': 'BAD_REQUEST', 'detail': e.message}, url=None, status=400)
         result = client.vim_create(user.get_token(), vim_data)
-        # TODO  'vim:show', to_redirect=True, vim_id=vim_id
-        return __response_handler(request, result, 'vims:list', to_redirect=True, )
+
+        if result['error']:
+            return __response_handler(request, result['data'], url=None,
+                                      status=result['data']['status'] if 'status' in result['data'] else 500)
+        else:
+            return __response_handler(request, {}, url=None, status=200)
 
 
 @login_required
@@ -87,9 +95,9 @@ def delete(request, vim_id=None):
         del_res = client.vim_delete(user.get_token(), vim_id)
     except Exception as e:
         log.exception(e)
-    return __response_handler(request, del_res, 'vims:list', to_redirect=True, )
+    return __response_handler(request, del_res, 'vims:list', to_redirect=True)
 
-   
+
 @login_required
 def show(request, vim_id=None):
     user = osmutils.get_user(request)

@@ -1,0 +1,108 @@
+<!--
+Copyright 2019 EveryUP Srl
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an  BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div class="modal" id="modal_new_vim" xmlns="http://www.w3.org/1999/html">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">New VIM</h4>
+            </div>
+            <form id="formCreateVIM" action='{% url "vims:create" %}'
+                  class="form-horizontal"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" id="modal_new_vim_body">
+                    <div class="form-group">
+                        <label for="vim_name" class="col-sm-2">Name *</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="vim_name" name="name" placeholder="Name" required>
+                        </div>
+
+                        <label for="vim_type" class="col-sm-2">Type *</label>
+                        <div class="col-sm-3">
+                            <select id="vim_type" name="vim_type" class="form-control">
+                                <option value="openvim">OpenVIM</option>
+                                <option value="openstack">Openstack</option>
+                                <option value="vmware">VMware vCD</option>
+                                <option value="aws">AWS</option>
+                                <option value="opennebula">OpenNebula</option>
+                            </select>
+                        </div>
+                    </div> 
+
+                    <div class="form-group">
+                        <label for="vim_url" class="col-sm-2">URL*</label>
+                        <div class="col-sm-3">
+                            <input type="url" class="form-control" id="vim_url" name="vim_url"
+                                           placeholder="VIM URL" required>
+                        </div>
+                        <label for="vim_tenant_name" class="col-sm-2">Tenant name*</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="vim_tenant_name" name="vim_tenant_name"
+                                            placeholder="Tenant name" required>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vim_user" class="col-sm-2">Username*</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="vim_user" name="vim_user"
+                                            placeholder="VIM Username" required>
+                        </div>
+                        <label for="vim_password" class="col-sm-2">Password*</label>
+                        <div class="col-sm-3">
+                            <input type="password" class="form-control" id="vim_password"
+                                       name="vim_password" placeholder="VIM Password" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <label for="vim_description" class="col-sm-2">Description</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="vim_description" name="description"
+                                        placeholder="Description" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="config" class="col-sm-3 control-label">Config </label>
+                        <div class="col-sm-6">
+                            <textarea class="form-control" id="config" name="config" placeholder="Yaml config"
+                                      rows="3"></textarea>
+                            <p class="help-block">Or load from file</p>
+                            <input type="file" id="config_file" name="config_file">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary"
+                            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Creating..."
+                            id="create_new_vim">Create
+                    </button>
+
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+

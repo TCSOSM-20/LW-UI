@@ -38,6 +38,7 @@ def list(request):
     result["datacenters"] = result_client['data'] if result_client and result_client['error'] is False else []
     return __response_handler(request, result, 'wim_list.html')
 
+
 @login_required
 def create(request):
     user = osmutils.get_user(request)
@@ -67,7 +68,7 @@ def create(request):
         if 'additional_conf' in new_wim_dict:
             try:
                 additional_conf_dict = yaml.safe_load(new_wim_dict['additional_conf'])
-                for k,v in additional_conf_dict.items():
+                for k, v in additional_conf_dict.items():
                     wim_data['config'][k] = v
             except Exception as e:
                 # TODO return error on json.loads exception
