@@ -43,7 +43,7 @@ def create_new_project(request):
         user = osmutils.get_user(request)
         client = Client()
         new_project_dict = request.POST.dict()
-        keys = ["name"]
+        keys = ["name", "domain_name"]
         project_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_project_dict.items()))
         result = client.project_create(user.get_token(), project_data)
         if isinstance(result, dict) and 'error' in result and result['error']:
@@ -61,6 +61,25 @@ def user_projects(request):
     return __response_handler(request, {
         'projects': result['data'] if result and result['error'] is False else [],
     },'projectlist.html')
+
+
+@login_required
+def user_domains(request):
+    user = osmutils.get_user(request)
+    client = Client()
+    result = client.get_domains(user.get_token())
+    if result and result['error'] is False:
+        domains = []
+        if result['data'] and result['data']['user_domain_name']:
+            domain_names = result['data']['user_domain_name'].split(',')
+            domains.extend(x for x in domain_names if x not in domains)
+        if result['data'] and result['data']['project_domain_name']:
+            domain_names = result['data']['project_domain_name'].split(',')
+            domains.extend(x for x in domain_names if x not in domains)
+
+        return __response_handler(request, {'domains': domains})
+    return __response_handler(request, {'domains': []})
+
 
 @login_required
 def open_project(request):

@@ -20,6 +20,7 @@ from projecthandler import views
 urlpatterns = [
     url(r'^$', views.open_project, name='open_project'),
     url(r'^list/', views.user_projects, name='projects_list'),
+    url(r'^domains/', views.user_domains, name='domains_list'),
     url(r'^new/', views.create_new_project, name='new_project'),
     url(r'^descriptors/', include('descriptorhandler.urls', namespace='descriptors'), name='descriptor_base'),
     url(r'^(?P<project_id>[-\w]+)/delete$', views.delete_project, name='delete_project'),

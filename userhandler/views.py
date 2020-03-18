@@ -32,11 +32,10 @@ def user_list(request):
     client = Client()
     result = client.user_list(user.get_token())
 
-    users = result['data'] if result and result['error'] is False else []    
     result = {
         'users': result['data'] if result and result['error'] is False else []
     }
-    
+
     return __response_handler(request, result, 'user_list.html')
 
 
@@ -44,11 +43,12 @@ def user_list(request):
 def create(request):
     user = osmutils.get_user(request)
     client = Client()
-    user_data ={
+    user_data = {
         "username": request.POST['username'],
-        "password": request.POST['password']
+        "password": request.POST['password'],
+        "domain_name": request.POST['domain_name']
     }
-    
+
     result = client.user_create(user.get_token(), user_data)
     if result['error']:
         return __response_handler(request, result['data'], url=None,
@@ -72,12 +72,13 @@ def delete(request, user_id=None):
     else:
         return __response_handler(request, {}, url=None, status=200)
 
+
 @login_required
 def user_info(request, user_id=None):
     user = osmutils.get_user(request)
     try:
         client = Client()
-        
+
         info_res = client.get_user_info(user.get_token(), user_id)
     except Exception as e:
         log.exception(e)
@@ -87,6 +88,7 @@ def user_info(request, user_id=None):
                                   status=info_res['data']['status'] if 'status' in info_res['data'] else 500)
     else:
         return __response_handler(request, info_res['data'], url=None, status=200)
+
 
 @login_required
 def update(request, user_id=None):
@@ -107,7 +109,7 @@ def update(request, user_id=None):
                     'project': project,
                     'role': role_param_ip[i],
                 })
-        
+
         update_res = client.user_update(user.get_token(), user_id, payload)
     except Exception as e:
         log.exception(e)

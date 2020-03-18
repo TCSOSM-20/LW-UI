@@ -20,8 +20,9 @@ limitations under the License.
 {% load staticfiles %}
 
 {% block head_block %}
-  	{{ block.super }}
-    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs/css/dataTables.bootstrap.min.css">
+      {{ block.super }}
+        <link rel="stylesheet" href="/static/node_modules/select2/dist/css/select2.min.css">
+        <link rel="stylesheet" href="/static/node_modules/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
 {% endblock %}
 {% block title_header_big %}
@@ -54,7 +55,7 @@ limitations under the License.
             <div class="box-tools">
                 <button type="button" class="btn btn-default" data-container="body"
                                         data-toggle="tooltip" data-placement="top" title="New Project"
-                                        onclick="javascript:showModalNewProject()">
+                                        onclick="javascript:showModalNewProject({'domains_list_url': '{% url "projects:domains_list" %}'})">
                                     <i class="fa fa-plus"></i> New Project</button>
             </div>
         </div>
@@ -85,6 +86,7 @@ limitations under the License.
   	{{ block.super }}
     <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="/static/node_modules/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/node_modules/select2/dist/js/select2.js"></script>
 
     <script>
         var table;
@@ -157,7 +159,31 @@ limitations under the License.
     });
     </script>
     <script>
-    function showModalNewProject(){
+    function showModalNewProject(args){
+        select2_groups = $('#domain_name').select2({
+            placeholder: 'Select Domain',
+            width: '100%',
+            ajax: {
+                url: args.domains_list_url,
+                dataType: 'json',
+                processResults: function (data) {
+                    domains_list = [];
+                    if (data['domains']) {
+                        for (d in data['domains']) {
+                            var domain = data['domains'][d];
+                            if( domain.endsWith(':ro') === false) {
+                                domains_list.push({ id: domain, text: domain })
+                            }
+                            
+                        }
+                    }
+
+                    return {
+                        results: domains_list
+                    };
+                }
+            }
+        });
         $('#modal_new_project').modal('show');
     }
 

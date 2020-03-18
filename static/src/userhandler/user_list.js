@@ -38,6 +38,32 @@ function openModalCreateUser(args) {
         }
     });
 
+    select2_groups = $('#domain_name').select2({
+        placeholder: 'Select Domain',
+        width: '100%',
+        ajax: {
+            url: args.domains_list_url,
+            dataType: 'json',
+            processResults: function (data) {
+                domains_list = [];
+
+                if (data['domains']) {
+                    for (d in data['domains']) {
+                        var domain = data['domains'][d];
+                        if( domain.endsWith(':ro') === false) {
+                            domains_list.push({ id: domain, text: domain })
+                        }
+                        
+                    }
+                }
+
+                return {
+                    results: domains_list
+                };
+            }
+        }
+    });
+
     $('#modal_new_user').modal('show');
 }
 
@@ -154,7 +180,6 @@ function deleteUser(user_id, name) {
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (result) {
-                    //$('#modal_show_vim_body').empty();
                     dialog.modal('hide');
                     table.ajax.reload();
                 },

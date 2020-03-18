@@ -38,14 +38,17 @@ class Client(object):
         self._user_endpoint = 'admin/v1/users'
         self._host = os.getenv('OSM_SERVER', "localhost")
         self._so_port = 9999
-        self._base_path = 'https://{0}:{1}/osm'.format(self._host, self._so_port)
+        self._base_path = 'https://{0}:{1}/osm'.format(
+            self._host, self._so_port)
 
     def auth(self, args):
         result = {'error': True, 'data': ''}
         token_url = "{0}/{1}".format(self._base_path, self._token_endpoint)
-        headers = {"Content-Type": "application/yaml", "accept": "application/json"}
+        headers = {"Content-Type": "application/yaml",
+                   "accept": "application/json"}
         try:
-            r = requests.post(token_url, json=args, verify=False, headers=headers)
+            r = requests.post(token_url, json=args,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -60,9 +63,11 @@ class Client(object):
     def switch_project(self, args):
         result = {'error': True, 'data': ''}
         token_url = "{0}/{1}".format(self._base_path, self._token_endpoint)
-        headers = {"Content-Type": "application/yaml", "accept": "application/json"}
+        headers = {"Content-Type": "application/yaml",
+                   "accept": "application/json"}
         try:
-            r = requests.post(token_url, json=args, verify=False, headers=headers)
+            r = requests.post(token_url, json=args,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -81,7 +86,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/roles".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -99,7 +105,8 @@ class Client(object):
         _url = "{0}/admin/v1/roles".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=role_data, verify=False, headers=headers)
+            r = requests.post(_url, json=role_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -115,7 +122,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/roles/{1}".format(self._base_path, role_id)
         try:
-            r = requests.patch(_url, json=role_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=role_data,
+                               verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -125,7 +133,7 @@ class Client(object):
         else:
             result['data'] = Util.json_loads_byteified(r.text)
         return result
-    
+
     def role_delete(self, token, id, force=None):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
@@ -133,9 +141,11 @@ class Client(object):
         query_path = ''
         if force:
             query_path = '?FORCE=true'
-        _url = "{0}/admin/v1/roles/{1}{2}".format(self._base_path, id, query_path)
+        _url = "{0}/admin/v1/roles/{1}{2}".format(
+            self._base_path, id, query_path)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -150,7 +160,7 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        
+
         _url = "{0}/admin/v1/roles/{1}".format(self._base_path, id)
         try:
             r = requests.get(_url, params=None, verify=False, headers=headers)
@@ -170,7 +180,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/users".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -189,7 +200,8 @@ class Client(object):
         _url = "{0}/admin/v1/users".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=user_data, verify=False, headers=headers)
+            r = requests.post(_url, json=user_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -206,7 +218,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
         try:
-            r = requests.patch(_url, json=user_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=user_data,
+                               verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -224,7 +237,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -241,7 +255,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/users/{1}".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -251,16 +266,36 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def get_domains(self, token):
+        result = {'error': False, 'data': ''}
+        headers = {"accept": "application/json", 'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/domains".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     def get_projects(self, token, uuids):
         result = {'error': False, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        
+
         projects = []
         try:
             for uuid in uuids:
-                _url = "{0}/admin/v1/projects/{1}".format(self._base_path, uuid)
-                r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+                _url = "{0}/admin/v1/projects/{1}".format(
+                    self._base_path, uuid)
+                r = requests.get(_url, params=None, verify=False,
+                                 stream=True, headers=headers)
                 if r.status_code not in (200, 201, 202, 204):
                     raise Exception()
                 projects.append(Util.json_loads_byteified(r.text))
@@ -279,7 +314,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/projects".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -296,7 +332,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/projects/{1}".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -315,7 +352,8 @@ class Client(object):
         _url = "{0}/admin/v1/projects".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=project_data, verify=False, headers=headers)
+            r = requests.post(_url, json=project_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -334,7 +372,8 @@ class Client(object):
         _url = "{0}/admin/v1/projects/{1}".format(self._base_path, id)
 
         try:
-            r = requests.patch(_url, json=project_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=project_data,
+                               verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -350,7 +389,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/projects/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -365,9 +405,10 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nst/v1/netslice_templates/{1}".format(self._base_path,id)
+        _url = "{0}/nst/v1/netslice_templates/{1}".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -382,16 +423,18 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "text/plain",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nst/v1/netslice_templates/{1}/nst".format(self._base_path,id)
+        _url = "{0}/nst/v1/netslice_templates/{1}/nst".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
             return result
         if r.status_code in (200, 201, 202, 204):
             result['error'] = False
-        result['data']  = Util.json2yaml(yaml.load(str(r.text)))
+        result['data'] = Util.json2yaml(yaml.load(str(r.text)))
 
         return result
 
@@ -399,10 +442,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        
+
         _url = "{0}/nst/v1/netslice_templates".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -420,9 +464,11 @@ class Client(object):
         query_path = ''
         if filter:
             query_path = '?_admin.type='+filter
-        _url = "{0}/nsd/v1/ns_descriptors_content{1}".format(self._base_path, query_path)
+        _url = "{0}/nsd/v1/ns_descriptors_content{1}".format(
+            self._base_path, query_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -440,9 +486,11 @@ class Client(object):
         query_path = ''
         if filter:
             query_path = '?_admin.type='+filter
-        _url = "{0}/vnfpkgm/v1/vnf_packages_content{1}".format(self._base_path, query_path)
+        _url = "{0}/vnfpkgm/v1/vnf_packages_content{1}".format(
+            self._base_path, query_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -459,7 +507,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/nsilcm/v1/netslice_instances".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -469,14 +518,15 @@ class Client(object):
         result['data'] = Util.json_loads_byteified(r.text)
 
         return result
-    
+
     def ns_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/nslcm/v1/ns_instances_content".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -493,7 +543,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/nslcm/v1/vnfrs".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -510,7 +561,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/pdu/v1/pdu_descriptors".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -526,16 +578,18 @@ class Client(object):
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/nst/v1/netslice_templates/{1}?FORCE=True".format(self._base_path, id)
+        _url = "{0}/nst/v1/netslice_templates/{1}?FORCE=True".format(
+            self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
             return result
         if r.status_code in (200, 201, 202, 204):
             result['error'] = False
-        
+
         return result
 
     def nsd_delete(self, token, id):
@@ -543,9 +597,11 @@ class Client(object):
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/nsd/v1/ns_descriptors_content/{1}".format(self._base_path, id)
+        _url = "{0}/nsd/v1/ns_descriptors_content/{1}".format(
+            self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -561,9 +617,11 @@ class Client(object):
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(self._base_path, id)
+        _url = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(
+            self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -585,7 +643,8 @@ class Client(object):
                 headers["Content-Type"] = "application/gzip"
             else:
                 headers["Content-Type"] = "application/yaml"
-            r = requests.post(_url, data=template, verify=False, headers=headers)
+            r = requests.post(_url, data=template,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -602,10 +661,12 @@ class Client(object):
         with open('/tmp/' + package.name, 'wb+') as destination:
             for chunk in package.chunks():
                 destination.write(chunk)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + package.name, 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + package.name, 'rb'))
         _url = "{0}/nsd/v1/ns_descriptors_content/".format(self._base_path)
         try:
-            r = requests.post(_url, data=open('/tmp/' + package.name, 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open(
+                '/tmp/' + package.name, 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -622,10 +683,12 @@ class Client(object):
         with open('/tmp/' + package.name, 'wb+') as destination:
             for chunk in package.chunks():
                 destination.write(chunk)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + package.name, 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + package.name, 'rb'))
         _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
         try:
-            r = requests.post(_url, data=open('/tmp/' + package.name, 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open(
+                '/tmp/' + package.name, 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -645,7 +708,8 @@ class Client(object):
         try:
             self._create_base_pkg('nsd', pkg_name)
             headers['Content-Filename'] = pkg_name + '.tar.gz'
-            r = requests.post(_url, data=open('/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open(
+                '/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -666,7 +730,8 @@ class Client(object):
 
         try:
             self._create_base_pkg('vnfd', pkg_name)
-            r = requests.post(_url, data=open('/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
+            r = requests.post(_url, data=open(
+                '/tmp/' + pkg_name + '.tar.gz', 'rb'), verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -687,7 +752,8 @@ class Client(object):
         tar_pkg = self.get_nsd_pkg(token, id)
         tarf = tarfile.open(fileobj=tar_pkg)
         tarf = self._descriptor_clone(tarf, 'nsd')
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
 
         _url = "{0}/nsd/v1/ns_descriptors_content/".format(self._base_path)
 
@@ -715,7 +781,8 @@ class Client(object):
         tarf = tarfile.open(fileobj=tar_pkg)
 
         tarf = self._descriptor_clone(tarf, 'vnfd')
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", 'rb'))
 
         _url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self._base_path)
 
@@ -737,9 +804,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nst/v1/netslice_templates/{1}/nst_content".format(self._base_path,id)
+        _url = "{0}/nst/v1/netslice_templates/{1}/nst_content".format(
+            self._base_path, id)
         try:
-            r = requests.put(_url, data=template, verify=False, headers=headers)
+            r = requests.put(_url, data=template,
+                             verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -758,9 +827,11 @@ class Client(object):
         tarf = tarfile.open(fileobj=tar_pkg)
 
         tarf = self._descriptor_update(tarf, data)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'))
 
-        _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(self._base_path, id)
+        _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(
+            self._base_path, id)
 
         try:
             r = requests.put(_url, data=open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'), verify=False,
@@ -789,9 +860,11 @@ class Client(object):
         tarf = tarfile.open(fileobj=tar_pkg)
 
         tarf = self._descriptor_update(tarf, data)
-        headers['Content-File-MD5'] = self.md5(open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'))
+        headers['Content-File-MD5'] = self.md5(
+            open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'))
 
-        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(self._base_path, id)
+        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(
+            self._base_path, id)
 
         try:
             r = requests.put(_url, data=open('/tmp/' + tarf.getnames()[0] + ".tar.gz", 'rb'), verify=False,
@@ -815,9 +888,11 @@ class Client(object):
         headers = {"accept": "application/zip",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(self._base_path, id)
+        _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -832,9 +907,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"accept": "application/zip",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(self._base_path, id)
+        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -847,7 +924,7 @@ class Client(object):
 
     def _descriptor_update(self, tarf, data):
         # extract the package on a tmp directory
-        tarf.extractall('/tmp') 
+        tarf.extractall('/tmp')
         regex = re.compile(r"^[^/]+(/[^/]+\.(yaml|yml))$", re.U)
         for name in tarf.getnames():
             if regex.match(name):
@@ -855,10 +932,12 @@ class Client(object):
                     yaml.safe_dump(data, outfile, default_flow_style=False)
                 break
 
-        tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + ".tar.gz", "w:gz")
+        tarf_temp = tarfile.open(
+            '/tmp/' + tarf.getnames()[0] + ".tar.gz", "w:gz")
 
         for tarinfo in tarf:
-            tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
+            tarf_temp.add('/tmp/' + tarinfo.name,
+                          tarinfo.name, recursive=False)
         tarf_temp.close()
         return tarf
 
@@ -914,7 +993,8 @@ class Client(object):
             yaml_file.write(yaml.dump(descriptor, default_flow_style=False))
 
         tarf_temp = tarfile.open('/tmp/' + pkg_name + '.tar.gz', "w:gz")
-        tarf_temp.add('/tmp/'+pkg_name+'/' + pkg_name + '.yaml', pkg_name + '/' + pkg_name + '.yaml', recursive=False)
+        tarf_temp.add('/tmp/'+pkg_name+'/' + pkg_name + '.yaml',
+                      pkg_name + '/' + pkg_name + '.yaml', recursive=False)
         tarf_temp.close()
 
     def _descriptor_clone(self, tarf, descriptor_type):
@@ -940,13 +1020,16 @@ class Client(object):
                             vnfd['short-name'] = 'clone_' + vnfd['short-name']
 
                     with open('/tmp/' + name, 'w') as yaml_file:
-                        yaml_file.write(yaml.dump(yaml_object, default_flow_style=False))
+                        yaml_file.write(
+                            yaml.dump(yaml_object, default_flow_style=False))
                 break
 
-        tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", "w:gz")
+        tarf_temp = tarfile.open(
+            '/tmp/' + tarf.getnames()[0] + "_clone.tar.gz", "w:gz")
 
         for tarinfo in tarf:
-            tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
+            tarf_temp.add('/tmp/' + tarinfo.name,
+                          tarinfo.name, recursive=False)
         tarf_temp.close()
         return tarf
 
@@ -956,7 +1039,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/nsd/v1/ns_descriptors/{1}/nsd".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -975,9 +1059,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {'Content-Type': 'application/yaml',
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(self._base_path, id)
+        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -996,9 +1082,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {'Content-Type': 'application/yaml', 'accept': 'text/plain',
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nsd/v1/ns_descriptors/{1}/artifacts".format(self._base_path, id)
+        _url = "{0}/nsd/v1/ns_descriptors/{1}/artifacts".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1018,9 +1106,11 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {'Content-Type': 'application/yaml', 'accept': 'text/plain',
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/artifacts".format(self._base_path, id)
+        _url = "{0}/vnfpkgm/v1/vnf_packages/{1}/artifacts".format(
+            self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1041,10 +1131,12 @@ class Client(object):
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/nsilcm/v1/netslice_instances_content".format(self._base_path)
+        _url = "{0}/nsilcm/v1/netslice_instances_content".format(
+            self._base_path)
 
         try:
-            r = requests.post(_url, json=nsi_data, verify=False, headers=headers)
+            r = requests.post(_url, json=nsi_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1062,7 +1154,8 @@ class Client(object):
         _url = "{0}/nslcm/v1/ns_instances_content".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=ns_data, verify=False, headers=headers)
+            r = requests.post(_url, json=ns_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1080,7 +1173,8 @@ class Client(object):
         _url = "{0}/pdu/v1/pdu_descriptors".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=pdu_data, verify=False, headers=headers)
+            r = requests.post(_url, json=pdu_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1094,10 +1188,12 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nslcm/v1/ns_lcm_op_occs/?nsInstanceId={1}".format(self._base_path, id)
+        _url = "{0}/nslcm/v1/ns_lcm_op_occs/?nsInstanceId={1}".format(
+            self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1112,10 +1208,12 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nsilcm/v1/nsi_lcm_op_occs/?netsliceInstanceId={1}".format(self._base_path, id)
+        _url = "{0}/nsilcm/v1/nsi_lcm_op_occs/?netsliceInstanceId={1}".format(
+            self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1133,7 +1231,8 @@ class Client(object):
         _url = "{0}/nslcm/v1/ns_lcm_op_occs/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1149,10 +1248,12 @@ class Client(object):
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
 
-        _url = "{0}/nslcm/v1/ns_instances/{1}/action".format(self._base_path, id)
+        _url = "{0}/nslcm/v1/ns_instances/{1}/action".format(
+            self._base_path, id)
 
         try:
-            r = requests.post(_url, json=action_payload, verify=False, headers=headers)
+            r = requests.post(_url, json=action_payload,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1169,9 +1270,11 @@ class Client(object):
         query_path = ''
         if force:
             query_path = '?FORCE=true'
-        _url = "{0}/nsilcm/v1/netslice_instances_content/{1}{2}".format(self._base_path, id, query_path)
+        _url = "{0}/nsilcm/v1/netslice_instances_content/{1}{2}".format(
+            self._base_path, id, query_path)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1189,9 +1292,11 @@ class Client(object):
         query_path = ''
         if force:
             query_path = '?FORCE=true'
-        _url = "{0}/nslcm/v1/ns_instances_content/{1}{2}".format(self._base_path, id, query_path)
+        _url = "{0}/nslcm/v1/ns_instances_content/{1}{2}".format(
+            self._base_path, id, query_path)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1208,7 +1313,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/pdu/v1/pdu_descriptors/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1223,10 +1329,12 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nsilcm/v1/netslice_instances/{1}".format(self._base_path, id)
+        _url = "{0}/nsilcm/v1/netslice_instances/{1}".format(
+            self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1240,10 +1348,12 @@ class Client(object):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", "accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
-        _url = "{0}/nslcm/v1/ns_instances_content/{1}".format(self._base_path, id)
+        _url = "{0}/nslcm/v1/ns_instances_content/{1}".format(
+            self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1260,7 +1370,8 @@ class Client(object):
         _url = "{0}/nslcm/v1/vnfrs/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1277,7 +1388,8 @@ class Client(object):
         _url = "{0}/pdu/v1/pdu_descriptors/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1293,7 +1405,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/test/message/alarm_request".format(self._base_path)
         try:
-            r = requests.post(_url, json=alarm_payload, verify=False, headers=headers)
+            r = requests.post(_url, json=alarm_payload,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1310,7 +1423,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/test/message/metric_request".format(self._base_path)
         try:
-            r = requests.post(_url, json=metric_payload, verify=False, headers=headers)
+            r = requests.post(_url, json=metric_payload,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1327,7 +1441,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/wim_accounts".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1344,7 +1459,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/vims".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1361,7 +1477,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/wim_accounts/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1378,7 +1495,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/vims/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1397,7 +1515,8 @@ class Client(object):
         _url = "{0}/admin/v1/wim_accounts/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1415,7 +1534,8 @@ class Client(object):
         _url = "{0}/admin/v1/vims/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1433,7 +1553,8 @@ class Client(object):
         _url = "{0}/admin/v1/wim_accounts".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=wim_data, verify=False, headers=headers)
+            r = requests.post(_url, json=wim_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1452,7 +1573,8 @@ class Client(object):
         _url = "{0}/admin/v1/vims".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=vim_data, verify=False, headers=headers)
+            r = requests.post(_url, json=vim_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1468,7 +1590,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/sdns".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1484,7 +1607,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/sdns/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1502,7 +1626,8 @@ class Client(object):
         _url = "{0}/admin/v1/sdns/{1}".format(self._base_path, id)
 
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1520,7 +1645,8 @@ class Client(object):
         _url = "{0}/admin/v1/sdns".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=sdn_data, verify=False, headers=headers)
+            r = requests.post(_url, json=sdn_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1536,7 +1662,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/k8sclusters/{1}".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1545,14 +1672,15 @@ class Client(object):
             result['error'] = False
         result['data'] = Util.json_loads_byteified(r.text)
         return result
-    
+
     def k8sc_list(self, token):
         result = {'error': True, 'data': ''}
         headers = {"accept": "application/json",
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/k8sclusters".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1570,7 +1698,8 @@ class Client(object):
         _url = "{0}/admin/v1/k8sclusters".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=cluster_data, verify=False, headers=headers)
+            r = requests.post(_url, json=cluster_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1587,7 +1716,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/k8sclusters/{1}".format(self._base_path, id)
         try:
-            r = requests.patch(_url, json=cluster_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=cluster_data,
+                               verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1605,7 +1735,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/k8sclusters/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1622,7 +1753,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/k8srepos/{1}".format(self._base_path, id)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1638,7 +1770,8 @@ class Client(object):
                    'Authorization': 'Bearer {}'.format(token['id'])}
         _url = "{0}/admin/v1/k8srepos".format(self._base_path)
         try:
-            r = requests.get(_url, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1656,7 +1789,8 @@ class Client(object):
         _url = "{0}/admin/v1/k8srepos".format(self._base_path)
 
         try:
-            r = requests.post(_url, json=cluster_data, verify=False, headers=headers)
+            r = requests.post(_url, json=cluster_data,
+                              verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1673,7 +1807,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/k8srepos/{1}".format(self._base_path, id)
         try:
-            r = requests.patch(_url, json=cluster_data, verify=False, headers=headers)
+            r = requests.patch(_url, json=cluster_data,
+                               verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
@@ -1691,7 +1826,8 @@ class Client(object):
 
         _url = "{0}/admin/v1/k8srepos/{1}".format(self._base_path, id)
         try:
-            r = requests.delete(_url, params=None, verify=False, headers=headers)
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
         except Exception as e:
             log.exception(e)
             result['data'] = str(e)
