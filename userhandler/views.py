@@ -43,12 +43,10 @@ def user_list(request):
 def create(request):
     user = osmutils.get_user(request)
     client = Client()
-    user_data = {
-        "username": request.POST['username'],
-        "password": request.POST['password'],
-        "domain_name": request.POST['domain_name']
-    }
 
+    new_user_dict = request.POST.dict()
+    keys = ["username", "password", "domain_name"]
+    user_data = dict(filter(lambda i: i[0] in keys and len(i[1]) > 0, new_user_dict.items()))
     result = client.user_create(user.get_token(), user_data)
     if result['error']:
         return __response_handler(request, result['data'], url=None,

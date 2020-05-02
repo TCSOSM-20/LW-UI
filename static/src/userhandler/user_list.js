@@ -16,55 +16,72 @@
 
 function openModalCreateUser(args) {
 
-    select2_groups = $('#projects').select2({
-        placeholder: 'Select Projects',
-        width: '100%',
-        ajax: {
-            url: args.projects_list_url,
-            dataType: 'json',
-            processResults: function (data) {
-                projects = [];
-                if (data['projects']) {
-                    for (d in data['projects']) {
-                        var project = data['projects'][d];
-                        projects.push({ id: project['_id'], text: project['name'] })
-                    }
-                }
-
-                return {
-                    results: projects
-                };
-            }
-        }
+    var dialog = bootbox.dialog({
+        message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i> Loading...</div>',
+        closeButton: false
     });
+    $.ajax({
+        url: args.domains_list_url,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (result_domain) {
+            domains_list = [];
+            $('#domain_name').prop('disabled', false).trigger('change');
+            if (result_domain['domains']) {
+                for (d in result_domain['domains']) {
+                    var domain = result_domain['domains'][d];
+                    if (domain.endsWith(':ro') === false) {
+                        domains_list.push({ id: domain, text: domain })
+                    }
 
-    select2_groups = $('#domain_name').select2({
-        placeholder: 'Select Domain',
-        width: '100%',
-        ajax: {
-            url: args.domains_list_url,
-            dataType: 'json',
-            processResults: function (data) {
-                domains_list = [];
-
-                if (data['domains']) {
-                    for (d in data['domains']) {
-                        var domain = data['domains'][d];
-                        if( domain.endsWith(':ro') === false) {
-                            domains_list.push({ id: domain, text: domain })
+                }
+            }
+            if (domains_list.length == 0) {
+                $('#domainNameGroupDiv').remove();
+            }
+            dialog.modal('hide');
+            select2_groups = $('#projects').select2({
+                placeholder: 'Select Projects',
+                width: '100%',
+                ajax: {
+                    url: args.projects_list_url,
+                    dataType: 'json',
+                    processResults: function (data) {
+                        projects = [];
+                        if (data['projects']) {
+                            for (d in data['projects']) {
+                                var project = data['projects'][d];
+                                projects.push({ id: project['_id'], text: project['name'] })
+                            }
                         }
-                        
+
+                        return {
+                            results: projects
+                        };
                     }
                 }
+            });
+            select2_groups = $('#domain_name').select2({
+                placeholder: 'Select Domain',
+                width: '100%',
+                "language": {
+                    "noResults": function () {
+                        return "No domains in the platform";
+                    }
+                },
+                data: domains_list
+            });
 
-                return {
-                    results: domains_list
-                };
-            }
+            $('#modal_new_user').modal('show');
+
+        },
+        error: function (result) {
+            dialog.modal('hide');
+            bootbox.alert("An error occurred.");
         }
     });
 
-    $('#modal_new_user').modal('show');
+
 }
 
 function openModalEditUserCredentials(args) {
