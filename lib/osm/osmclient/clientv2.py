@@ -1838,6 +1838,97 @@ class Client(object):
             result['data'] = Util.json_loads_byteified(r.text)
         return result
 
+    def osmr_get(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/osmrepos/{1}".format(self._base_path, id)
+        try:
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def osmr_list(self, token):
+        result = {'error': True, 'data': ''}
+        headers = {"accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+        _url = "{0}/admin/v1/osmrepos".format(self._base_path)
+        try:
+            r = requests.get(_url, params=None, verify=False,
+                             stream=True, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def osmr_create(self, token, cluster_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/osmrepos".format(self._base_path)
+
+        try:
+            r = requests.post(_url, json=cluster_data,
+                              verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def osmr_update(self, token, id, cluster_data):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/osmrepos/{1}".format(self._base_path, id)
+        try:
+            r = requests.patch(_url, json=cluster_data,
+                               verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
+    def osmr_delete(self, token, id):
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                   'Authorization': 'Bearer {}'.format(token['id'])}
+
+        _url = "{0}/admin/v1/osmrepos/{1}".format(self._base_path, id)
+        try:
+            r = requests.delete(_url, params=None,
+                                verify=False, headers=headers)
+        except Exception as e:
+            log.exception(e)
+            result['data'] = str(e)
+            return result
+        if r.status_code in (200, 201, 202, 204):
+            result['error'] = False
+        else:
+            result['data'] = Util.json_loads_byteified(r.text)
+        return result
+
     @staticmethod
     def md5(f):
         hash_md5 = hashlib.md5()
