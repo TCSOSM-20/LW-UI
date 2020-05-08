@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^vims/', include('vimhandler.urls', namespace='vims'), name='vims_base'),
     url(r'^k8scluster/', include('k8sclusterhandler.urls', namespace='k8sc'), name='k8sc_base'),
     url(r'^k8srepo/', include('k8srepohandler.urls', namespace='k8sr'), name='k8sr_base'),
+    url(r'^osmrepo/', include('osmrepohandler.urls', namespace='osmr'), name='osmr_base'),
     url(r'^wims/', include('wimhandler.urls', namespace='wims'), name='wims_base'),
     url(r'^packages/', include('packagehandler.urls', namespace='packages'), name='packages_base'),
     url(r'^instances/', include('instancehandler.urls', namespace='instances'), name='instances_base'),

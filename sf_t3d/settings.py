@@ -66,7 +66,8 @@ INSTALLED_APPS = [
     'rolehandler',
     'netslicehandler',
     'k8sclusterhandler',
-    'k8srepohandler'
+    'k8srepohandler',
+    'osmrepohandler'
 
 ]
 
@@ -109,6 +110,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'netslicehandler', 'template'),
             os.path.join(BASE_DIR, 'k8sclusterhandler', 'template'),
             os.path.join(BASE_DIR, 'k8srepohandler', 'template'),
+            os.path.join(BASE_DIR, 'osmrepohandler', 'template'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
