@@ -137,12 +137,12 @@ limitations under the License.
                         </li>
                 </ul>
             </li>
-            {% url "osm:list"   as  osmrepo_list_url %}
+<!--             {% url "osm:list"   as  osmrepo_list_url %}
             <li {% if request.get_full_path == osmrepo_list_url %} class="active" {% endif %} >
                 <a href='{% url "osmr:list"   %}'>
                     <i class="fa fa-folder fa-fw"></i><span>OSM Repositories</span>
                 </a>
-            </li>
+            </li> -->
             {% url "wims:list"   as  wim_list_url %}
             <li {% if request.get_full_path == wim_list_url %} class="active" {% endif %}>
                 <a href='{% url "wims:list"   %}'>
